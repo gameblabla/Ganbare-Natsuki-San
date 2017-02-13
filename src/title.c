@@ -150,9 +150,9 @@ void title_keys( void )
 #elif defined(DREAMCAST)
 	sprintf(path_work, "/ram/work.sav");
 	sprintf(path_item, "/ram/item_wk.sav");
-#elif defined(NSPIRE)
-	sprintf(path_work, "save/work.sav");
-	sprintf(path_item, "save/item_wk.sav");
+#elif defined(_TINSPIRE)
+	sprintf(path_work, "./save/work.sav.tns");
+	sprintf(path_item, "./save/item_wk.sav.tns");
 #else
 	sprintf(path_work, "%s/.ganbare/work.sav", getenv("HOME"));
 	sprintf(path_item, "%s/.ganbare/item_wk.sav", getenv("HOME"));

@@ -1,15 +1,15 @@
 CC = gcc
 
-CFLAGS  = -Os -fomit-frame-pointer -Wall -Werror -I/usr/include/SDL -I./src/gfx -DNOSOUND -DSCALING
-CXXFLAGS = $(CFLAGS)
-LDFLAGS = `sdl-config --libs` -lm
-
-OBJS  = src/ram.o src/util_snd.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o src/refresh.o src/get_resolution.o src/gfx/SDL_rotozoom.o
+CFLAGS  = -Os -fomit-frame-pointer -I/usr/include/SDL -I./src/gfx
+LDFLAGS = -lSDL -lSDL_mixer -lm
+OBJS  = src/ram.o src/util_snd.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o
 SOURCES = $(patsubst %.o, %.c, $(OBJS))
 
-all: gnp
+OUTPUT= gnp
 
-gnp: $(OBJS)
+all: $(OUTPUT)
+
+$(OUTPUT): $(OBJS)
 	$(CC) -o $@ $(OBJS) $(LDFLAGS)
 
 clean:

@@ -164,9 +164,9 @@ void ExitProgram(void)
 #ifdef MINGW
 	sprintf(path_config, "save/config");
 	sprintf(path_folder, "save");
-#elif defined(NSPIRE)
-	sprintf(path_config, "save/config");
-	sprintf(path_folder, "save");
+#elif defined(_TINSPIRE)
+	sprintf(path_config, "./save/config.tns");
+	sprintf(path_folder, "./save");
 #else		
 	sprintf(path_config, "%s/.ganbare/config", getenv("HOME"));
 	sprintf(path_folder, "%s/.ganbare", getenv("HOME"));
@@ -202,9 +202,12 @@ void main_init_config( void )
 #ifdef MINGW
 	sprintf(path_config, "save/config");
 	sprintf(path_folder, "save");
-#elif defined(NSPIRE)
-	sprintf(path_config, "save/config");
-	sprintf(path_folder, "save");
+#elif defined(_TINSPIRE)
+	sprintf(path_config, "./save/config.tns");
+	sprintf(path_folder, "./save");
+#elif defined(DREAMCAST)
+	sprintf(path_config, "/cd/.ganbare/config");
+	sprintf(path_folder, "/cd/.ganbare");
 #else		
 	sprintf(path_config, "%s/.ganbare/config", getenv("HOME"));
 	sprintf(path_folder, "%s/.ganbare", getenv("HOME"));
@@ -212,7 +215,7 @@ void main_init_config( void )
 
 #ifdef MINGW
 	mkdir(path_folder);
-#elif defined(NSPIRE)
+#elif defined(_TINSPIRE)
 	mkdir(path_folder, 0755);
 #else	
 	mkdir(path_folder, 0755);

@@ -2182,12 +2182,12 @@ void save_file_w( )
 	sprintf(path_work, "/ram/work.sav");
 	sprintf(path_item, "/ram/item_wk.sav");
 	
-#elif defined(NSPIRE)
-	sprintf(path_config, "save/config");
-	sprintf(path_folder, "save");
+#elif defined(_TINSPIRE)
+	sprintf(path_config, "./save/config.tns");
+	sprintf(path_folder, "./save");
 
-	sprintf(path_work, "save/work.sav");
-	sprintf(path_item, "save/item_wk.sav");
+	sprintf(path_work, "./save/work.sav.tns");
+	sprintf(path_item, "./save/item_wk.sav.tns");
 #else		
 	sprintf(path_config, "%s/.ganbare/config", getenv("HOME"));
 	sprintf(path_folder, "%s/.ganbare", getenv("HOME"));
@@ -2198,7 +2198,7 @@ void save_file_w( )
 	
 #ifdef MINGW
 	mkdir(path_folder);
-#elif defined(NSPIRE)
+#elif defined(_TINSPIRE)
 	mkdir(path_folder, 0755);	
 #elif defined(DREAMCAST)
 

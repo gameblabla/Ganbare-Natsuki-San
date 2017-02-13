@@ -863,8 +863,6 @@ int initPAD(void)
 	pad_type = 0;
 	trgs = 0;
 	reps = 0;
-
-	rep_cnt = 0;
 #endif
 	return 1;
 }
@@ -902,23 +900,19 @@ void KeyInput( void )
 #elif defined(DREAMCAST)
 
 	int pad = 0;
+	int x = 0, y = 0;
+	x = SDL_JoystickGetAxis(joys, 0);
+	y = SDL_JoystickGetAxis(joys, 1);
 
-	keys = SDL_GetKeyState(NULL);
-
-	if(joys){
-		int x = 0, y = 0;
-		x = SDL_JoystickGetAxis(joys, 0);
-		y = SDL_JoystickGetAxis(joys, 1);
-
-		if(SDL_JoystickGetButton(joys,  sdljbUp) || y < -JOYSTICK_AXIS) pad |= PAD_UP;
-		if(SDL_JoystickGetButton(joys,  sdljbLeft) || x < -JOYSTICK_AXIS) pad |= PAD_LEFT;
-		if(SDL_JoystickGetButton(joys,  sdljbDown) || y > JOYSTICK_AXIS) pad |= PAD_DOWN;
-		if(SDL_JoystickGetButton(joys,  sdljbRight) || x > JOYSTICK_AXIS) pad |= PAD_RIGHT;
-		if(SDL_JoystickGetButton(joys, sdljbCross)) pad |= PAD_BUTTON1;
-		if(SDL_JoystickGetButton(joys, sdljbCircle)) pad |= PAD_BUTTON2;
-		if(SDL_JoystickGetButton(joys, sdljbTriangle)) pad |= PAD_BUTTON3;
-		if(SDL_JoystickGetButton(joys, sdljbSquare)) pad |= PAD_BUTTON5;
-	}	
+	if(SDL_JoystickGetButton(joys,  sdljbUp) || y < -JOYSTICK_AXIS) pad |= PAD_UP;
+	else if(SDL_JoystickGetButton(joys,  sdljbDown) || y > JOYSTICK_AXIS) pad |= PAD_DOWN;
+	if(SDL_JoystickGetButton(joys,  sdljbLeft) || x < -JOYSTICK_AXIS) pad |= PAD_LEFT;
+	else if(SDL_JoystickGetButton(joys,  sdljbRight) || x > JOYSTICK_AXIS) pad |= PAD_RIGHT;
+	
+	if(SDL_JoystickGetButton(joys, sdljbCross)) pad |= PAD_BUTTON1;
+	if(SDL_JoystickGetButton(joys, sdljbCircle)) pad |= PAD_BUTTON2;
+	if(SDL_JoystickGetButton(joys, sdljbTriangle)) pad |= PAD_BUTTON3;
+	if(SDL_JoystickGetButton(joys, sdljbSquare)) pad |= PAD_BUTTON5;
 
 #else
 	int x = 0, y = 0;
