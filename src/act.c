@@ -263,7 +263,7 @@ static long replay[60 * 60 * 10];	/* フレーム＊秒＊分 */
 static long replay_time = 1;
 static long replay_time_MAX = 60 * 60 * 10;	/* 最大時間 */
 static long replay_load_key[10];
-static long replay_file_name = 0;
+//static long replay_file_name = 0;
 static long replay_save_flag = 0;				/* 保存を行うか 1:しない */
 static long rrkey[5];								/* 入力キー方向 */
 
@@ -384,7 +384,7 @@ void act_init( void )
 	memset( string, 0, sizeof( string ) );								/* 入力キー方向 */
 
 	ResetGameFlag2();				/* ファイルなし */
-	for ( i = 0; i <= 500; i++ )
+	for ( i = 0; i < 500; i++ )
 	{
 		item_wk[i] = gameflag2[i];
 	}
@@ -428,7 +428,7 @@ void act_init( void )
 		}
 		sn = 10;
 	}
-	for ( i = 0 ; i <= 20 ; i++ )
+	for ( i = 0 ; i < 20 ; i++ )
 	{
 		map_data[i] = gameflag2[i + 320];
 	}
@@ -1677,12 +1677,12 @@ void jmp_st( )
 {
 	long px1 ;
 	long px2 ;
-	long py ;
+	//long py ;
 	long py2 ;
 
 	px1 = ( player[0] + 10 ) / 32;
 	px2 = ( player[0] + 22 ) / 32;
-	py = ( 16 - ( ( player[1] + 28 ) / 32 ) );
+	//py = ( 16 - ( ( player[1] + 28 ) / 32 ) );
 	py2 = ( 16 - ( ( player[1] + 32 + 28 ) / 32 ) );
 //	py = ( 16 - ( ( player[1] ) / 32 ) );
 		/* 水中判定 */
@@ -1704,7 +1704,7 @@ void jmp_st( )
 void jmp( )
 {
 	long y1;
-	long px ;
+	//long px ;
 	long px1 ;
 	long px2 ;
 	long py ;
@@ -1720,7 +1720,7 @@ void jmp( )
 	if ( player[14] == 10 ) 
 	{
 		/* 今回の位置 */
-		px = ( player[0] + 16 ) / 32;
+		//px = ( player[0] + 16 ) / 32;
 		px1 = ( player[0] + 10 ) / 32;
 		px2 = ( player[0] + 21 ) / 32;
 		py = ( 16 - ( ( player[1] + 28 ) / 32 ) );
@@ -2182,12 +2182,12 @@ void save_file_w( )
 	sprintf(path_work, "/ram/work.sav");
 	sprintf(path_item, "/ram/item_wk.sav");
 	
-#elif defined(_TINSPIRE)
-	sprintf(path_config, "./save/config.tns");
-	sprintf(path_folder, "./save");
+#elif defined(NSPIRE)
+	sprintf(path_config, "save/config");
+	sprintf(path_folder, "save");
 
-	sprintf(path_work, "./save/work.sav.tns");
-	sprintf(path_item, "./save/item_wk.sav.tns");
+	sprintf(path_work, "save/work.sav");
+	sprintf(path_item, "save/item_wk.sav");
 #else		
 	sprintf(path_config, "%s/.ganbare/config", getenv("HOME"));
 	sprintf(path_folder, "%s/.ganbare", getenv("HOME"));
@@ -2198,7 +2198,7 @@ void save_file_w( )
 	
 #ifdef MINGW
 	mkdir(path_folder);
-#elif defined(_TINSPIRE)
+#elif defined(NSPIRE)
 	mkdir(path_folder, 0755);	
 #elif defined(DREAMCAST)
 
@@ -2779,7 +2779,7 @@ void wait_scl( long type, long d_num )
 			map1[i] = gameflag2[i];
 		}
 	}
-	for ( i = 0 ; i <= 20 ; i++ )
+	for ( i = 0 ; i < 20 ; i++ )
 	{
 		map_data[i] = gameflag2[i + 320];
 	}
@@ -2916,7 +2916,7 @@ void wait_scl2( long d_num ,long init_x, long init_y )
 			map1[i] = gameflag2[i];
 		}
 	}
-	for ( i = 0 ; i <= 20 ; i++ )
+	for ( i = 0 ; i < 20 ; i++ )
 	{
 		map_data[i] = gameflag2[i + 320];
 	}
@@ -3041,7 +3041,7 @@ void wait_scl3( )
 			map1[i] = gameflag2[i];
 		}
 	}
-	for ( i = 0 ; i <= 20 ; i++ )
+	for ( i = 0 ; i < 20 ; i++ )
 	{
 		map_data[i] = gameflag2[i + 320];
 	}
@@ -3099,11 +3099,11 @@ void wait_scl3( )
 
 void snack_counter_disp()
 {
-	long px;
-	long py;
-	long x;
-	long dx;
-	long dy;
+	//long px;
+	//long py;
+	//long x;
+	//long dx;
+	//long dy;
 	long count;
 	long i;
 
@@ -3116,11 +3116,11 @@ void snack_counter_disp()
 		}
 	}
 	
-	px = 10;
-	py = 18;
-	dx = 10;
-	dy = 8;
-	x = 0;
+	//px = 10;
+	//py = 18;
+	//dx = 10;
+	//dy = 8;
+	//x = 0;
 	BltRect( 18, 100, 2, 0, 72, 100, 8 );	/* replay */
 	
 	BltNumericImage2( count, 2, 140, 2, 18, 0, 0, 10, 8 );
@@ -3132,7 +3132,7 @@ void minimap_disp( void )
 	long px;
 	long py;
 	long size;
-	long width;
+	//long width;
 	long height;
 	long i;
 	long x;
@@ -3141,7 +3141,7 @@ void minimap_disp( void )
 	px   = 2;
 	py   = 12;
 	size = 3;
-	width  = size*20;
+	//width  = size*20;
 	height = size*15;
 
 	if ( gameflag[132] == 0 )
@@ -3844,11 +3844,11 @@ void item_disp( )
 	long bx;
 	long by;
 	long k_f;
-	long wbx;
+	//long wbx;
 	long disp_x_j;
 	long disp_y_j;
 	
-	wbx = 0;
+	//wbx = 0;
 	k_f = 0;
 	disp_x_j = 0;
 	disp_y_j = 0;
@@ -4400,23 +4400,23 @@ void enm_disp()
 	long i;
 	long size ;
 	long p_h;
-	long all;
+	//long all;
 	long size_hosei_x;
 	long size_hosei_y;
 	long isclaer;
-	long is_tukami;
+	//long is_tukami;
 	long disp_x_j;
 	long disp_y_j;
 
 	disp_x_j = 0;
 	disp_y_j = 0;
 	
-	is_tukami = 0;
+	//is_tukami = 0;
 	isclaer = 0; 
 	size_hosei_x = 0;
 	size_hosei_y = 0;
 	p_h = 32;	/* プレイヤーの当たり判定 */
-	all = 1;
+	//all = 1;
 	size = 0;
 	
 	for ( i = 0; i < 20; i++ )
@@ -4424,7 +4424,7 @@ void enm_disp()
 		if ( enemy[0 +( i * 20 )] == 1 )
 		{
 			isclaer = 1;
-			all = 0;
+			//all = 0;
 			/* 無敵時間が存在する場合はカウント */
 			if ( enemy[16 + ( i * 20 )] > 0 )
 			{
@@ -4889,7 +4889,7 @@ void enmjmp( long i )
 	long px1 ;
 	long px2 ;
 	long py ;
-	long py2 ;
+	//long py2 ;
 
 	long size;
 	long e10;
@@ -4979,7 +4979,7 @@ void enmjmp( long i )
 	px1 = ( enemy[1 + ( i * 20 )] + size ) / 32;
 	px2 = ( enemy[1 + ( i * 20 )] + size ) / 32;
 	py = ( 16 - ( ( enemy[2 + ( i * 20 )] + 28 ) / 32 ) );
-	py2 = ( 16 - ( ( enemy[2 + ( i * 20 )] + 49 + 48 ) / 32 ) );
+	//py2 = ( 16 - ( ( enemy[2 + ( i * 20 )] + 49 + 48 ) / 32 ) );
 //	py = ( 16 - ( ( player[1] ) / 32 ) );
 
 	if ( enemy[2 + ( i * 20 )] > 480 ) 
@@ -5153,7 +5153,7 @@ void k_jmp( long i )
 	long px1 ;
 	long px2 ;
 	long py ;
-	long py2 ;
+	//long py2 ;
 	long py3 ;
 
 	if ( kane[6 + ( i * 10 )] == 10 ) 
@@ -5186,7 +5186,7 @@ void k_jmp( long i )
 	px1 = ( kane[1 + ( i * 10 )] + 16 ) / 32;
 	px2 = ( kane[1 + ( i * 10 )] + 16 ) / 32;
 	py = ( 16 - ( ( kane[2 + ( i * 10 )] + 28 ) / 32 ) );
-	py2 = ( 16 - ( ( kane[2 + ( i * 10 )] + 49 + 48 ) / 32 ) );
+	//py2 = ( 16 - ( ( kane[2 + ( i * 10 )] + 49 + 48 ) / 32 ) );
 	kane[2 + ( i * 10 )] = kane[2 + ( i * 10 )] - ( y1 / 25 );
 	py3 = ( 16 - ( ( kane[2 + ( i * 10 )] + 32 + 32 + 16 ) / 32 ) );
 
@@ -5417,16 +5417,16 @@ void p_mgc_set( long muki , long p3 )
 void p_mgc_disp( )
 {
 	long ii;
-	long f;
-	long b;
+	//long f;
+	//long b;
 	
 	for ( ii = 0; ii < 40; ii++ )
 	{
 		if ( pmshot[ii * 20 + 2] == 1 )
 		{
 			
-			f = 1;
-			b = 230;
+			//f = 1;
+			//b = 230;
 			
 			
 			BltRect( 4, ( pmshot[ii * 20 + 5] >> 16 ) - d_x, 480 - ( pmshot[ii * 20 + 6] >> 16 ) - 32 - d_y, 0, 96, 32, 32 );
@@ -5575,8 +5575,8 @@ void replay_input_load( void )
 void replay_file_save_w( void )
 {
 
-	long d_num;
-	d_num = 1;
+	//long d_num;
+	//d_num = 1;
 	sprintf(string,"replay/%d/replay_data_w_%d.dat", (int)stage, (int)save_data[3] );
 	SaveFile( string, &replay[0], sizeof( replay ) );
 
@@ -5584,8 +5584,8 @@ void replay_file_save_w( void )
 void replay_file_save( long type )
 {
 
-	long d_num;
-	d_num = replay_file_name;
+	//long d_num;
+	//d_num = replay_file_name;
 	if ( type == 0 )
 	{
 		sprintf(string,"replay/%d/replay_data_%d.dat", (int)stage, (int)save_data[3] );
@@ -5600,10 +5600,10 @@ void replay_file_save( long type )
 long replay_file_load( void )
 {
 	long rc ;
-	long d_num;
+	//long d_num;
 	
 	rc = 1;
-	d_num = 1;
+	//d_num = 1;
 	
 	if ( gameflag[125] == 0 )
 	{

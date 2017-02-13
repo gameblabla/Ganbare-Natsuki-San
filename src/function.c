@@ -123,7 +123,7 @@ int LoadGameFlag( char *fn )
 {
 	int rc = 0;
 	FILE *fp;
-	int size;
+	//int size;
 
 #ifdef NSPIRE
 	char buf[192];
@@ -142,7 +142,7 @@ int LoadGameFlag( char *fn )
 	}
 	else 
 	{
-		size = fread( &gameflag[0], 1, sizeof( gameflag ), fp );
+		/*size = */fread( &gameflag[0], 1, sizeof( gameflag ), fp );
 		fclose( fp );
 #ifdef GP2X
 		sync( );
@@ -155,7 +155,7 @@ int SaveGameFlag( char *fn )
 {
 	int rc = 0;
 	FILE *fp;
-	int size;
+	//int size;
 
 #ifdef NSPIRE
 	char buf[255];
@@ -170,7 +170,7 @@ int SaveGameFlag( char *fn )
 		}
 		else 
 		{
-			size = fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
+			/*size = */fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
 			fclose( fp );
 		}
 	}
@@ -183,7 +183,7 @@ int SaveGameFlag( char *fn )
 		}
 		else 
 		{
-			size = fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
+			/*size = */fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
 			fclose( fp );
 		}
 	}
@@ -203,7 +203,7 @@ int SaveGameFlag( char *fn )
 		}
 		else 
 		{
-			size = fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
+			/*size = */fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
 			fclose( fp );
 		}
 	}
@@ -217,7 +217,7 @@ int SaveGameFlag( char *fn )
 		}
 		else 
 		{
-			size = fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
+			/*size = */fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
 			fclose( fp );
 		}
 	}
@@ -231,7 +231,7 @@ int SaveGameFlag( char *fn )
 	}
 	else 
 	{
-		size = fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
+		/*size = */fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
 		fclose( fp );
 #ifdef GP2X
 		sync( );
@@ -252,7 +252,7 @@ int LoadGameFlag2( char *fn )
 {
 	int rc = 0;
 	FILE *fp;	
-	int size;
+	//int size;
 	
 	printf("Fopen : %s\n", fn);
 	
@@ -274,7 +274,7 @@ int LoadGameFlag2( char *fn )
 	else 
 	{
 		printf("Fopen %s was a sucess\n", fn);
-		size = fread( &gameflag2[0], 1, sizeof( gameflag ), fp ); 
+		/*size = */fread( &gameflag2[0], 1, sizeof( gameflag ), fp ); 
 		fclose( fp );	
 #ifdef GP2X
 		sync( );
@@ -288,7 +288,7 @@ int SaveGameFlag2( char *fn )
 {
 	int rc = 0;
 	FILE *fp;	
-	int size;
+	//int size;
 
 #ifdef NSPIRE
 	char buf[192];
@@ -307,7 +307,7 @@ int SaveGameFlag2( char *fn )
 	}
 	else 
 	{
-		size = fwrite( &gameflag2[0], 1, sizeof( gameflag ), fp ); 
+		/*size = */fwrite( &gameflag2[0], 1, sizeof( gameflag ), fp ); 
 		fclose( fp );
 #ifdef GP2X
 		sync( );
@@ -338,7 +338,7 @@ int SaveFile( char *fn, long *buff, long size )
 	}
 	else 
 	{
-		size = fwrite( buff, 1, size, fp ); 
+		/*size = */fwrite( buff, 1, size, fp ); 
 		fclose( fp );
 #ifdef GP2X
 		sync( );
@@ -369,7 +369,7 @@ int LoadFile( char *fn, long *buff, long size )
 	}
 	else 
 	{
-		size = fread( buff, 1, size, fp ); 
+		/*size = */fread( buff, 1, size, fp ); 
 		fclose( fp );
 #ifdef GP2X
 		sync( );
@@ -863,6 +863,8 @@ int initPAD(void)
 	pad_type = 0;
 	trgs = 0;
 	reps = 0;
+
+	rep_cnt = 0;
 #endif
 	return 1;
 }
@@ -900,19 +902,23 @@ void KeyInput( void )
 #elif defined(DREAMCAST)
 
 	int pad = 0;
-	int x = 0, y = 0;
-	x = SDL_JoystickGetAxis(joys, 0);
-	y = SDL_JoystickGetAxis(joys, 1);
 
-	if(SDL_JoystickGetButton(joys,  sdljbUp) || y < -JOYSTICK_AXIS) pad |= PAD_UP;
-	else if(SDL_JoystickGetButton(joys,  sdljbDown) || y > JOYSTICK_AXIS) pad |= PAD_DOWN;
-	if(SDL_JoystickGetButton(joys,  sdljbLeft) || x < -JOYSTICK_AXIS) pad |= PAD_LEFT;
-	else if(SDL_JoystickGetButton(joys,  sdljbRight) || x > JOYSTICK_AXIS) pad |= PAD_RIGHT;
-	
-	if(SDL_JoystickGetButton(joys, sdljbCross)) pad |= PAD_BUTTON1;
-	if(SDL_JoystickGetButton(joys, sdljbCircle)) pad |= PAD_BUTTON2;
-	if(SDL_JoystickGetButton(joys, sdljbTriangle)) pad |= PAD_BUTTON3;
-	if(SDL_JoystickGetButton(joys, sdljbSquare)) pad |= PAD_BUTTON5;
+	keys = SDL_GetKeyState(NULL);
+
+	if(joys){
+		int x = 0, y = 0;
+		x = SDL_JoystickGetAxis(joys, 0);
+		y = SDL_JoystickGetAxis(joys, 1);
+
+		if(SDL_JoystickGetButton(joys,  sdljbUp) || y < -JOYSTICK_AXIS) pad |= PAD_UP;
+		if(SDL_JoystickGetButton(joys,  sdljbLeft) || x < -JOYSTICK_AXIS) pad |= PAD_LEFT;
+		if(SDL_JoystickGetButton(joys,  sdljbDown) || y > JOYSTICK_AXIS) pad |= PAD_DOWN;
+		if(SDL_JoystickGetButton(joys,  sdljbRight) || x > JOYSTICK_AXIS) pad |= PAD_RIGHT;
+		if(SDL_JoystickGetButton(joys, sdljbCross)) pad |= PAD_BUTTON1;
+		if(SDL_JoystickGetButton(joys, sdljbCircle)) pad |= PAD_BUTTON2;
+		if(SDL_JoystickGetButton(joys, sdljbTriangle)) pad |= PAD_BUTTON3;
+		if(SDL_JoystickGetButton(joys, sdljbSquare)) pad |= PAD_BUTTON5;
+	}	
 
 #else
 	int x = 0, y = 0;
