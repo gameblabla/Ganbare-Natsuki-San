@@ -41,7 +41,6 @@ int iDoRun;
 
 int main(int argc, char *argv[])
 {
-	SDL_Rect rect;
 	Uint32 flags;
 	SDL_Surface* tmp;
 	char AppPath[1024];
@@ -99,11 +98,6 @@ int main(int argc, char *argv[])
 	g_screen = SDL_SetVideoMode(DISPLY_WIDTH, DISPLY_HEIGHT, DEPTH, flags);
 #endif
 
-	rect.x = (DISPLY_WIDTH-320)/2;
-	rect.y = (DISPLY_HEIGHT-240)/2;
-	rect.w = DISPLY_WIDTH;
-	rect.h = DISPLY_HEIGHT;
-	
 	tmp = SDL_LoadBMP("image/color.bmp");	
 	SetGscreenPalette( tmp );
 	SDL_FreeSurface(tmp);

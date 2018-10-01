@@ -123,9 +123,8 @@ int LoadGameFlag( char *fn )
 {
 	int rc = 0;
 	FILE *fp;
-	int size;
 
-#ifdef NSPIRE
+#ifdef _TINSPIRE
 	char buf[192];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
@@ -142,7 +141,7 @@ int LoadGameFlag( char *fn )
 	}
 	else 
 	{
-		size = fread( &gameflag[0], 1, sizeof( gameflag ), fp );
+		fread( &gameflag[0], 1, sizeof( gameflag ), fp );
 		fclose( fp );
 #ifdef GP2X
 		sync( );
@@ -155,9 +154,8 @@ int SaveGameFlag( char *fn )
 {
 	int rc = 0;
 	FILE *fp;
-	int size;
 
-#ifdef NSPIRE
+#ifdef _TINSPIRE
 	char buf[255];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	
@@ -170,7 +168,7 @@ int SaveGameFlag( char *fn )
 		}
 		else 
 		{
-			size = fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
+			fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
 			fclose( fp );
 		}
 	}
@@ -183,7 +181,7 @@ int SaveGameFlag( char *fn )
 		}
 		else 
 		{
-			size = fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
+			fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
 			fclose( fp );
 		}
 	}
@@ -203,7 +201,7 @@ int SaveGameFlag( char *fn )
 		}
 		else 
 		{
-			size = fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
+			fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
 			fclose( fp );
 		}
 	}
@@ -217,7 +215,7 @@ int SaveGameFlag( char *fn )
 		}
 		else 
 		{
-			size = fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
+			fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
 			fclose( fp );
 		}
 	}
@@ -231,7 +229,7 @@ int SaveGameFlag( char *fn )
 	}
 	else 
 	{
-		size = fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
+		fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
 		fclose( fp );
 #ifdef GP2X
 		sync( );
@@ -252,11 +250,10 @@ int LoadGameFlag2( char *fn )
 {
 	int rc = 0;
 	FILE *fp;	
-	int size;
 	
 	printf("Fopen : %s\n", fn);
 	
-#ifdef NSPIRE
+#ifdef _TINSPIRE
 	char buf[192];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
@@ -274,7 +271,7 @@ int LoadGameFlag2( char *fn )
 	else 
 	{
 		printf("Fopen %s was a sucess\n", fn);
-		size = fread( &gameflag2[0], 1, sizeof( gameflag ), fp ); 
+		fread( &gameflag2[0], 1, sizeof( gameflag ), fp ); 
 		fclose( fp );	
 #ifdef GP2X
 		sync( );
@@ -288,9 +285,8 @@ int SaveGameFlag2( char *fn )
 {
 	int rc = 0;
 	FILE *fp;	
-	int size;
 
-#ifdef NSPIRE
+#ifdef _TINSPIRE
 	char buf[192];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "wb" ) ) == NULL )
@@ -307,7 +303,7 @@ int SaveGameFlag2( char *fn )
 	}
 	else 
 	{
-		size = fwrite( &gameflag2[0], 1, sizeof( gameflag ), fp ); 
+		fwrite( &gameflag2[0], 1, sizeof( gameflag ), fp ); 
 		fclose( fp );
 #ifdef GP2X
 		sync( );
@@ -321,7 +317,7 @@ int SaveFile( char *fn, long *buff, long size )
 	int rc = 0;
 	FILE *fp;	
 
-#ifdef NSPIRE
+#ifdef _TINSPIRE
 	char buf[192];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "wb" ) ) == NULL )
@@ -338,7 +334,7 @@ int SaveFile( char *fn, long *buff, long size )
 	}
 	else 
 	{
-		size = fwrite( buff, 1, size, fp ); 
+		fwrite( buff, 1, size, fp ); 
 		fclose( fp );
 #ifdef GP2X
 		sync( );
@@ -352,7 +348,7 @@ int LoadFile( char *fn, long *buff, long size )
 	int rc = 0;
 	FILE *fp;	
 	
-#ifdef NSPIRE
+#ifdef _TINSPIRE
 	char buf[192];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
@@ -369,7 +365,7 @@ int LoadFile( char *fn, long *buff, long size )
 	}
 	else 
 	{
-		size = fread( buff, 1, size, fp ); 
+		fread( buff, 1, size, fp ); 
 		fclose( fp );
 #ifdef GP2X
 		sync( );
@@ -390,7 +386,7 @@ long GetConfig( char* fn, char* cParam )
 	
 	rc = 0;
 
-#ifdef NSPIRE
+#ifdef _TINSPIRE
 	char buf[192];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "r" ) ) == NULL )
@@ -444,7 +440,7 @@ long LogFileWrite( char* fn, char* cParam )
 	
 	rc = 0;
 
-#ifdef NSPIRE
+#ifdef _TINSPIRE
 	char buf[192];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "w" ) ) == NULL )
@@ -480,7 +476,7 @@ long LoadBitmap( char *fname , int bmpindex, int flag )
 	
 	ReleaseBitmap( bmpindex );
 
-#ifdef NSPIRE
+#ifdef _TINSPIRE
 	char buf[128];
 	snprintf(buf, sizeof(buf), "%s.tns", fname);
 	tmp = SDL_LoadBMP( buf );
@@ -899,20 +895,20 @@ void KeyInput( void )
 	}
 #elif defined(DREAMCAST)
 
-	int pad = 0;
-	int x = 0, y = 0;
-	x = SDL_JoystickGetAxis(joys, 0);
-	y = SDL_JoystickGetAxis(joys, 1);
-
-	if(SDL_JoystickGetButton(joys,  sdljbUp) || y < -JOYSTICK_AXIS) pad |= PAD_UP;
-	else if(SDL_JoystickGetButton(joys,  sdljbDown) || y > JOYSTICK_AXIS) pad |= PAD_DOWN;
-	if(SDL_JoystickGetButton(joys,  sdljbLeft) || x < -JOYSTICK_AXIS) pad |= PAD_LEFT;
-	else if(SDL_JoystickGetButton(joys,  sdljbRight) || x > JOYSTICK_AXIS) pad |= PAD_RIGHT;
-	
-	if(SDL_JoystickGetButton(joys, sdljbCross)) pad |= PAD_BUTTON1;
-	if(SDL_JoystickGetButton(joys, sdljbCircle)) pad |= PAD_BUTTON2;
-	if(SDL_JoystickGetButton(joys, sdljbTriangle)) pad |= PAD_BUTTON3;
-	if(SDL_JoystickGetButton(joys, sdljbSquare)) pad |= PAD_BUTTON5;
+	keys = SDL_GetKeyState(NULL);
+	if(joys){
+		int x = 0, y = 0;
+		x = SDL_JoystickGetAxis(joys, 0);
+		y = SDL_JoystickGetAxis(joys, 1);
+		if(SDL_JoystickGetButton(joys,  sdljbUp) || y < -JOYSTICK_AXIS) pad |= PAD_UP;
+		if(SDL_JoystickGetButton(joys,  sdljbLeft) || x < -JOYSTICK_AXIS) pad |= PAD_LEFT;
+		if(SDL_JoystickGetButton(joys,  sdljbDown) || y > JOYSTICK_AXIS) pad |= PAD_DOWN;
+		if(SDL_JoystickGetButton(joys,  sdljbRight) || x > JOYSTICK_AXIS) pad |= PAD_RIGHT;
+		if(SDL_JoystickGetButton(joys, sdljbCross)) pad |= PAD_BUTTON1;
+		if(SDL_JoystickGetButton(joys, sdljbCircle)) pad |= PAD_BUTTON2;
+		if(SDL_JoystickGetButton(joys, sdljbTriangle)) pad |= PAD_BUTTON3;
+		if(SDL_JoystickGetButton(joys, sdljbSquare)) pad |= PAD_BUTTON5;
+	}	
 
 #else
 	int x = 0, y = 0;
@@ -979,7 +975,7 @@ void KeyInput( void )
 		if(keys[SDLK_LCTRL] == SDL_PRESSED || btn1){
 			pad |= PAD_BUTTON1;
 		}
-#ifdef NSPIRE
+#ifdef _TINSPIRE
 		if(keys[SDLK_LSHIFT] == SDL_PRESSED || btn2){
 #else
 		if(keys[SDLK_LALT] == SDL_PRESSED || btn2){
