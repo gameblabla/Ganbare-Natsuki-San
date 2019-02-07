@@ -9,3 +9,4 @@ src/gfx/*.o
 src/include/*.o
 gnp
 gnp.exe
+*.ipk

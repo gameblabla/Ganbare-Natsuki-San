@@ -1,0 +1,32 @@
+# Software Name
+PROGRAM = gnp
+
+# Compiler
+CC = /opt/rs97-toolchain/bin/mipsel-linux-gcc
+
+# Linker
+LDFLAGS = -lSDL_mixer -lvorbisidec -logg -lSDL -lm -lSDL_image -lstdc++ -s
+CFLAGS = -O3 -mips32 -DGCW -Wall
+
+# Include
+INCLUDES := 
+
+CFLAGS +=  -Isrc
+CFILES =  src/ram.c src/util_snd.c src/function.c src/dconv.c src/scene.c src/title.c src/init.c src/act.c src/option.c src/ending.c src/logo.c
+
+#
+#========================================(Compile)
+#
+
+OFILES = $(SFILES:.S=.o) $(CFILES:.c=.o)
+
+$(PROGRAM):	$(OFILES)
+			$(CC) $(CFLAGS) $(OFILES) -o $@ $(LDFLAGS)
+
+all: $(PROGRAM)
+
+%.o: %.c
+	 $(CC) $(ALL_INCLUDES) $(CFLAGS) -c $< -o $@
+
+clean:
+	 -rm -f $(OFILES) $(MAPFILE) $(PROGRAM)
