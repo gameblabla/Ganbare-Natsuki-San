@@ -1,7 +1,7 @@
 
-#include "SDL.h"
+#include <SDL/SDL.h>
 #ifndef NOSOUND
-#include "SDL_mixer.h"
+#include <SDL/SDL_mixer.h>
 #endif
 #include "include/general.h"
 #include "include/util_snd.h"
@@ -21,7 +21,7 @@ enum{
 enum{
 	SND_RATE = 44100, 
 	SND_CHANNEL = 2, 
-	SND_BUFFER = 4096
+	SND_BUFFER = 1024
 };
 #endif
 

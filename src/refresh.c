@@ -1,7 +1,7 @@
 #ifdef SCALING
 #include <stdio.h>
 #include <stdlib.h>
-#include "SDL.h"
+#include <SDL/SDL.h>
 #include "SDL_rotozoom.h"
 #include "refresh.h"
 

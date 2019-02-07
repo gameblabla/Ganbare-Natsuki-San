@@ -4,7 +4,7 @@
 #include <time.h>
 #include <string.h>
 #define SDL_MAIN_HANDLED
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include <unistd.h>
 
 #include "define.h"

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "SDL.h"
+#include <SDL/SDL.h>
 #include "define.h"
 #include "function.h"
 #include "util_snd.h"

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "SDL.h"
+#include <SDL/SDL.h>
 #include "define.h"
 #include "extern.h"
 #include "scene.h"

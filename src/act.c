@@ -4,7 +4,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include "SDL.h"
+#include <SDL/SDL.h>
 #include "define.h"
 #include "function.h"
 #include "util_snd.h"

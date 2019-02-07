@@ -3,9 +3,9 @@
 #include <unistd.h>
 #include <time.h>
 
-#include "SDL.h"
+#include <SDL/SDL.h>
 #ifndef NOSOUND
-#include "SDL_mixer.h"
+#include <SDL/SDL_mixer.h>
 #endif
 #include "define.h"
 #include "function.h"
