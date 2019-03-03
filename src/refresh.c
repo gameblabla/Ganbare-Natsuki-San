@@ -2,18 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL/SDL.h>
-#include "SDL_rotozoom.h"
 #include "refresh.h"
-
 #include "get_resolution.h"
+
+extern SDL_Surface *g_screen;
 
 void RefreshScreen(SDL_Surface* tmp)
 {
-	SDL_Surface* doble;
-	doble = zoomSurface(tmp,screen_scale.w_scale,screen_scale.h_scale,0);
-	SDL_BlitSurface(doble,NULL,real_screen,&screen_position);
+	SDL_SoftStretch(g_screen,NULL,real_screen,NULL);
 	SDL_Flip(real_screen);
-	SDL_FreeSurface(doble);
 }
 
 #endif

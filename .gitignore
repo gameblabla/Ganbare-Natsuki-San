@@ -5,7 +5,6 @@
 dc/
 opk/gnp
 src/*.o
-src/gfx/*.o
 src/include/*.o
 gnp
 gnp.exe
