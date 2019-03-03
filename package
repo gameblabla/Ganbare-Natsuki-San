@@ -7,9 +7,10 @@ mkdir -p ipkg/home/retrofw/games/gnp/sound
 mkdir -p ipkg/home/retrofw/apps/gmenu2x/sections/games
 cp gnp ipkg/home/retrofw/games/gnp/gnp
 cp opk/icon.png ipkg/home/retrofw/games/gnp/gnp.png
-cp -r opk/data ipkg/home/retrofw/games/gnp/data
-cp -r opk/image ipkg/home/retrofw/games/gnp/image
-cp -r opk/sound ipkg/home/retrofw/games/gnp/sound
+cp COPYRIGHT ipkg/home/retrofw/games/gnp/COPYRIGHT
+cp -r opk/data ipkg/home/retrofw/games/gnp
+cp -r opk/image ipkg/home/retrofw/games/gnp
+cp -r opk/sound ipkg/home/retrofw/games/gnp
 
 cd ipkg
 
@@ -26,7 +27,7 @@ esac
 
 print 'Package: gnp
 Version: 20190207
-Description: Ganbare
+Description: Ganbare Natsuki-San
 Section: games
 Priority: optional
 Maintainer: gameblabla
@@ -39,11 +40,10 @@ print '2.0' > debian-binary
 
 print 'title=Ganbare
 description=Ganbare Natsuki-San
-exec=/home/retrofw/games/gnp/gnp
-clock=600' > home/retrofw/apps/gmenu2x/sections/games/gnp
+exec=/home/retrofw/games/gnp/gnp' > home/retrofw/apps/gmenu2x/sections/games/gnp
 
-tar -czvf control.tar.gz control
-tar -czvf data.tar.gz home
+tar -czvf control.tar.gz control --owner=0 --group=0
+tar -czvf data.tar.gz home --owner=0 --group=0
 ar rv ../gnp.ipk control.tar.gz data.tar.gz debian-binary
 
 cd ..
