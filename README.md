@@ -18,4 +18,7 @@ All the unofficials ports would load in memory the 8-bits colored backgrounds,
 
 even though the same backgrounds are available in 32-bits.
 
+LICENSE
+========
 
+GNP is licensed under a BSD-like license. See COPYRIGHT file for more information.
