@@ -89,9 +89,6 @@ int main(int argc, char *argv[])
 	
 #ifdef SCALING
 	Get_Resolution();
-	printf("screen_scale.w_display %d \n", screen_scale.w_display);
-	printf("screen_scale.w_scale %d \n", screen_scale.w_scale);
-	printf("screen_scale.w_scale_size %d \n", screen_scale.w_scale_size);
 	real_screen = SDL_SetVideoMode(screen_scale.w_display, screen_scale.h_display, DEPTH, SDL_SWSURFACE | SDL_NOFRAME);
 	g_screen = SDL_CreateRGBSurface(SDL_SWSURFACE, DISPLY_WIDTH, DISPLY_HEIGHT, DEPTH, 0,0,0,0);
 #else
