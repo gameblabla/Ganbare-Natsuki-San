@@ -1,8 +1,12 @@
 #include <SDL/SDL.h>
+#ifdef _cplusplus
 extern "C" {
+#endif
 #include "get_resolution.h"
 #include "define.h"
+#ifdef _cplusplus
 }
+#endif
 
 #ifdef SYLLABLE
 #include <gui/desktop.h>
