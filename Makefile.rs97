@@ -5,8 +5,8 @@ PROGRAM = gnp
 CC = /opt/rs97-toolchain/bin/mipsel-linux-gcc
 
 # Linker
-LDFLAGS = -lSDL_mixer -lvorbisidec -logg -lSDL -lm -lSDL_image -lstdc++ -s
-CFLAGS = -O3 -mips32 -DGCW -Wall
+LDFLAGS = -lSDL_mixer -lvorbisidec -logg -lSDL -lm -lSDL_image -lstdc++ -flto -s
+CFLAGS = -O2 -mips32 -DGCW -Wall -flto
 
 # Include
 INCLUDES := 
