@@ -22,9 +22,9 @@ void act_keys( void );
 void fram_set( );
 void jmp_st( );
 void jmp( );
-void idou_l( long ankr_flag );
-void idou_r( long ankr_flag );
-void cleaer_ankr( long ankr_flag );
+void idou_l( int32_t ankr_flag );
+void idou_r( int32_t ankr_flag );
+void cleaer_ankr( int32_t ankr_flag );
 void act_drow( void );
 void save_file_w( );
 void save_file( );
@@ -33,77 +33,77 @@ void playerdisp( );
 void bakdisp1();
 void bakdisp2( );
 void bak_make( );
-void wait_scl( long type, long d_num );
-void wait_scl2( long d_num ,long init_x, long init_y );
+void wait_scl( int32_t type, int32_t d_num );
+void wait_scl2( int32_t d_num ,int32_t init_x, int32_t init_y );
 void wait_scl3( );
 void snack_counter_disp();
 void minimap_disp( void );
 void mapdisp();
-void bgm_midi( long BgmWavNo );
+void bgm_midi( int32_t BgmWavNo );
 void stage_start( );
 void stage_endj( );
 void stage_claer( );
 void stage_end( );
-void p_shot_set( long type , long muki, long houkou );
+void p_shot_set( int32_t type , int32_t muki, int32_t houkou );
 void p_shot_disp( );
-void p_shot_f_set( long x, long y , long type );
+void p_shot_f_set( int32_t x, int32_t y , int32_t type );
 void p_shot_f_disp( );
-void p_shot_f2_set( long x, long y , long muki );
+void p_shot_f2_set( int32_t x, int32_t y , int32_t muki );
 void p_shot_f2_disp( );
-void item_set( long type, long x, long y, long iti, long g_num );
-long item_sonzai( long map1, long map2 );
+void item_set( int32_t type, int32_t x, int32_t y, int32_t iti, int32_t g_num );
+int32_t item_sonzai( int32_t map1, int32_t map2 );
 void item_disp( );
-long item_up( );
-long item_up2( );
-long item_event( );
-void init_event_set_enm( long event_no , long b_num );
-void init_event_set( long event_no , long b_num );
-void event_set( long event_no , long b_num );
-void event_set_enm( long event_no , long b_num );
+int32_t item_up( );
+int32_t item_up2( );
+int32_t item_event( );
+void init_event_set_enm( int32_t event_no , int32_t b_num );
+void init_event_set( int32_t event_no , int32_t b_num );
+void event_set( int32_t event_no , int32_t b_num );
+void event_set_enm( int32_t event_no , int32_t b_num );
 void event_disp( );
 void event_save( );
 void load_save_file( );
 void event_kaihuku( );
 void event_return( );
 void event_warp( );
-void enm_set( long type, long x, long y );
-void enm_set2( long type, long x, long y ,long muki );
-long e_hp( long type );
+void enm_set( int32_t type, int32_t x, int32_t y );
+void enm_set2( int32_t type, int32_t x, int32_t y ,int32_t muki );
+int32_t e_hp( int32_t type );
 void enm_disp();
-void e_move( long i );
-void boss_dead( long x, long y );
-void e_shot_set( long type , long i , long x, long y );
+void e_move( int32_t i );
+void boss_dead( int32_t x, int32_t y );
+void e_shot_set( int32_t type , int32_t i , int32_t x, int32_t y );
 void e_shot_disp( );
-void enmjmp( long i );
-long map1_item_j( long x, long y );
-void kane_set( long x, long y );
+void enmjmp( int32_t i );
+int32_t map1_item_j( int32_t x, int32_t y );
+void kane_set( int32_t x, int32_t y );
 void kane_disp(  );
-void k_jmp( long i );
-void p_jump_f_set( long x, long y );
+void k_jmp( int32_t i );
+void p_jump_f_set( int32_t x, int32_t y );
 void p_jump_f_disp( );
 void screen_BackupPlane( );
 void window_disp( );
 void window_keys( );
-long labs( long para );
-void p_mgc_set( long muki , long p3 );
+int32_t labs_gnp( int32_t para );
+void p_mgc_set( int32_t muki , int32_t p3 );
 void p_mgc_disp( );
-void BlendExBltRectW( long plane_no, long x, long y, long sx, long sy, long hx, long hy, long func, long blend );
-void BlendExBltW( long plane_no, long x, long y, long func, long blend );
-void BlendExBltFastW( long plane_no, long x, long y, long func, long blend );
+void BlendExBltRectW( int32_t plane_no, int32_t x, int32_t y, int32_t sx, int32_t sy, int32_t hx, int32_t hy, int32_t func, int32_t blend );
+void BlendExBltW( int32_t plane_no, int32_t x, int32_t y, int32_t func, int32_t blend );
+void BlendExBltFastW( int32_t plane_no, int32_t x, int32_t y, int32_t func, int32_t blend );
 void replay_input_save( void );
 void replay_input_load( void );
 void replay_file_save_w( void );
-void replay_file_save( long type );
-long replay_file_load( void );
-long GetKyori( long i1, long i2 );
+void replay_file_save( int32_t type );
+int32_t replay_file_load( void );
+int32_t GetKyori( int32_t i1, int32_t i2 );
 void debugdisp( void );
 
 char string[1024];
 
-static long scene_exit;
-static long sn = 0;									/* 場面用変数これを変えることによって描画関数内の処理を変える		*/
+static int32_t scene_exit;
+static int32_t sn = 0;									/* 場面用変数これを変えることによって描画関数内の処理を変える		*/
 
-static long enm1_parameter[10 * 20] = 
+static int32_t enm1_parameter[10 * 20] = 
 {
 /*   HP */
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 	/* 0未使用 */
@@ -122,7 +122,7 @@ static long enm1_parameter[10 * 20] =
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0 	/* 20未使用 */
 };
 
-static long enm2_parameter[10 * 20] = 
+static int32_t enm2_parameter[10 * 20] = 
 {
 /*   HP */
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 	/* 0未使用 */
@@ -138,7 +138,7 @@ static long enm2_parameter[10 * 20] =
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0 	/* 20未使用 */
 };
 
-static long enm3_parameter[10 * 20] = 
+static int32_t enm3_parameter[10 * 20] = 
 {
 /*   HP   金 攻撃 属性 相性 */
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 	/* 0未使用 */
@@ -154,7 +154,7 @@ static long enm3_parameter[10 * 20] =
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0 	/* 20未使用 */
 };
 
-static long enm4_parameter[10 * 20] = 
+static int32_t enm4_parameter[10 * 20] = 
 {
 /*   HP */
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 	/* 0未使用 */
@@ -170,9 +170,9 @@ static long enm4_parameter[10 * 20] =
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0 	/* 20未使用 */
 };
 
-static long item_data[3] = { 32, 500, 10 };			/* アイテムの情報　サイズ、最大配置個数、1データバッファ数 */
-static long enm_data[3] = { 0, 500, 20 };			/* 敵の情報　予備、最大配置個数、1データバッファ数 */
-static long MapInfo[10] = 
+static int32_t item_data[3] = { 32, 500, 10 };			/* アイテムの情報　サイズ、最大配置個数、1データバッファ数 */
+static int32_t enm_data[3] = { 0, 500, 20 };			/* 敵の情報　予備、最大配置個数、1データバッファ数 */
+static int32_t MapInfo[10] = 
 {
 	20 * 1									/* 0:マップのxサイズ */
 ,	15 * 1									/* 1:マップのyサイズ */
@@ -181,7 +181,7 @@ static long MapInfo[10] =
 ,   20										/* 4:ヘッダデータ部のデータ数 */
 };
 
-static long player[50];									/* プレイヤー用バッファ */
+static int32_t player[50];									/* プレイヤー用バッファ */
 											/* player[0] X */
 											/* player[1] Y */
 											/* player[2] 状態 */
@@ -221,52 +221,52 @@ static long player[50];									/* プレイヤー用バッファ */
 											/* player[36] アンカー吹っ飛び方向 */
 											/* player[37] アイテムを掴んでいる */
 											/* player[38] アンカーを伸ばした(効果音用) */
-static long dp_x;									/* プレイヤーの表示位置（画面内の相対座標） */
-static long dp_y;									/* プレイヤーの表示位置（画面内の相対座標） */
-static long demo[10];
-static long map1[320];								/* 背景用バッファ レイヤー1 */
-static long map2[320];								/* 背景用バッファ レイヤー2 */
-static long map_data[20];
-static long bak_cnt = 0;							/* 背景アニメーション用カウンタ */
-static long d_x = 0;								/* 背景表示位置 */
-static long d_y = 0;								/* 背景表示位置 */
-//static long disp_data[60];							/* セーブ一覧 */
-static long next_px = 0;							/* 画面切り替え時のキャラ移動対策 */
-static long next_py = 0;
+static int32_t dp_x;									/* プレイヤーの表示位置（画面内の相対座標） */
+static int32_t dp_y;									/* プレイヤーの表示位置（画面内の相対座標） */
+static int32_t demo[10];
+static int32_t map1[320];								/* 背景用バッファ レイヤー1 */
+static int32_t map2[320];								/* 背景用バッファ レイヤー2 */
+static int32_t map_data[20];
+static int32_t bak_cnt = 0;							/* 背景アニメーション用カウンタ */
+static int32_t d_x = 0;								/* 背景表示位置 */
+static int32_t d_y = 0;								/* 背景表示位置 */
+//static int32_t disp_data[60];							/* セーブ一覧 */
+static int32_t next_px = 0;							/* 画面切り替え時のキャラ移動対策 */
+static int32_t next_py = 0;
 
-static long atk_rr1 =22;						/* 腕の回転速度 */
-static long atk_rr2 = 1;						/* 腕の回転速度 */
-//long atk_rr = 360 / 32;						/* 腕の回転速度 */
+static int32_t atk_rr1 =22;						/* 腕の回転速度 */
+static int32_t atk_rr2 = 1;						/* 腕の回転速度 */
+//int32_t atk_rr = 360 / 32;						/* 腕の回転速度 */
 
-static long stage = 0;								/* ステージ番号 */
+static int32_t stage = 0;								/* ステージ番号 */
 
-static long pshot[10 * 10];							/* プレイヤー攻撃用情報 */
-static long pshotf[10 * 40];						/* プレイヤー攻撃用情報 */
-static long pshotf2[10 * 80];						/* プレイヤー攻撃用情報 */
-static long pmshot[20 * 40];						/* プレイヤー攻撃用情報 */
-static long pjumpf[100];							/* プレイヤー攻撃用情報 */
-static long item[10 * 50];							/* アイテム用バッファ */
-static long item_wk[5*100];							/* 地面 その他のマップ情報 */
-static long enemy[40 * 20];								/* 敵情報															*/
-static long mgc_e[10 * 20] ;						/* MGC表示情報														*/
-static long p_ef[1000] ;							/* 汎用バッファ（足跡等）														*/
-//static long life_a[5];								/* HPアニメーション用 */
-static long kane[200];								/* アイテム用バッファ */
+static int32_t pshot[10 * 10];							/* プレイヤー攻撃用情報 */
+static int32_t pshotf[10 * 40];						/* プレイヤー攻撃用情報 */
+static int32_t pshotf2[10 * 80];						/* プレイヤー攻撃用情報 */
+static int32_t pmshot[20 * 40];						/* プレイヤー攻撃用情報 */
+static int32_t pjumpf[100];							/* プレイヤー攻撃用情報 */
+static int32_t item[10 * 50];							/* アイテム用バッファ */
+static int32_t item_wk[5*100];							/* 地面 その他のマップ情報 */
+static int32_t enemy[40 * 20];								/* 敵情報															*/
+static int32_t mgc_e[10 * 20] ;						/* MGC表示情報														*/
+static int32_t p_ef[1000] ;							/* 汎用バッファ（足跡等）														*/
+//static int32_t life_a[5];								/* HPアニメーション用 */
+static int32_t kane[200];								/* アイテム用バッファ */
 
-static long Jump_counts = 0;
-static long save_data[512];							/* 保存情報 */
-static long test[5];
-static long rayer[5];								/* 背景スクロール量 */
-static long play_time[5];
+static int32_t Jump_counts = 0;
+static int32_t save_data[512];							/* 保存情報 */
+static int32_t test[5];
+static int32_t rayer[5];								/* 背景スクロール量 */
+static int32_t play_time[5];
 /* リプレイ２０分 */
-static long replay[60 * 60 * 10];	/* フレーム＊秒＊分 */
-static long replay_time = 1;
-static long replay_time_MAX = 60 * 60 * 10;	/* 最大時間 */
-static long replay_load_key[10];
-static long replay_save_flag = 0;				/* 保存を行うか 1:しない */
-static long rrkey[5];								/* 入力キー方向 */
+static int32_t replay[60 * 60 * 10];	/* フレーム＊秒＊分 */
+static int32_t replay_time = 1;
+static int32_t replay_time_MAX = 60 * 60 * 10;	/* 最大時間 */
+static int32_t replay_load_key[10];
+static int32_t replay_save_flag = 0;				/* 保存を行うか 1:しない */
+static int32_t rrkey[5];								/* 入力キー方向 */
 
-//static long event_buff[100];
+//static int32_t event_buff[100];
 /* event_buff[0]	文字用ｳｨﾝﾄﾞｳ表示 */
 /* event_buff[1]	顔表示 */
 /* event_buff[2]	ｷｰ入力待ち */
@@ -282,10 +282,10 @@ static long rrkey[5];								/* 入力キー方向 */
 /* TextLayer( 10 )はｲﾍﾞﾝﾄで使用（固定） */
 /* プレーン80～90はｲﾍﾞﾝﾄで使用 */
 /* wav30はｲﾍﾞﾝﾄで使用 */
-//static long file_handle = 0	;
-static long one_event = 0;							/* 重なって発生するイベントの前回重なっていたかのフラグ */
-//static long start_plyer_disp = 1;					/* 開始時に表示するかフラグ */
-//static long start_effct_disp = 0;					/* 開始時に効果を表示するかフラグ */
+//static int32_t file_handle = 0	;
+static int32_t one_event = 0;							/* 重なって発生するイベントの前回重なっていたかのフラグ */
+//static int32_t start_plyer_disp = 1;					/* 開始時に表示するかフラグ */
+//static int32_t start_effct_disp = 0;					/* 開始時に効果を表示するかフラグ */
 
 #define DEBUG_DISP (0)
 
@@ -293,7 +293,7 @@ static long one_event = 0;							/* 重なって発生するイベントの前回重なっていたか
 // メイン関数
 void act_main( void )
 {
-	long exit_code;
+	int32_t exit_code;
 	
 	exit_code = 0;
 
@@ -320,11 +320,11 @@ void act_main( void )
 
 void act_init( void )
 {
-	long i;
-	long x;
-	long y;
-	long wk;
-	long d_num;
+	int32_t i;
+	int32_t x;
+	int32_t y;
+	int32_t wk;
+	int32_t d_num;
 	
 	char path_item[512];
 	char path_work[512];
@@ -706,7 +706,7 @@ void act_init( void )
 
 void act_relese( void )
 {
-	long i;
+	int32_t i;
 	
 	save_file_w( );
 
@@ -721,16 +721,16 @@ void act_relese( void )
 
 void act_keys( void )
 {
-	long i;
-	long old_x;
-	long muki;
-	long muki2;
-	long px;
-	long py;
-	long kaiten;
-	long rr;
-	long rg;
-	long ii;
+	int32_t i;
+	int32_t old_x;
+	int32_t muki;
+	int32_t muki2;
+	int32_t px;
+	int32_t py;
+	int32_t kaiten;
+	int32_t rr;
+	int32_t rg;
+	int32_t ii;
 	
 	if ( sn == 1 )
 	{
@@ -1216,8 +1216,8 @@ void act_keys( void )
 									
 									
 									rr = GetKyori(
-													  labs( player[0] - player[32] ) ,
-													  labs( player[1] - player[33] )
+													  labs_gnp( player[0] - player[32] ) ,
+													  labs_gnp( player[1] - player[33] )
 													); 
 									player[21] = rr;
 									if ( player[21] < 37 )
@@ -1324,8 +1324,8 @@ void act_keys( void )
 													
 													
 													rr = GetKyori(
-																	  labs( player[0] - player[32] ) ,
-																	  labs( player[1] - player[33] )
+																	  labs_gnp( player[0] - player[32] ) ,
+																	  labs_gnp( player[1] - player[33] )
 																	); 
 													player[21] = rr;
 													if ( player[21] < 37 )
@@ -1533,8 +1533,8 @@ void act_keys( void )
 			
 			
 			rr = GetKyori(
-							  labs( player[0] - player[32] ) ,
-							  labs( player[1] - player[33] )
+							  labs_gnp( player[0] - player[32] ) ,
+							  labs_gnp( player[1] - player[33] )
 							); 
 			player[21] = rr;
 			if ( player[21] < 37 )
@@ -1578,8 +1578,8 @@ void act_keys( void )
 			
 			
 			rr = GetKyori(
-							  labs( player[0] - player[32] ) ,
-							  labs( player[1] - player[33] )
+							  labs_gnp( player[0] - player[32] ) ,
+							  labs_gnp( player[1] - player[33] )
 							); 
 			player[21] = rr;
 			if ( player[21] < 37 )
@@ -1674,9 +1674,9 @@ void fram_set( )
 /* すい中の場合はジャンプ力増加 */
 void jmp_st( )
 {
-	long px1 ;
-	long px2 ;
-	long py2 ;
+	int32_t px1 ;
+	int32_t px2 ;
+	int32_t py2 ;
 
 	px1 = ( player[0] + 10 ) / 32;
 	px2 = ( player[0] + 22 ) / 32;
@@ -1696,11 +1696,11 @@ void jmp_st( )
 /* ジャンプＹ位置計算 */
 void jmp( )
 {
-	long y1;
-	long px1 ;
-	long px2 ;
-	long py ;
-	long py3 ;
+	int32_t y1;
+	int32_t px1 ;
+	int32_t px2 ;
+	int32_t py ;
+	int32_t py3 ;
 	
 
 	player[13]++;
@@ -1909,13 +1909,13 @@ void jmp( )
 
 }
 
-void idou_l( long ankr_flag )
+void idou_l( int32_t ankr_flag )
 {
-	long px ;
-	long py1 ;
-	long py2 ;
+	int32_t px ;
+	int32_t py1 ;
+	int32_t py2 ;
 
-	long i;
+	int32_t i;
 
 
 	/* 今回の位置 */
@@ -1967,13 +1967,13 @@ void idou_l( long ankr_flag )
 
 }
 /* 自分の左右に移動可能か？ */
-void idou_r( long ankr_flag )
+void idou_r( int32_t ankr_flag )
 {
-	long px ;
-	long py1 ;
-	long py2 ;
+	int32_t px ;
+	int32_t py1 ;
+	int32_t py2 ;
 
-	long i;
+	int32_t i;
 
 	/* 今回の位置 */
 	px = ( player[0] + 21 + player[29]  ) / 32;
@@ -2023,7 +2023,7 @@ void idou_r( long ankr_flag )
 
 }
 
-void cleaer_ankr( long ankr_flag )
+void cleaer_ankr( int32_t ankr_flag )
 {
 	if ( ankr_flag != 0 )
 	{
@@ -2153,7 +2153,7 @@ void act_drow( void )
 /* 一時ファイル保存 */
 void save_file_w( )
 {
-	long i;
+	int32_t i;
 	char path_config[512];
 	char path_item[512];
 	char path_work[512];
@@ -2228,8 +2228,8 @@ void save_file_w( )
 
 void playerdisp( )
 {
-	long i;
-	long arm_muki;
+	int32_t i;
+	int32_t arm_muki;
 	
 	arm_muki = 0;
 	
@@ -2714,15 +2714,15 @@ void bak_make( )
 
 
 /* ＷＡＩＴつきスクロール */
-void wait_scl( long type, long d_num )
+void wait_scl( int32_t type, int32_t d_num )
 {
 /*  
 	0:上	1:下	2:左	3:右
 	よみこむファイルＮＯ
 */
-	long i;
-	long x;
-	long y;
+	int32_t i;
+	int32_t x;
+	int32_t y;
 
 	screen_BackupPlane( );
 
@@ -2857,11 +2857,11 @@ void wait_scl( long type, long d_num )
 }
 
 
-void wait_scl2( long d_num ,long init_x, long init_y )
+void wait_scl2( int32_t d_num ,int32_t init_x, int32_t init_y )
 {
-	long i;
-	long x;
-	long y;
+	int32_t i;
+	int32_t x;
+	int32_t y;
 
 	for ( i = 0; i < 100; i++ )
 	{
@@ -2982,10 +2982,10 @@ void wait_scl2( long d_num ,long init_x, long init_y )
 
 void wait_scl3( )
 {
-	long i;
-	long x;
-	long y;
-	long d_num;
+	int32_t i;
+	int32_t x;
+	int32_t y;
+	int32_t d_num;
 	
 	d_num = save_data[3];
 
@@ -3090,8 +3090,8 @@ void wait_scl3( )
 
 void snack_counter_disp()
 {
-	long count;
-	long i;
+	int32_t count;
+	int32_t i;
 
 	count = 0;
 	for(i = 0; i < 20; i++)
@@ -3110,13 +3110,13 @@ void snack_counter_disp()
 
 void minimap_disp( void )
 {
-	long px;
-	long py;
-	long size;
-	long height;
-	long i;
-	long x;
-	long y;
+	int32_t px;
+	int32_t py;
+	int32_t size;
+	int32_t height;
+	int32_t i;
+	int32_t x;
+	int32_t y;
 
 	px   = 2;
 	py   = 12;
@@ -3156,7 +3156,7 @@ void mapdisp()
 		stage_hosei = 50;
 	}
 
-	long wk;
+	int32_t wk;
 
 	if ( gameflag[132] == 1 )
 	{
@@ -3523,9 +3523,9 @@ void stage_end( )
 }
 
 
-void p_shot_set( long type , long muki, long houkou )
+void p_shot_set( int32_t type , int32_t muki, int32_t houkou )
 {
-	long i;
+	int32_t i;
 		
 	for ( i = 0; i < 10; i++ )
 	{
@@ -3549,7 +3549,7 @@ void p_shot_set( long type , long muki, long houkou )
 
 void p_shot_disp( )
 {
-	long i;
+	int32_t i;
 	
 	for ( i = 0; i < 10; i++ )
 	{
@@ -3643,9 +3643,9 @@ void p_shot_disp( )
 	}
 }
 
-void p_shot_f_set( long x, long y , long type )
+void p_shot_f_set( int32_t x, int32_t y , int32_t type )
 {
-	long i;
+	int32_t i;
 	
 	for ( i = 0; i < 40; i++ )
 	{
@@ -3663,7 +3663,7 @@ void p_shot_f_set( long x, long y , long type )
 }
 void p_shot_f_disp( )
 {
-	long i;
+	int32_t i;
 	
 	for ( i = 0; i < 40; i++ )
 	{
@@ -3685,13 +3685,13 @@ void p_shot_f_disp( )
 		}
 	}
 }
-void p_shot_f2_set( long x, long y , long muki )
+void p_shot_f2_set( int32_t x, int32_t y , int32_t muki )
 {
-	long i;
-	long k; 
-	long ii;
-	long rg;
-	long max;
+	int32_t i;
+	int32_t k; 
+	int32_t ii;
+	int32_t rg;
+	int32_t max;
 	
 
 	max = 10;
@@ -3722,7 +3722,7 @@ void p_shot_f2_set( long x, long y , long muki )
 }
 void p_shot_f2_disp( )
 {
-	long ii;
+	int32_t ii;
 
 	for ( ii = 0; ii < 80; ii++ )
 	{
@@ -3748,9 +3748,9 @@ void p_shot_f2_disp( )
 }
 
 
-void item_set( long type, long x, long y, long iti, long g_num )
+void item_set( int32_t type, int32_t x, int32_t y, int32_t iti, int32_t g_num )
 {
-	long i;
+	int32_t i;
 	
 	if ( iti != 0 )
 	{
@@ -3792,10 +3792,10 @@ void item_set( long type, long x, long y, long iti, long g_num )
 		}
 	}
 }
-long item_sonzai( long map1, long map2 )
+int32_t item_sonzai( int32_t map1, int32_t map2 )
 {
-	long i;
-	long rc;
+	int32_t i;
+	int32_t rc;
 
 	rc = 1;
 	for ( i = 0; i < 100; i++ )
@@ -3818,13 +3818,13 @@ long item_sonzai( long map1, long map2 )
 
 void item_disp( )
 {
-	long i;
-	long k;
-	long bx;
-	long by;
-	long k_f;
-	long disp_x_j;
-	long disp_y_j;
+	int32_t i;
+	int32_t k;
+	int32_t bx;
+	int32_t by;
+	int32_t k_f;
+	int32_t disp_x_j;
+	int32_t disp_y_j;
 
 	k_f = 0;
 	disp_x_j = 0;
@@ -4111,11 +4111,11 @@ void item_disp( )
 	}
 }
 
-long item_up( )
+int32_t item_up( )
 {
-	long i;
-	long bx;
-	long by;
+	int32_t i;
+	int32_t bx;
+	int32_t by;
 	
 	for ( i = 0; i < 50; i++ )
 	{
@@ -4160,11 +4160,11 @@ long item_up( )
 	}
 	return( -1 );
 }
-long item_up2( )
+int32_t item_up2( )
 {
-	long i;
-	long bx;
-	long by;
+	int32_t i;
+	int32_t bx;
+	int32_t by;
 	
 	for ( i = 0; i < 50; i++ )
 	{
@@ -4191,11 +4191,11 @@ long item_up2( )
 }
 
 /* アイテムに重なって上が押された時のイベント */
-long item_event( )
+int32_t item_event( )
 {
-	long i;
-	long rc;
-	long r_f;
+	int32_t i;
+	int32_t rc;
+	int32_t r_f;
 	
 	rc = 0;
 	
@@ -4234,12 +4234,12 @@ long item_event( )
 
 
 //敵作成
-void enm_set( long type, long x, long y )
+void enm_set( int32_t type, int32_t x, int32_t y )
 {	
-	long i;
-	long size;
-	long syu;
-	long j;
+	int32_t i;
+	int32_t size;
+	int32_t syu;
+	int32_t j;
 
 	for ( i = 0; i < 20; i++ )
 	{
@@ -4291,12 +4291,12 @@ void enm_set( long type, long x, long y )
 }
 
 //敵作成
-void enm_set2( long type, long x, long y ,long muki )
+void enm_set2( int32_t type, int32_t x, int32_t y ,int32_t muki )
 {	
-	long i;
-	long size;
-	long syu;
-	long j;
+	int32_t i;
+	int32_t size;
+	int32_t syu;
+	int32_t j;
 
 	for ( i = 0; i < 20; i++ )
 	{
@@ -4349,9 +4349,9 @@ void enm_set2( long type, long x, long y ,long muki )
 
 
 /* 敵のＨＰを設定（e_setで使われる） */
-long e_hp( long type )
+int32_t e_hp( int32_t type )
 {
-	long rc;
+	int32_t rc;
 	rc = 1;
 	if ( ( type / 100 ) == 1 )	/* 32 */
 	{
@@ -4374,14 +4374,14 @@ long e_hp( long type )
 
 void enm_disp()
 {	
-	long i;
-	long size ;
-	long p_h;
-	long size_hosei_x;
-	long size_hosei_y;
-	long isclaer;
-	long disp_x_j;
-	long disp_y_j;
+	int32_t i;
+	int32_t size ;
+	int32_t p_h;
+	int32_t size_hosei_x;
+	int32_t size_hosei_y;
+	int32_t isclaer;
+	int32_t disp_x_j;
+	int32_t disp_y_j;
 
 	disp_x_j = 0;
 	disp_y_j = 0;
@@ -4714,7 +4714,7 @@ void enm_disp()
 	} 
 }
 
-void e_move( long i )
+void e_move( int32_t i )
 {
 	
 	if ( enemy[6 + ( i * 20 )] > 0 )
@@ -4732,12 +4732,12 @@ void e_move( long i )
 }
 
 /* ボスを倒した演出 */
-void boss_dead( long x, long y )
+void boss_dead( int32_t x, int32_t y )
 {
 /*	
-	long i;
-	long xx;
-	long yy;
+	int32_t i;
+	int32_t xx;
+	int32_t yy;
 	for ( i = 0; i < 100; i++ ) 
 	{
 //		BltFromBackupPlane();		//	バックアッププレーンからのBlt
@@ -4758,13 +4758,13 @@ void boss_dead( long x, long y )
 
 //-----------------------------------------------------------------------------------
 /* 敵ショット生成 */
-void e_shot_set( long type , long i , long x, long y )
+void e_shot_set( int32_t type , int32_t i , int32_t x, int32_t y )
 {
-	long ii;
-	long j;
-	long rg;
-	long mx;
-	long my;
+	int32_t ii;
+	int32_t j;
+	int32_t rg;
+	int32_t mx;
+	int32_t my;
 	
 	/* 発生位置X */
 	/* 発生位置Y */
@@ -4802,9 +4802,9 @@ void e_shot_set( long type , long i , long x, long y )
 /* ショット移動 */
 void e_shot_disp( )
 {
-	long i;
-	long p_h;
-	long size ;
+	int32_t i;
+	int32_t p_h;
+	int32_t size ;
 	
 	p_h = 22;	/* プレイヤーの当たり判定 */
 	size = 0;
@@ -4854,16 +4854,16 @@ void e_shot_disp( )
 }
 
 /* 敵用ジャンプ */
-void enmjmp( long i )
+void enmjmp( int32_t i )
 {
-	long y1;
-	long px ;
-	long px1 ;
-	long px2 ;
-	long py ;
+	int32_t y1;
+	int32_t px ;
+	int32_t px1 ;
+	int32_t px2 ;
+	int32_t py ;
 
-	long size;
-	long e10;
+	int32_t size;
+	int32_t e10;
 
 	if ( enemy[3 + ( i * 20 )] == 1 )
 	{
@@ -4988,12 +4988,12 @@ void enmjmp( long i )
 
 
 /* 移動後の座標のマスを返す */
-long map1_item_j( long x, long y )
+int32_t map1_item_j( int32_t x, int32_t y )
 {
-	long px ;
-	long py ;
-	long i;
-	long rc;
+	int32_t px ;
+	int32_t py ;
+	int32_t i;
+	int32_t rc;
 	
 	px = ( x ) / 32;
 	py = ( 15 - ( ( y + 16 ) / 32 ) );
@@ -5035,9 +5035,9 @@ long map1_item_j( long x, long y )
 }
 
 
-void kane_set( long x, long y )
+void kane_set( int32_t x, int32_t y )
 {
-	long i;
+	int32_t i;
 	
 	for ( i = 0; i < 20; i++ )
 	{
@@ -5060,7 +5060,7 @@ void kane_set( long x, long y )
 
 void kane_disp(  )
 {
-	long i;
+	int32_t i;
 	
 	for ( i = 0; i < 20; i++ )
 	{
@@ -5110,13 +5110,13 @@ void kane_disp(  )
 	}
 }
 /* ジャンプＹ位置計算 */
-void k_jmp( long i )
+void k_jmp( int32_t i )
 {
-	long y1;
-	long px1 ;
-	long px2 ;
-	long py ;
-	long py3 ;
+	int32_t y1;
+	int32_t px1 ;
+	int32_t px2 ;
+	int32_t py ;
+	int32_t py3 ;
 
 	if ( kane[6 + ( i * 10 )] == 10 ) 
 	{
@@ -5187,9 +5187,9 @@ void k_jmp( long i )
 
 }
 
-void p_jump_f_set( long x, long y )
+void p_jump_f_set( int32_t x, int32_t y )
 {
-	long i;
+	int32_t i;
 	
 	for ( i = 0; i < 10; i++ )
 	{
@@ -5207,7 +5207,7 @@ void p_jump_f_set( long x, long y )
 
 void p_jump_f_disp( )
 {
-	long i;
+	int32_t i;
 	
 	for ( i = 0; i < 10; i++ )
 	{
@@ -5292,9 +5292,9 @@ void window_keys( )
 
 
 /* 絶対値を返す */
-long labs( long para )
+int32_t labs_gnp( int32_t para )
 {
-	long rc;
+	int32_t rc;
 	
 	rc = para;
 	
@@ -5306,13 +5306,13 @@ long labs( long para )
 }
 
 /* 魔法生成 */
-void p_mgc_set( long muki , long p3 )
+void p_mgc_set( int32_t muki , int32_t p3 )
 {
-	long i;
-	long k; 
-	long ii;
-	long rg;
-	long max;
+	int32_t i;
+	int32_t k; 
+	int32_t ii;
+	int32_t rg;
+	int32_t max;
 	
 	rg = 0;
 	
@@ -5377,7 +5377,7 @@ void p_mgc_set( long muki , long p3 )
 
 void p_mgc_disp( )
 {
-	long ii;
+	int32_t ii;
 	
 	for ( ii = 0; ii < 40; ii++ )
 	{
@@ -5422,7 +5422,7 @@ void p_mgc_disp( )
 
 void replay_input_save( void )
 {
-	long input_keys;
+	int32_t input_keys;
 	input_keys = 0;
 	
 	/* キー処理は基本的にplayer[2]が何状態の時にキーを入れたらどうなるを記述していく */
@@ -5472,8 +5472,8 @@ void replay_input_save( void )
 
 void replay_input_load( void )
 {
-	long i;
-	long input_keys;
+	int32_t i;
+	int32_t input_keys;
 	input_keys = 0;
 	
 	for ( i = 0; i < 10 ; i++ )
@@ -5531,7 +5531,7 @@ void replay_file_save_w( void )
 	SaveFile( string, &replay[0], sizeof( replay ) );
 
 }
-void replay_file_save( long type )
+void replay_file_save( int32_t type )
 {
 	if ( type == 0 )
 	{
@@ -5544,9 +5544,9 @@ void replay_file_save( long type )
 	SaveFile( string, &replay[0], sizeof( replay ) );
 }
 
-long replay_file_load( void )
+int32_t replay_file_load( void )
 {
-	long rc ;
+	int32_t rc ;
 	rc = 1;
 	
 	if ( gameflag[125] == 0 )
@@ -5566,11 +5566,11 @@ long replay_file_load( void )
 }
 
 
-long GetKyori( long i1, long i2 )
+int32_t GetKyori( int32_t i1, int32_t i2 )
 {
-	long rc = 0;
+	int32_t rc = 0;
 	
-	rc = ( long )sqrt( ( i1 * i1 ) + ( i2 * i2 ) );
+	rc = ( int32_t )sqrt( ( i1 * i1 ) + ( i2 * i2 ) );
 	
 	return ( rc );
 }

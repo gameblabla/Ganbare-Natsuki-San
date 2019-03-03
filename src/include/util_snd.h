@@ -24,23 +24,23 @@ enum {
 
 extern void soundInitBuffer(void);
 extern void soundRelease(void);
-extern void soundLoadBuffer(SINT num, UINT8 *fname, int loop);
-extern void soundLoadBuffer2(SINT num, UINT8 *fname1, UINT8 *fname2);
-extern void soundLoadBufferSE(SINT num, UINT8 *fname);
-extern void soundStopBgm(SINT num);
+extern void soundLoadBuffer(int32_t num, uint8_t *fname, int loop);
+extern void soundLoadBuffer2(int32_t num, uint8_t *fname1, uint8_t *fname2);
+extern void soundLoadBufferSE(int32_t num, uint8_t *fname);
+extern void soundStopBgm(int32_t num);
 extern void soundStopBgmPlaying(void);
 extern int soundIsPlayBgm(void);
-extern void soundPlayBgm(SINT num);
-extern void soundPlayFadeFlag(SINT flag, SINT time);
+extern void soundPlayBgm(int32_t num);
+extern void soundPlayFadeFlag(int32_t flag, int32_t time);
 extern void soundPlayCtrl(void);
-extern void soundSetVolumeMaster(SINT vol);
-extern void soundSetVolumeBgm(SINT vol, SINT num);
-extern void soundSetVolumeAll(SINT vol);
-extern void soundStopSe(SINT num);
-extern void soundPlaySe(SINT num);
-extern int soundIsPlaySe(SINT num);
+extern void soundSetVolumeMaster(int32_t vol);
+extern void soundSetVolumeBgm(int32_t vol, int32_t num);
+extern void soundSetVolumeAll(int32_t vol);
+extern void soundStopSe(int32_t num);
+extern void soundPlaySe(int32_t num);
+extern int soundIsPlaySe(int32_t num);
 extern void soundStopSeAll(void);
 
-extern SINT sound_buff[];
+extern int32_t sound_buff[];
 
 #endif /* _UTIL_SND_ */

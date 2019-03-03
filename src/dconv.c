@@ -2,9 +2,9 @@
 #include "include/general.h"
 #include "include/dconv.h"
 
-static UINT32 DCNVnext = 1UL;
+static uint32_t DCNVnext = 1UL;
 
-static UINT16 SinTable[1025] =
+static uint16_t SinTable[1025] =
 {
 	0x0000,0x0064,0x00c9,0x012d,0x0192,0x01f6,0x025b,0x02bf,	/*  0.000 */
 	0x0324,0x0388,0x03ed,0x0451,0x04b6,0x051a,0x057f,0x05e3,	/*  0.703 */
@@ -137,7 +137,7 @@ static UINT16 SinTable[1025] =
 	0x0000														/* 90.000 */
 };
 
-static UINT16 AtanTable[1025] =
+static uint16_t AtanTable[1025] =
 {
 	0x0000,0x000a,0x0014,0x001e,0x0028,0x0032,0x003d,0x0047,	 /*    0 0.000000 : 0.00 */
 	0x0051,0x005b,0x0065,0x0070,0x007a,0x0084,0x008e,0x0098,	 /*    8 0.007813 : 0.45 */
@@ -270,33 +270,33 @@ static UINT16 AtanTable[1025] =
 	0x2000														 /* 1024 1.000000 : 45.00 */
 };
 
-UINT16 DCNVrand(UINT16 max);
-void DCNVinitRand(UINT16 seed);
-void DCNVshuffleDim(int cnt, UINT16 *tbl);
-void DCNVshuffleMain(int cnt, UINT16 *tbl);
-SINT32 MOTsin(ANGLE ang);
-SINT32 MOTcos(ANGLE ang);
-SINT16 MOTatan(SINT32 posX,SINT32 posY);
+uint16_t DCNVrand(uint16_t max);
+void DCNVinitRand(uint16_t seed);
+void DCNVshuffleDim(int cnt, uint16_t *tbl);
+void DCNVshuffleMain(int cnt, uint16_t *tbl);
+int32_t MOTsin(int16_t ang);
+int32_t MOTcos(int16_t ang);
+int16_t MOTatan(int32_t posX,int32_t posY);
 
-static SINT16 MOTatanSub(SINT32 posX, SINT32 posY);
+static int16_t MOTatanSub(int32_t posX, int32_t posY);
 
-UINT16 DCNVrand(UINT16 max)
+uint16_t DCNVrand(uint16_t max)
 {
 	DCNVnext = DCNVnext * 1103515245UL + 12345UL;
 
 	if(max){
-		return ((UINT16)(DCNVnext / 65536) % max);
+		return ((uint16_t)(DCNVnext / 65536) % max);
 	}else{
 		return 0;
 	}
 }
 
-void DCNVinitRand(UINT16 seed)
+void DCNVinitRand(uint16_t seed)
 {
-	DCNVnext = (UINT32)seed;
+	DCNVnext = (uint32_t)seed;
 }
 
-void DCNVshuffleDim(int cnt, UINT16 *tbl)
+void DCNVshuffleDim(int cnt, uint16_t *tbl)
 {
 	int i;
 
@@ -307,7 +307,7 @@ void DCNVshuffleDim(int cnt, UINT16 *tbl)
 	DCNVshuffleMain(cnt, tbl);
 }
 
-void DCNVshuffleMain(int cnt, UINT16 *tbl)
+void DCNVshuffleMain(int cnt, uint16_t *tbl)
 {
 	int i;
 	int seed;
@@ -315,16 +315,16 @@ void DCNVshuffleMain(int cnt, UINT16 *tbl)
 
 	for(i = cnt - 1; i > 0; i--)
 	{
-		seed = DCNVrand((UINT16)(i - 1));
+		seed = DCNVrand((uint16_t)(i - 1));
 		tmp = tbl[i];
 		tbl[i] = tbl[seed];
 		tbl[seed] = tmp;
 	}
 }
 
-SINT32 MOTsin(ANGLE ang)
+int32_t MOTsin(int16_t ang)
 {
-	UINT16 deg;
+	uint16_t deg;
 
 	deg = ang;
 	deg  += 8;
@@ -332,18 +332,18 @@ SINT32 MOTsin(ANGLE ang)
 
 	switch(deg & 0x0c00){
 		case 0x0000 :
-			return ((SINT32)(SinTable[deg]));
+			return ((int32_t)(SinTable[deg]));
 		case 0x0400 :
 			if((deg = 2048 - deg) < 1024){
-				return ((SINT32)(SinTable[deg]));
+				return ((int32_t)(SinTable[deg]));
 			}else{
 				return (0x10000L);
 			}
 		case 0x0800 :
-			return (0 - (SINT32)(SinTable[deg - 2048]));
+			return (0 - (int32_t)(SinTable[deg - 2048]));
 		case 0x0c00 :
 			if((deg = 4096 - deg) < 1024){
-				return (0 - (SINT32)(SinTable[deg]));
+				return (0 - (int32_t)(SinTable[deg]));
 			}else{
 				return (0 - 0x10000L);
 			}
@@ -352,9 +352,9 @@ SINT32 MOTsin(ANGLE ang)
 	return -1;
 }
 
-SINT32 MOTcos(ANGLE ang)
+int32_t MOTcos(int16_t ang)
 {
-	UINT16 deg;
+	uint16_t deg;
 
 	deg = ang;
 	deg  += 8;
@@ -363,26 +363,26 @@ SINT32 MOTcos(ANGLE ang)
 	switch(deg & 0x0c00){
 		case 0x0000 :
 			if(deg){
-				return ((SINT32)(SinTable[1024 - deg]));
+				return ((int32_t)(SinTable[1024 - deg]));
 			}else{
 				return (0x10000L);
 			}
 		case 0x0400 :
-			return (0 - (SINT32)(SinTable[deg - 1024]));
+			return (0 - (int32_t)(SinTable[deg - 1024]));
 		case 0x0800 :
 			if((deg = 3072 - deg) < 1024){
-				return (0 - (SINT32)(SinTable[deg]));
+				return (0 - (int32_t)(SinTable[deg]));
 			}else{
 				return (0 - 0x10000L);
 			}
 		case 0x0c00 :
-			return ((SINT32)(SinTable[deg - 3072]));
+			return ((int32_t)(SinTable[deg - 3072]));
 	}
 
 	return -1;
 }
 
-SINT16 MOTatan(SINT32 posX,SINT32 posY)
+int16_t MOTatan(int32_t posX,int32_t posY)
 {
 	if(posX >= 0){
 		if(posY < 0){
@@ -399,10 +399,10 @@ SINT16 MOTatan(SINT32 posX,SINT32 posY)
 	}
 }
 
-SINT16 MOTatanSub(SINT32 posX, SINT32 posY)
+int16_t MOTatanSub(int32_t posX, int32_t posY)
 {
-	SINT32 absX;
-	SINT32 absY;
+	int32_t absX;
+	int32_t absY;
 
 	if(abs(posX) < 256){
 		return (0x0000);

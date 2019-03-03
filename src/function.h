@@ -11,25 +11,25 @@ extern int LoadGameFlag( char *fn );
 extern int SaveGameFlag( char *fn );
 extern int LoadGameFlag2( char *fn );
 extern int SaveGameFlag2( char *fn );
-extern int SaveFile( char *fn, long *buff, long size );
-extern int LoadFile( char *fn, long *buff, long size );
-extern long GetConfig( char* fn, char* cParam );
-extern long LogFileWrite( char* fn, char* cParam );
+extern int SaveFile( char *fn, int32_t *buff, int32_t size );
+extern int LoadFile( char *fn, int32_t *buff, int32_t size );
+extern int32_t GetConfig( char* fn, char* cParam );
+extern int32_t LogFileWrite( char* fn, char* cParam );
 
-extern long LoadBitmap( char *fname, int bmpindex, int flag );
+extern int32_t LoadBitmap( char *fname, int bmpindex, int flag );
 extern void ReleaseBitmap( int bmpindex );
 extern void Blt( int bmpindex, int dstX, int dstY );
 extern void BltRect(int bmpindex, int srcX, int srcY, int dstX, int dstY, int width, int height);
 extern void ClearSecondary( void );
-extern void BltNumericImage( long value, long length, long x, long y, long plane, long num_stpos_x, long num_stpos_y, long num_width, long num_height );
-extern void BltNumericImage2( long value, long length, long x, long y, long plane, long num_stpos_x, long num_stpos_y, long num_width, long num_height );
+extern void BltNumericImage( int32_t value, int32_t length, int32_t x, int32_t y, int32_t plane, int32_t num_stpos_x, int32_t num_stpos_y, int32_t num_width, int32_t num_height );
+extern void BltNumericImage2( int32_t value, int32_t length, int32_t x, int32_t y, int32_t plane, int32_t num_stpos_x, int32_t num_stpos_y, int32_t num_width, int32_t num_height );
 extern void SetGscreenPalette( SDL_Surface *surface );
 extern void SetPalette(int getbmpindex, int setbmpindex);
 extern void BltRectRotZoom( int bmpindex, int dstX, int dstY, int srcX, int srcY, int width, int height, double angle, double zoom, int smooth);
 extern void CreateSurface( int bmpindex, int size_x, int size_y  );
 extern void SwapToSecondary( int bmpindex );
 extern void SaveBmp( int bmpindex, char *fn );
-extern void drawGRPline(f32 x1, f32 y1, f32 x2, f32 y2, Uint32 color);
+extern void drawGRPline(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Uint32 color);
 
 extern int IsPushKey( int keycode );
 extern int IsPressKey( int keycode );
@@ -45,9 +45,9 @@ extern void FPSWait( void );
 extern int system_keys( void );
 extern int Set_Volume( int vol );
 
-extern long funcSin( long rdo );
-extern long funcCos( long rdo );
-extern long funcTan2( long posX, long posY );
-extern long get2keta( long val, long st );
+extern int32_t funcSin( int32_t rdo );
+extern int32_t funcCos( int32_t rdo );
+extern int32_t funcTan2( int32_t posX, int32_t posY );
+extern int32_t get2keta( int32_t val, int32_t st );
 
 #endif

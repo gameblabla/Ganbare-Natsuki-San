@@ -1,19 +1,7 @@
 #ifndef	_GENERAL_
 #define _GENERAL_
 
-typedef int BOOL_D;
-typedef unsigned int UINT;
-typedef signed int SINT;
-typedef unsigned char UINT8;
-typedef signed char SINT8;
-typedef unsigned short UINT16;
-typedef signed short SINT16;
-typedef signed int SINT32;
-typedef unsigned int UINT32;
-typedef signed long SLONG;
-typedef unsigned long ULONG;
-typedef signed short ANGLE;
-typedef SINT32 f32;
+#include <stdint.h>
 
 enum{
 	X,Y,Z,XYZ,XYZS,XY = Z,S = XYZ,SX = Z,SY = S
@@ -57,10 +45,10 @@ enum{
 
 typedef union REG32{
 	struct{
-		UINT16 low;
-		UINT16 high;
+		uint16_t low;
+		uint16_t high;
 	}half;
-	UINT32 full;
+	uint32_t full;
 }REG32;
 
 #include <stdio.h>

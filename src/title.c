@@ -705,7 +705,7 @@ void title_k_jmp( int i )
 /***************************************************************************/
 int replay_file_find( void )
 {
-	long i;
+	int32_t i;
 	int file_j;
 	int stage;
 	
@@ -742,7 +742,7 @@ int replay_file_find( void )
 /***************************************************************************/
 int replay_file_find2( void )
 {
-	long i;
+	int32_t i;
 	int file_j;
 	int stage;
 	

@@ -27,9 +27,9 @@ enum{
 
 void soundInitBuffer(void);
 void soundRelease(void);
-void soundLoadBuffer(int num, UINT8 *fname, int loop);
-void soundLoadBuffer2(int num, UINT8 *fname1, UINT8 *fname2);
-void soundLoadBufferSE(int num, UINT8 *fname);
+void soundLoadBuffer(int num, uint8_t *fname, int loop);
+void soundLoadBuffer2(int num, uint8_t *fname1, uint8_t *fname2);
+void soundLoadBufferSE(int num, uint8_t *fname);
 void soundStopBgm(int num);
 void soundStopBgmPlaying(void);
 int soundIsPlayBgm(void);
@@ -76,7 +76,7 @@ void soundInitBuffer(void)
 #ifndef NOSOUND
 	int i;
     int audio_rate;
-    UINT16 audio_format;
+    uint16_t audio_format;
     int audio_channels;
     int audio_buffers;
 
@@ -143,7 +143,7 @@ void soundRelease(void)
 #endif
 }
 
-void soundLoadBuffer(int num, UINT8 *fname, int loop)
+void soundLoadBuffer(int num, uint8_t *fname, int loop)
 {
 #ifndef NOSOUND
 	if(!music[num]){
@@ -154,7 +154,7 @@ void soundLoadBuffer(int num, UINT8 *fname, int loop)
 #endif
 }
 
-void soundLoadBuffer2(int num, UINT8 *fname1, UINT8 *fname2)
+void soundLoadBuffer2(int num, uint8_t *fname1, uint8_t *fname2)
 {
 #ifndef NOSOUND
 	if(!music[num]){
@@ -167,7 +167,7 @@ void soundLoadBuffer2(int num, UINT8 *fname1, UINT8 *fname2)
 #endif
 }
 
-void soundLoadBufferSE(int num, UINT8 *fname)
+void soundLoadBufferSE(int num, uint8_t *fname)
 {
 #ifndef NOSOUND
 	chunk[num] = Mix_LoadWAV((char *)fname);
@@ -262,7 +262,7 @@ void soundPlayBgm2(int num)
 #endif
 }
 
-void soundLoadPlayBgm(UINT8 *fname, int loop)
+void soundLoadPlayBgm(uint8_t *fname, int loop)
 {
 //	soundStopBgmPlaying();
 //	if(music[BGM_TEST]){
