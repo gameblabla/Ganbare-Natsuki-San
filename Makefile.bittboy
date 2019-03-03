@@ -1,0 +1,32 @@
+# Software Name
+PROGRAM = gnp
+
+# Compiler
+CC = /opt/bittboy-toolchain/bin/arm-miyoo-linux-musleabi-gcc
+
+# Linker
+LDFLAGS = -Wl,--start-group -lSDL_mixer -lasound -lmodplug -lvorbisidec -logg -lSDL -lm -lSDL_image -lstdc++ -Wl,--end-group -Wl,--as-needed -Wl,--gc-sections -flto -s
+CFLAGS = -O2 -fdata-sections -ffunction-sections -fno-PIC -Wall
+
+# Include
+INCLUDES := 
+
+CFLAGS +=  -Isrc
+CFILES =  src/ram.c src/util_snd.c src/function.c src/dconv.c src/scene.c src/title.c src/init.c src/act.c src/option.c src/ending.c src/logo.c
+
+#
+#========================================(Compile)
+#
+
+OFILES = $(SFILES:.S=.o) $(CFILES:.c=.o)
+
+$(PROGRAM):	$(OFILES)
+			$(CC) $(CFLAGS) $(OFILES) -o $@ $(LDFLAGS)
+
+all: $(PROGRAM)
+
+%.o: %.c
+	 $(CC) $(ALL_INCLUDES) $(CFLAGS) -c $< -o $@
+
+clean:
+	 -rm -f $(OFILES) $(MAPFILE) $(PROGRAM)
