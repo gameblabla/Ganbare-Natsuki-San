@@ -1,0 +1,13 @@
+
+* Make it more platform agnostic.
+Unfortunately, this fucking game's source code is somewhat obfuscated and the comments were in japanese,
+making this task difficult.
+
+Right now it relies on a configuration file being written somewhere. Said file is then read by the game.
+There should be a way of allowing the game to run without it.
+
+* Add support for the TI-Nspire CX, Dreamcast
+Kind of related to the above.
+
+* Port it to SDL2
+Will be needed for Android port and other modern platforms. (Wayland and all)
