@@ -2503,6 +2503,8 @@ void playerdisp( )
 }
 //-------------------------------------------------------------
 //背景表示
+
+/* Scrolling map display - Gameblabla */
 void bakdisp1()
 {
 	int x;
@@ -2590,27 +2592,9 @@ void bakdisp1()
 	{
 		d_y = 360 - player[1];
 	}
-	/* stage13,14,17は多重スクロール */
-/*
-	if ( stage == 13 )
-	{
-		BltFastRect( 110, 0, 0, ( d_x / 8 ), ( d_y / 8 ) - 2, 320, 240 );
-		BltRect( 111, 0, 0, ( d_x / 4 ), ( d_y / 4 ) - 4, 320, 240 );
-		BltRect( 112, 0, 0, ( d_x / 2 ), ( d_y / 2 ) - 8, 320, 240 );
-		BltRect( 125, 0, 0 , d_x , d_y - 16, 320, 240 );
-	}
-	else 
-	{
-*/
-	/* 背景アニメーションON */
+
 	Blt( 113, 0, 0 );						/* 背景スクロール演出 */
-//	Blt( 110, 0 - rayer[0] - d_x, 0 - d_y );				/* 背景スクロール演出 */
-//	Blt( 110, 640 - rayer[0] - d_x, 0 - d_y );				/* 背景スクロール演出 */
-//	Blt( 111, 0 - rayer[1] - d_x, 0 - d_y );				/* 背景スクロール演出 */
-//	Blt( 111, 640 - rayer[1] - d_x, 0 - d_y );				/* 背景スクロール演出 */
-//	Blt( 112, 0 - rayer[2] - d_x, 0 - d_y );				/* 背景スクロール演出 */
-//	Blt( 112, 640 - rayer[2] - d_x, 0 - d_y );				/* 背景スクロール演出 */
-	/* 地面表示 */
+
 	i = bak_cnt / 10;
 	for ( x = 0; x < 20; x++ )
 	{
@@ -2618,8 +2602,8 @@ void bakdisp1()
 		{
 			if ( ( ( d_x - 32 ) <= ( x * 32 ) ) 
 			  && ( ( d_y - 32 ) <= ( y * 32 ) )
-			  && ( ( d_x + 320 + 32 ) >= ( x * 32 ) )
-			  && ( ( d_y + 240 + 32 ) >= ( y * 32 ) ) )
+			  && ( ( d_x + DISPLY_WIDTH + 32 ) >= ( x * 32 ) )
+			  && ( ( d_y + DISPLY_HEIGHT + 32 ) >= ( y * 32 ) ) )
 			{
 				b_y = map1[ x + ( y * 20 ) ] / 100;
 				b_x = map1[ x + ( y * 20 ) ] % 100;
@@ -2660,8 +2644,8 @@ void bakdisp2( )
 		{
 			if ( ( ( d_x - 32 ) <= ( x * 32 ) ) 
 			  && ( ( d_y - 32 ) <= ( y * 32 ) )
-			  && ( ( d_x + 320 + 32 ) >= ( x * 32 ) )
-			  && ( ( d_y + 240 + 32 ) >= ( y * 32 ) ) )
+			  && ( ( d_x + DISPLY_WIDTH + 32 ) >= ( x * 32 ) )
+			  && ( ( d_y + DISPLY_HEIGHT + 32 ) >= ( y * 32 ) ) )
 			{
 				if ( ( map1[ x + ( y * 20 ) ] >= 100 ) && ( map1[ x + ( y * 20 ) ] <= 219 ) )
 				{
@@ -3228,6 +3212,7 @@ void mapdisp()
 		}
 	}
 
+	/* Game HUD in-game - Gameblabla */
 	if ( stage != 0 )
 	{	
 		if ( gameflag[127] == 1 )	//トータルアタック
@@ -3841,8 +3826,8 @@ void item_disp( )
 			disp_y_j = ( 0 - item[2 + ( i * item_data[2] )] ) + MapInfo[3];
 			if ( ( ( d_x - item_data[0] ) <= ( disp_x_j ) ) 
 			  && ( ( d_y - item_data[0] ) <= ( disp_y_j  ) )
-			  && ( ( d_x + 320 + item_data[0] ) >= ( disp_x_j ) )
-			  && ( ( d_y + 240 + item_data[0] ) >= ( disp_y_j ) ) )
+			  && ( ( d_x + DISPLY_WIDTH + item_data[0] ) >= ( disp_x_j ) )
+			  && ( ( d_y + DISPLY_HEIGHT + item_data[0] ) >= ( disp_y_j ) ) )
 			{
 
 				BltRect( 12 , item[1 + ( i * 10 )] - d_x, ( 0 - item[2 + ( i * 10 )] ) + 480 - 32 - d_y, 32 * bx, by * 32, 32, 32 );
@@ -4456,8 +4441,8 @@ void enm_disp()
 
 			if ( ( ( d_x - size ) <= ( disp_x_j ) ) 
 			  && ( ( d_y - size ) <= ( disp_y_j  ) )
-			  && ( ( d_x + 320 + size ) >= ( disp_x_j ) )
-			  && ( ( d_y + 240 + size ) >= ( disp_y_j ) ) )
+			  && ( ( d_x + DISPLY_WIDTH + size ) >= ( disp_x_j ) )
+			  && ( ( d_y + DISPLY_HEIGHT + size ) >= ( disp_y_j ) ) )
 			{
 				if ( enemy[6 + ( i * 20 )] > 0 )	/* やられ */
 				{

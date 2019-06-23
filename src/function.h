@@ -25,7 +25,6 @@ extern void BltNumericImage( int32_t value, int32_t length, int32_t x, int32_t y
 extern void BltNumericImage2( int32_t value, int32_t length, int32_t x, int32_t y, int32_t plane, int32_t num_stpos_x, int32_t num_stpos_y, int32_t num_width, int32_t num_height );
 extern void SetGscreenPalette( SDL_Surface *surface );
 extern void SetPalette(int getbmpindex, int setbmpindex);
-extern void BltRectRotZoom( int bmpindex, int dstX, int dstY, int srcX, int srcY, int width, int height, double angle, double zoom, int smooth);
 extern void CreateSurface( int bmpindex, int size_x, int size_y  );
 extern void SwapToSecondary( int bmpindex );
 extern void SaveBmp( int bmpindex, char *fn );

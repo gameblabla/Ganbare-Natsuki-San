@@ -36,7 +36,6 @@ void BltNumericImage2( int32_t value, int32_t length, int32_t x, int32_t y, int3
 int32_t get2keta( int32_t val, int32_t st );
 void SetGscreenPalette( SDL_Surface *surface );
 void SetPalette(int getbmpindex, int setbmpindex);
-void BltRectRotZoom( int bmpindex, int dstX, int dstY, int srcX, int srcY, int width, int height, double angle, double zoom, int smooth);
 void CreateSurface( int bmpindex, int size_x, int size_y  );
 void SwapToSecondary( int bmpindex );
 void SaveBmp( int bmpindex, char *fn );
@@ -630,52 +629,6 @@ void SwapToSecondary( int bmpindex )
 		g_surface_bakup = g_screen;
 		g_screen = bitmap[bmpindex];
 	}
-} 
-
-void BltRectRotZoom( int bmpindex, int dstX, int dstY, int srcX, int srcY, int width, int height, double angle, double zoom, int smooth)
-{
-#if false
-	SDL_Surface *temp_Surface;
-	
-	temp_Surface = rotozoomSurface(bitmap[bmpindex], angle, zoom, smooth);
-	SDL_Surface *surface;
-    Uint8 bpp;
-	SDL_Palette *pal;
-	Uint8 r;
-	Uint8 g;
-	Uint8 b;
-
-	surface = bitmap[bmpindex];
-    if(surface){
-	    bpp = surface->format->BytesPerPixel;
-		if(bpp <= 8){
-			pal = surface->format->palette;
-			if(pal){
-				SDL_SetPalette(temp_Surface, SDL_LOGPAL|SDL_PHYSPAL, pal->colors, 0, 256);
-				r = pal->colors->r;
-				g = pal->colors->g;
-				b = pal->colors->b;
-				SDL_SetColorKey(temp_Surface, (SDL_SRCCOLORKEY|SDL_RLEACCEL), SDL_MapRGBA(g_screen->format,r,g,b,0) );
-			}
-		}
-	}
-	
-	
-	SDL_Rect srcRect;
-	srcRect.x = 0;
-	srcRect.y = 0;
-	srcRect.w = temp_Surface->w;
-	srcRect.h = temp_Surface->h;
-
-	SDL_Rect dstRect;
-	dstRect.x = dstX - ( temp_Surface->w / 2 );
-	dstRect.y = dstY - ( temp_Surface->h / 2 );
-	dstRect.w = temp_Surface->w;
-	dstRect.h = temp_Surface->h;
-
-	SDL_BlitSurface( temp_Surface , &srcRect, g_screen, &dstRect);
-	SDL_FreeSurface(temp_Surface);
-#endif
 }
 
 
@@ -690,137 +643,6 @@ void ClearSecondary( void )
 	
 	
 	SDL_FillRect(g_screen, &rect, SDL_MapRGBA(g_screen->format,0,0,0,255));
-}
-
-void drawGRPline(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Uint32 color)
-{
-	int32_t x, y, dx, dy, s, step;
-	int i, j;
-
-	dx = abs((x2 >> 16) - (x1 >> 16)) * WP;
-	dy = abs((y2 >> 16) - (y1 >> 16)) * WP;
-
-	x = x1;
-	y = y1;
-
-	if(dx > dy)
-	{
-		if(x1 > x2)
-		{
-			step = (y1 > y2) ? +1 * WP : -1 * WP;
-			s = x1;
-			x1 = x2;
-			x2 = s;
-			y1 = y2;
-		}
-		else
-		{
-			step = (y1 < y2) ? +1 * WP : -1 * WP;
-		}
-		pointSDLsurface( x, y, color);
-		s = dx / 2 * WP;
-		i = x1 >> 16;
-		j = x2 >> 16;
-		while(++i <= j)
-		{
-			x1 += 1 * WP;
-			s -= dy;
-			if(s < 0)
-			{
-				s += dx;
-				y1 += step;
-			}
-			pointSDLsurface( x1 + WP, y1,      color);
-			pointSDLsurface( x1 + WP, y1 + WP, color);
-			pointSDLsurface( x1 + WP, y1 - WP, color);
-
-			pointSDLsurface( x1,      y1,      color);
-			pointSDLsurface( x1,      y1 + WP, color);
-			pointSDLsurface( x1,      y1 - WP, color);
-
-			pointSDLsurface( x1 - WP, y1,      color);
-			pointSDLsurface( x1 - WP, y1 + WP, color);
-			pointSDLsurface( x1 - WP, y1 - WP, color);
-		}
-	}
-	else
-	{
-		if(y1 > y2)
-		{
-			step = (x1 > x2) ? +1 * WP : -1 * WP;
-			s = y1;
-			y1 = y2;
-			y2 = s;
-			x1 = x2;
-		}
-		else
-		{
-			step = (x1 < x2)? +1 * WP : -1 * WP;
-		}
-		pointSDLsurface( x, y, color);
-		s = dy / 2 * WP;
-		i = y1 >> 16;
-		j = y2 >> 16;
-		while(++i <= j)
-		{
-			y1 += 1 * WP;
-			s -= dx;
-			if(s < 0)
-			{
-				s += dy;
-				x1 += step;
-			}
-			pointSDLsurface( x1 + WP, y1,      color);
-			pointSDLsurface( x1 + WP, y1 + WP, color);
-			pointSDLsurface( x1 + WP, y1 - WP, color);
-
-			pointSDLsurface( x1,      y1,      color);
-			pointSDLsurface( x1,      y1 + WP, color);
-			pointSDLsurface( x1,      y1 - WP, color);
-
-			pointSDLsurface( x1 - WP, y1,      color);
-			pointSDLsurface( x1 - WP, y1 + WP, color);
-			pointSDLsurface( x1 - WP, y1 - WP, color);
-		}
-	}
-}
-void pointSDLsurface( int32_t px, int32_t py, Uint32 color)
-{
-	if ( px < 0 || px >= ( DISPLY_WIDTH_WP ) || py < 0 || py >= ( DISPLY_HEIGHT_WP ) )
-	{
-		return;
-	}
-
-	putSDLpixel(g_screen, px, py, color);
-}
-
-void putSDLpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
-{
-    int bpp = surface->format->BytesPerPixel;
-    Uint8 *p = (Uint8 *)surface->pixels + (y >> 16) * surface->pitch + (x >> 16) * bpp;
-
-    switch(bpp){
-	    case 1:
-	        *p = pixel;
-	        break;
-	    case 2:
-	        *(Uint16 *)p = pixel;
-	        break;
-	    case 3:
-	        if(SDL_BYTEORDER == SDL_BIG_ENDIAN){
-	            p[0] = (pixel >> 16) & 0xff;
-	            p[1] = (pixel >> 8) & 0xff;
-	            p[2] = pixel & 0xff;
-	        }else{
-	            p[0] = pixel & 0xff;
-	            p[1] = (pixel >> 8) & 0xff;
-	            p[2] = (pixel >> 16) & 0xff;
-	        }
-	        break;
-	    case 4:
-	        *(Uint32 *)p = pixel;
-	        break;
-    }
 }
 
 void KeyInit( void )
