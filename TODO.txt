@@ -1,3 +1,14 @@
+* Widescreen mode
+So far got the items, players, map to display properly out of bounds.
+However, there are still loads of issues remaining namely :
+- Player centering and making sure collisions work still
+- Make sure nothing breaks while adapting the code to work in widescreen.
+- Upscale or redo backgrounds in widescreen (480x272)
+- Adapt the menu code
+
+I'll try with 480x240 first (half of the Pandora resolution), then 480x272 for PSP.
+The previous PSP port was just 320x240 centered in the middle of the screen so nothing spectacular.
+The PSTV/Vita port will just double the pixels (960x544).
 
 * Make it more platform agnostic.
 Unfortunately, this fucking game's source code is somewhat obfuscated and the comments were in japanese,
@@ -8,6 +19,9 @@ There should be a way of allowing the game to run without it.
 
 * Add support for the TI-Nspire CX, Dreamcast
 Kind of related to the above.
+
+* Translate the remaining Japanese text
+Not everything was translated.
 
 * Port it to SDL2
 Will be needed for Android port and other modern platforms. (Wayland and all)
