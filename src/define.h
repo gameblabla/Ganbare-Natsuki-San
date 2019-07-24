@@ -11,7 +11,7 @@
 
 #define CONFIGFILE_NAME "debug.txt"
 
-#define DISPLY_WIDTH (320)
+#define DISPLY_WIDTH (480)
 #define DISPLY_HEIGHT (240)
 
 #define DISPLY_WIDTH_PLUS_HALF (DISPLY_WIDTH + DISPLY_WIDTH/2)

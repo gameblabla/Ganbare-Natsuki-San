@@ -2226,6 +2226,7 @@ void save_file_w( )
 /* ÉvÉåÉCÉÑÅ[ÇÃèÛë‘åàíËèàóù       */
 /**********************************/
 
+/* Player sprite - Displayed according to the screen scrolling - Gameblabla */
 void playerdisp( )
 {
 	int32_t i;
@@ -2272,17 +2273,17 @@ void playerdisp( )
 	}
 	fram_set( );
 	
-	if ( player[0] < 160 )
+	if ( player[0] < DISPLY_WIDTH_HALF )
 	{
 		dp_x = player[0];
 	}
-	else if ( player[0] >= 480 )
+	else if ( player[0] >= DISPLY_WIDTH_PLUS_HALF )
 	{
-		dp_x = player[0] - 320;
+		dp_x = player[0] - DISPLY_WIDTH;
 	}
 	else 
 	{
-		dp_x = 160;
+		dp_x = DISPLY_WIDTH_HALF;
 	}
 	
 	if ( player[1] < 120 )
@@ -2567,17 +2568,17 @@ void bakdisp1()
 		bak_cnt = 0;
 	}
 
-	if ( player[0] < 160 )
+	if ( player[0] < DISPLY_WIDTH_HALF )
 	{
 		d_x = 0;
 	}
-	else if ( player[0] >= 480 )
+	else if ( player[0] >= DISPLY_WIDTH_PLUS_HALF )
 	{
-		d_x = 320;
+		d_x = DISPLY_WIDTH;
 	}
 	else 
 	{
-		d_x = player[0] - 160;
+		d_x = player[0] - DISPLY_WIDTH_HALF;
 	}
 
 	if ( player[1] < ( 120 ) )
