@@ -3218,25 +3218,25 @@ void mapdisp()
 	{	
 		if ( gameflag[127] == 1 )	//トータルアタック
 		{
-			BltRect( 18, 5, 220, 0, 128, 100, 8 );	/* rank */
+			BltRect( 18, 5, DISPLY_HEIGHT - 20, 0, 128, 100, 8 );	/* rank */
 		}
 		else if ( stage == 2 )
 		{
-			BltRect( 18, 5, 220, 0, 112, 100, 8 );	/* rank */
+			BltRect( 18, 5, DISPLY_HEIGHT - 20, 0, 112, 100, 8 );	/* rank */
 		}
 		else 
 		{
 			if ( ( save_data[3] >= 1 ) && ( save_data[3] <= 15 ) )
 			{
-				BltRect( 18, 5, 220, 0, 88, 100, 8 );	/* rank */
+				BltRect( 18, 5, DISPLY_HEIGHT - 20, 0, 88, 100, 8 );	/* rank */
 			}
 			if ( ( save_data[3] >= 16 ) && ( save_data[3] <= 35 ) )
 			{
-				BltRect( 18, 5, 220, 0, 96, 100, 8 );	/* rank */
+				BltRect( 18, 5, DISPLY_HEIGHT - 20, 0, 96, 100, 8 );	/* rank */
 			}
 			if ( ( save_data[3] >= 36 ) && ( save_data[3] <= 50 ) )
 			{
-				BltRect( 18, 5, 220, 0, 104, 100, 8 );	/* rank */
+				BltRect( 18, 5, DISPLY_HEIGHT - 20, 0, 104, 100, 8 );	/* rank */
 			}
 		}
 
@@ -3254,39 +3254,39 @@ void mapdisp()
 			BltNumericImage2( Jump_counts, 2, 230, 2, 18, 0, 0, 10, 8 );	/* Jump_counts */
 		}
 		
-		BltRect( 18, 50, 230, 0, 8, 100, 8 );	/*  */
-		BltRect( 18, 5, 230, 0, 16, 100, 8 );	/*  */
+		BltRect( 18, 50, DISPLY_HEIGHT - 10, 0, 8, 100, 8 );	/*  */
+		BltRect( 18, 5, DISPLY_HEIGHT - 10, 0, 16, 100, 8 );	/*  */
 		
-		BltRect( 18, 200, 230 , 0, 8, 100, 8 );	/*  */
-		BltRect( 18, 155, 230 , 0, 24, 100, 8 );	/*  */
+		BltRect( 18, 200, DISPLY_HEIGHT - 10 , 0, 8, 100, 8 );	/*  */
+		BltRect( 18, 155, DISPLY_HEIGHT - 10 , 0, 24, 100, 8 );	/*  */
 
-		BltNumericImage( play_time[0], 2, 110, 230, 18, 0, 0, 10, 8 );	/* 時間 */
-		BltNumericImage( play_time[1], 2, 80, 230, 18, 0, 0, 10, 8 );	/* 時間 */
-		BltNumericImage( play_time[2], 2, 50, 230, 18, 0, 0, 10, 8 );	/* 時間 */
+		BltNumericImage( play_time[0], 2, 110, DISPLY_HEIGHT - 10, 18, 0, 0, 10, 8 );	/* 時間 */
+		BltNumericImage( play_time[1], 2, 80, DISPLY_HEIGHT - 10, 18, 0, 0, 10, 8 );	/* 時間 */
+		BltNumericImage( play_time[2], 2, 50, DISPLY_HEIGHT - 10, 18, 0, 0, 10, 8 );	/* 時間 */
 
 		if ( gameflag[127] == 1 )	
 		{
 			wk = get2keta( gameflag[137] , 1 );
-			BltNumericImage( wk, 2, 260, 230, 18, 0, 0, 10, 8 );	
+			BltNumericImage( wk, 2, 260, DISPLY_HEIGHT - 10, 18, 0, 0, 10, 8 );	
 			wk = get2keta( gameflag[137] , 100 );
-			BltNumericImage( wk, 2, 230, 230, 18, 0, 0, 10, 8 );	
+			BltNumericImage( wk, 2, 230, DISPLY_HEIGHT - 10, 18, 0, 0, 10, 8 );	
 			wk = get2keta( gameflag[137] , 10000 );
-			BltNumericImage( wk, 2, 200, 230, 18, 0, 0, 10, 8 );	
+			BltNumericImage( wk, 2, 200, DISPLY_HEIGHT - 10, 18, 0, 0, 10, 8 );	
 		}
 		else 
 		{
 			wk = get2keta( gameflag[200 + save_data[3] + stage_hosei] , 1 );
-			BltNumericImage( wk, 2, 260, 230, 18, 0, 0, 10, 8 );	
+			BltNumericImage( wk, 2, 260, DISPLY_HEIGHT - 10, 18, 0, 0, 10, 8 );	
 			wk = get2keta( gameflag[200 + save_data[3] + stage_hosei] , 100 );
-			BltNumericImage( wk, 2, 230, 230, 18, 0, 0, 10, 8 );	
+			BltNumericImage( wk, 2, 230, DISPLY_HEIGHT - 10, 18, 0, 0, 10, 8 );	
 			wk = get2keta( gameflag[200 + save_data[3] + stage_hosei] , 10000 );
-			BltNumericImage( wk, 2, 200, 230, 18, 0, 0, 10, 8 );	
+			BltNumericImage( wk, 2, 200, DISPLY_HEIGHT - 10, 18, 0, 0, 10, 8 );	
 		}
 	}
 	else 
 	{
 		BltRect( 18, 180, 2, 0, 80, 100, 8 );	/*  */
-		BltNumericImage2( Jump_counts, 3, 210, 2, 18, 0, 0, 10, 8 );	/* Jump_counts */
+		BltNumericImage2( Jump_counts, 3, DISPLY_HEIGHT - 30, 2, 18, 0, 0, 10, 8 );	/* Jump_counts */
 	}
 
 }
