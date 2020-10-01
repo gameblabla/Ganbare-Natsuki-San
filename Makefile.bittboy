@@ -2,10 +2,10 @@
 PROGRAM = gnp
 
 # Compiler
-CC = /opt/bittboy-toolchain/bin/arm-miyoo-linux-musleabi-gcc
+CC = /opt/bittboy-toolchain/bin/arm-linux-gcc
 
 # Linker
-LDFLAGS = -Wl,--start-group -lSDL_mixer -lasound -lmodplug -lvorbisidec -logg -lSDL -lm -lSDL_image -lstdc++ -Wl,--end-group -Wl,--as-needed -Wl,--gc-sections -flto -s
+LDFLAGS = -Wl,--start-group -lSDL_mixer -lasound -lmikmod -lvorbisidec -logg -lSDL -lm -lSDL_image -ljpeg -lpng -lstdc++ -Wl,--end-group -Wl,--as-needed -Wl,--gc-sections -flto -s
 CFLAGS = -O2 -fdata-sections -ffunction-sections -fno-PIC -Wall
 
 # Include

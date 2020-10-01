@@ -3,7 +3,7 @@
 
 #include "include/general.h"
 
-enum { sdljbTriangle = 0, sdljbCircle, sdljbCross, sdljbSquare, sdljbLTrig, sdljbRTrig, sdljbDown, sdljbLeft, sdljbUp, sdljbRight, sdljbSelect, sdljbStart, sdljbHome } SDLJoyBtn;
+enum Joystick_SDL { sdljbTriangle = 0, sdljbCircle, sdljbCross, sdljbSquare, sdljbLTrig, sdljbRTrig, sdljbDown, sdljbLeft, sdljbUp, sdljbRight, sdljbSelect, sdljbStart, sdljbHome };
 
 extern void ResetGameFlag( void );
 extern void ResetGameFlag2( void );

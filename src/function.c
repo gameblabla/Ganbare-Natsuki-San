@@ -14,6 +14,8 @@
 #include "include/general.h"
 #include "include/dconv.h"
 
+enum Joystick_SDL SDLJoyBtn;
+
 void FunctionInit( void );
 void ResetGameFlag( void );
 void ResetGameFlag2( void );

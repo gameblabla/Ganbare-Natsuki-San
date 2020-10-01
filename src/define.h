@@ -1,7 +1,8 @@
-#include "gp2x.h"
+#pragma once
+#ifndef DEFINE_H
+#define DEFINE_H
 
-#ifndef __DEFINE
-#define __DEFINE
+#include "gp2x.h"
 
 #define WP 65536
 #define WWP (WP*2)
@@ -11,8 +12,13 @@
 
 #define CONFIGFILE_NAME "debug.txt"
 
-#define DISPLY_WIDTH (480)
+#ifdef WIDESCREEN
+#define DISPLY_WIDTH (400)
 #define DISPLY_HEIGHT (240)
+#else
+#define DISPLY_WIDTH (320)
+#define DISPLY_HEIGHT (240)
+#endif
 
 #define DISPLY_WIDTH_PLUS_HALF (DISPLY_WIDTH + DISPLY_WIDTH/2)
 #define DISPLY_HEIGHT_PLUS_HALF (DISPLY_HEIGHT + DISPLY_HEIGHT/2)
@@ -73,7 +79,7 @@ enum
 	EN_SN_OPTION,
 	EN_SN_ENDING,
 	EN_SN_LOGO,
-} DISP_SCENE;
+};
 
 enum {
 	EN_BGM_GAME01 = 0,
