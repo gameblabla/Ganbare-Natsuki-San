@@ -1,6 +1,6 @@
 CC = gcc
 
-CFLAGS  = -Os -fomit-frame-pointer -I/usr/include/SDL -DGCW0 -DFUNKEY
+CFLAGS  = -Os -g3 -fomit-frame-pointer -DGCW0 -DFUNKEY -DSCALING
 LDFLAGS = -lSDL -lSDL_mixer -lm
 OBJS  = src/ram.o src/util_snd.o src/get_resolution.o src/refresh.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o
 SOURCES = $(patsubst %.o, %.c, $(OBJS))

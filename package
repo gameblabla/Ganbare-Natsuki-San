@@ -3,10 +3,9 @@
 mkdir -p opk
 cp ./gnp.elf opk/gnp.elf
 cp ./data/assets/gnp.png opk/icon.png
-cp -r ./data/4by3/assets opk/
+cp -r ./data/4by3/data opk/
 cp -r ./data/4by3/image opk/
 cp -r ./data/sound opk/
-cp ./COPYING opk/COPYING
 
 # https://unix.stackexchange.com/questions/219268/how-to-add-new-lines-when-using-echo
 print()
