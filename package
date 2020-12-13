@@ -1,18 +1,12 @@
 #!/bin/sh
 
-mkdir -p ipkg/home/retrofw/games/gnp
-mkdir -p ipkg/home/retrofw/games/gnp/data
-mkdir -p ipkg/home/retrofw/games/gnp/image
-mkdir -p ipkg/home/retrofw/games/gnp/sound
-mkdir -p ipkg/home/retrofw/apps/gmenu2x/sections/games
-cp gnp ipkg/home/retrofw/games/gnp/gnp
-cp opk/icon.png ipkg/home/retrofw/games/gnp/gnp.png
-cp COPYRIGHT ipkg/home/retrofw/games/gnp/COPYRIGHT
-cp -r opk/data ipkg/home/retrofw/games/gnp
-cp -r opk/image ipkg/home/retrofw/games/gnp
-cp -r opk/sound ipkg/home/retrofw/games/gnp
-
-cd ipkg
+mkdir -p opk
+cp ./gnp.elf opk/gnp.elf
+cp ./data/assets/gnp.png opk/icon.png
+cp -r ./data/4by3/assets opk/
+cp -r ./data/4by3/image opk/
+cp -r ./data/sound opk/
+cp ./COPYING opk/COPYING
 
 # https://unix.stackexchange.com/questions/219268/how-to-add-new-lines-when-using-echo
 print()
@@ -25,26 +19,17 @@ esac
 
 # Create GmenuNx entry file plus other things
 
-print 'Package: gnp
-Version: 20190207
-Description: Ganbare Natsuki-San
-Section: games
-Priority: optional
-Maintainer: gameblabla
-Architecture: mipsel
-Homepage: https://github.com/gameblabla/Ganbare-Natsuki-San
-Depends:
-Source: https://github.com/gameblabla/Ganbare-Natsuki-San' > control
+print '[Desktop Entry]
+Type=Application
+Name=Ganbare Natsuki-san
+Comment=Puzzle/Platform game
+Exec=gnp.elf
+Icon=icon
+Terminal=false
+Type=Application
+Categories=games;
+X-OD-NeedsDownscaling=true' > opk/default."$1".desktop
 
-print '2.0' > debian-binary
+mksquashfs ./opk gnp_"$1".opk -all-root -noappend -no-exports -no-xattrs
 
-print 'title=Ganbare
-description=Ganbare Natsuki-San
-exec=/home/retrofw/games/gnp/gnp' > home/retrofw/apps/gmenu2x/sections/games/gnp
-
-tar -czvf control.tar.gz control --owner=0 --group=0
-tar -czvf data.tar.gz home --owner=0 --group=0
-ar rv ../gnp.ipk control.tar.gz data.tar.gz debian-binary
-
-cd ..
-rm -r ipkg
+rm -r opk

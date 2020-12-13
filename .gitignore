@@ -9,3 +9,6 @@ src/include/*.o
 gnp
 gnp.exe
 *.ipk
+*.opk
+*.o
+*.gcda

@@ -1,12 +1,12 @@
 # Software Name
-PROGRAM = gnp
+PROGRAM = gnp.elf
 
 # Compiler
 CC = /opt/bittboy-toolchain/bin/arm-linux-gcc
 
 # Linker
-LDFLAGS = -Wl,--start-group -lSDL_mixer -lasound -lmikmod  -lmad -lvorbisidec -logg -lSDL -lm -lSDL_image -ljpeg -lpng -lstdc++ -Wl,--end-group -Wl,--as-needed -Wl,--gc-sections -flto -s
-CFLAGS = -O2 -fdata-sections -ffunction-sections -fno-PIC -Wall
+LDFLAGS = -lc -lgcc -lSDL_mixer -lasound -lmikmod  -lmad -lvorbisidec -logg -lSDL -lm -lSDL_image -ljpeg -lpng -lstdc++ -flto -s
+CFLAGS = -Ofast -fdata-sections -ffunction-sections -fno-PIC -Wall -flto
 
 # Include
 INCLUDES := 

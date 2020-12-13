@@ -12,7 +12,8 @@ extern "C" {
 #include <gui/desktop.h>
 #endif
 
-extern struct scaling screen_scale;
+struct scaling screen_scale;
+SDL_Surface *real_screen;
 
 void Get_Resolution(void)
 {

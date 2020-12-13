@@ -1,0 +1,15 @@
+OUTPUT = gnp.elf
+CC = /opt/funkey-toolchain/bin/arm-linux-gcc
+
+CFLAGS  = -Os -fdata-sections -ffunction-sections -fsingle-precision-constant -flto -fomit-frame-pointer -I/usr/include/SDL -DGCW0 -DSCALING
+LDFLAGS =  -nodefaultlibs -lc -lgcc -lm -lSDL_mixer -lmikmod -lmpg123 -lvorbisidec -logg -lSDL -lasound -Wl,-z,norelro -Wl,--hash-style=gnu -Wl,--build-id=none -Wl,-O1,--sort-common,--as-needed,--gc-sections -flto -no-pie -s
+OBJS  = src/ram.o src/util_snd.o src/get_resolution.o src/refresh.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o
+SOURCES = $(patsubst %.o, %.c, $(OBJS))
+
+all: $(OUTPUT)
+
+$(OUTPUT): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
+
+clean:
+	rm $(OBJS)
