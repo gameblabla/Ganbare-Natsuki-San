@@ -3,11 +3,8 @@
 
 #include <stdint.h>
 
-enum{
-	X,Y,Z,XYZ,XYZS,XY = Z,S = XYZ,SX = Z,SY = S
-};
-
-enum{
+enum
+{
 	PAD_DOWN = 0x01,
 	PAD_LEFT = 0x02,
 	PAD_RIGHT = 0x04,
@@ -38,10 +35,21 @@ enum{
 #define NULL 0
 #endif
 
+#ifndef FALSE
 #define FALSE 0
+#endif
+
+#ifndef TRUE
 #define TRUE 1
+#endif
+
+#ifndef NONE
 #define NONE 0
+#endif
+
+#ifndef ABS
 #define ABS(a) ((a) < 0 ? -(a) : (a))
+#endif
 
 typedef union REG32{
 	struct{

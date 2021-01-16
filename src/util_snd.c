@@ -1,4 +1,4 @@
-
+#include <stdint.h>
 #include <SDL.h>
 #ifndef NOSOUND
 #include <SDL_mixer.h>

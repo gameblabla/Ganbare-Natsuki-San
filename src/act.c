@@ -395,7 +395,7 @@ void act_init( void )
 	
 	ResetGameFlag2( );
 	LoadGameFlag2(path_work);
-	for ( i = 0; i < sizeof(save_data); i++ )
+	for ( i = 0; i < 400; i++ )
 	{
 		save_data[i] = gameflag2[i];
 	}
@@ -2225,7 +2225,7 @@ void save_file_w( )
 	save_data[0] = player[0];	
 	save_data[1] = player[1];
 	save_data[4] = player[3];
-	for ( i = 0; i < 512; i++ )
+	for ( i = 0; i < 400; i++ )
 	{
 		gameflag2[i] = save_data[i];
 	}

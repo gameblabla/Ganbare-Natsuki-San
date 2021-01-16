@@ -1,6 +1,8 @@
 #ifndef _UTIL_SND_
 #define _UTIL_SND_
 
+#include <stdint.h>
+
 enum{
 	SOUND_MUSBANK = 32,
 	SOUND_CHUNKBANK = 32,
