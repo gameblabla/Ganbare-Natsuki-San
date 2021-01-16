@@ -241,7 +241,7 @@ void option_keys( void )
 		}
 		if( ( mode == 3 ) && ( ag == 1 ) )
 		{
-			sprintf(string,"image/option/%d_f.bmp", selct[mode] );
+			sprintf(string,"image/option/%d.bmp", selct[mode] );
 			LoadBitmap( string, 10 , false );
 		}
 	}
@@ -276,7 +276,7 @@ void option_keys( void )
 			{
 				selct[mode] = 99;
 			}
-			sprintf(string,"image/option/%d_f.bmp", selct[mode] );
+			sprintf(string,"image/option/%d.bmp", selct[mode] );
 			LoadBitmap( string, 10 , false );
 		}
 	}
@@ -309,7 +309,7 @@ void option_keys( void )
 		else if ( mode == 3 )
 		{
 			ag = 1;
-			sprintf(string,"image/option/%d_f.bmp", selct[mode] );
+			sprintf(string,"image/option/%d.bmp", selct[mode] );
 			LoadBitmap( string, 10 , false );
 		}
 		else if ( mode == 1 )	/* se test */
