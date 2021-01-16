@@ -1,9 +1,10 @@
-OUTPUT = gnp.elf
 CC = /opt/gcw0-toolchain/usr/bin/mipsel-linux-gcc
-
 CFLAGS  = -O3 -flto -mips32r2 -DGCW -Wall
-CXXFLAGS = $(CFLAGS)
 LDFLAGS = -lc -lgcc -lm -lSDL -lasound -lSDL_mixer -lvorbisidec -logg -lmpg123 -lSDL_image -lpng -lz -flto -s
+SYSROOT = $(shell $(CC) --print-sysroot)
+CFLAGS += `$(SYSROOT)/usr/bin/sdl-config --cflags`
+
+OUTPUT = gnp.elf
 
 OBJS  = src/ram.o src/util_snd.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o
 SOURCES = $(patsubst %.o, %.c, $(OBJS))

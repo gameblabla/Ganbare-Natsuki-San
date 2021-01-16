@@ -1,7 +1,7 @@
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 #ifndef NOSOUND
-#include <SDL/SDL_mixer.h>
+#include <SDL_mixer.h>
 #endif
 #include "general.h"
 #include "util_snd.h"

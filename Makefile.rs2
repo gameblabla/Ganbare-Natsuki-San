@@ -1,8 +1,10 @@
-OUTPUT = gnp.elf
-CC = /opt/retrostone2-toolchain/bin/arm-linux-gcc
-
+CC = /opt/gcw0-toolchain/usr/bin/mipsel-linux-gcc
 CFLAGS  = -O1 -fdata-sections -ffunction-sections -flto -fomit-frame-pointer -DGCW0 -DSDL_JOYSTICK
 LDFLAGS =  -nodefaultlibs -lc -lgcc -lm -lSDL_mixer -lmikmod -lmpg123 -lvorbisidec -logg -lSDL -lasound -Wl,-z,norelro -Wl,--hash-style=gnu -Wl,--build-id=none -Wl,-O1,--sort-common,--as-needed,--gc-sections -flto -no-pie -s
+SYSROOT = $(shell $(CC) --print-sysroot)
+CFLAGS += `$(SYSROOT)/usr/bin/sdl-config --cflags`
+OUTPUT = gnp.elf
+
 OBJS  = src/ram.o src/util_snd.o src/refresh.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o
 SOURCES = $(patsubst %.o, %.c, $(OBJS))
 

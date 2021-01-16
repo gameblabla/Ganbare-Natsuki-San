@@ -4,7 +4,7 @@
 #include <time.h>
 #include <string.h>
 #define SDL_MAIN_HANDLED
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <unistd.h>
 
 #include "define.h"
@@ -46,7 +46,9 @@ int iDoRun;
 int main(int argc, char *argv[])
 {
 	Uint32 flags;
+	#if DEPTH == 8
 	SDL_Surface* tmp;
+	#endif
 	char AppPath[1024];
 	char AppPathw[1024];
 
@@ -129,6 +131,16 @@ void main_init( void )
 	main_init_config( );	
 
 #ifndef NOSOUND
+
+#ifdef MIDI_MUSIC
+	soundLoadBuffer(EN_BGM_GAME01, (Uint8 *)"sound/bgm/01.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME02, (Uint8 *)"sound/bgm/02.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME03, (Uint8 *)"sound/bgm/03.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME04, (Uint8 *)"sound/bgm/04.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME05, (Uint8 *)"sound/bgm/05.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME06, (Uint8 *)"sound/bgm/06.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME07, (Uint8 *)"sound/bgm/07.mid", -1);
+#else
 	soundLoadBuffer(EN_BGM_GAME01, (Uint8 *)"sound/bgm/01.ogg", -1);
 	soundLoadBuffer(EN_BGM_GAME02, (Uint8 *)"sound/bgm/02.ogg", -1);
 	soundLoadBuffer(EN_BGM_GAME03, (Uint8 *)"sound/bgm/03.ogg", -1);
@@ -136,6 +148,7 @@ void main_init( void )
 	soundLoadBuffer(EN_BGM_GAME05, (Uint8 *)"sound/bgm/05.ogg", -1);
 	soundLoadBuffer(EN_BGM_GAME06, (Uint8 *)"sound/bgm/06.ogg", -1);
 	soundLoadBuffer(EN_BGM_GAME07, (Uint8 *)"sound/bgm/07.ogg", -1);
+#endif
 	
 	soundLoadBufferSE(EN_SE_ATK1   , (Uint8 *)"sound/se/atk1.wav" );
 	soundLoadBufferSE(EN_SE_DAMEGE , (Uint8 *)"sound/se/damage.wav" );

@@ -4,7 +4,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include "define.h"
 #include "function.h"
 #include "util_snd.h"
@@ -3146,14 +3146,13 @@ void minimap_disp( void )
 void mapdisp()
 {
 	int stage_hosei;
+	int32_t wk;
 	
 	stage_hosei = 0;
 	if ( stage == 2 )
 	{
 		stage_hosei = 50;
 	}
-
-	int32_t wk;
 
 	if ( gameflag[132] == 1 )
 	{

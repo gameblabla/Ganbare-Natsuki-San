@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 extern SDL_Surface *g_screen;
 extern int g_scene;
 

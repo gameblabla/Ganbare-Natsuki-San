@@ -2,8 +2,6 @@
 #include "general.h"
 #include "dconv.h"
 
-static uint32_t DCNVnext = 1UL;
-
 static uint16_t SinTable[1025] =
 {
 	0x0000,0x0064,0x00c9,0x012d,0x0192,0x01f6,0x025b,0x02bf,	/*  0.000 */

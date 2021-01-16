@@ -3,9 +3,9 @@
 #include <unistd.h>
 #include <time.h>
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 #ifndef NOSOUND
-#include <SDL/SDL_mixer.h>
+#include <SDL_mixer.h>
 #endif
 #include "define.h"
 #include "function.h"
@@ -516,12 +516,11 @@ void ReleaseBitmap( int bmpindex )
 void BltRect( int bmpindex, int dstX, int dstY, int srcX, int srcY, int width, int height)
 {
 	SDL_Rect srcRect;
+	SDL_Rect dstRect;
 	srcRect.x = srcX;
 	srcRect.y = srcY;
 	srcRect.w = width;
 	srcRect.h = height;
-
-	SDL_Rect dstRect;
 	dstRect.x = dstX;
 	dstRect.y = dstY;
 	dstRect.w = width;

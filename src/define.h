@@ -42,6 +42,7 @@
 	#define DEPTH 8
 	#define RELATIVE_PATH
 	#define SCALING
+	#define MIDI_MUSIC
 #else
 	#define DEPTH 32
 #endif
