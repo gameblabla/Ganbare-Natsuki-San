@@ -1,6 +1,6 @@
 
-#include "include/general.h"
-#include "include/dconv.h"
+#include "general.h"
+#include "dconv.h"
 
 static uint32_t DCNVnext = 1UL;
 
@@ -270,57 +270,11 @@ static uint16_t AtanTable[1025] =
 	0x2000														 /* 1024 1.000000 : 45.00 */
 };
 
-uint16_t DCNVrand(uint16_t max);
-void DCNVinitRand(uint16_t seed);
-void DCNVshuffleDim(int cnt, uint16_t *tbl);
-void DCNVshuffleMain(int cnt, uint16_t *tbl);
 int32_t MOTsin(int16_t ang);
 int32_t MOTcos(int16_t ang);
 int16_t MOTatan(int32_t posX,int32_t posY);
 
 static int16_t MOTatanSub(int32_t posX, int32_t posY);
-
-uint16_t DCNVrand(uint16_t max)
-{
-	DCNVnext = DCNVnext * 1103515245UL + 12345UL;
-
-	if(max){
-		return ((uint16_t)(DCNVnext / 65536) % max);
-	}else{
-		return 0;
-	}
-}
-
-void DCNVinitRand(uint16_t seed)
-{
-	DCNVnext = (uint32_t)seed;
-}
-
-void DCNVshuffleDim(int cnt, uint16_t *tbl)
-{
-	int i;
-
-	for(i = 0; i < cnt; i++){
-		tbl[i] = i;
-	}
-
-	DCNVshuffleMain(cnt, tbl);
-}
-
-void DCNVshuffleMain(int cnt, uint16_t *tbl)
-{
-	int i;
-	int seed;
-	int tmp;
-
-	for(i = cnt - 1; i > 0; i--)
-	{
-		seed = DCNVrand((uint16_t)(i - 1));
-		tmp = tbl[i];
-		tbl[i] = tbl[seed];
-		tbl[seed] = tmp;
-	}
-}
 
 int32_t MOTsin(int16_t ang)
 {

@@ -14,6 +14,10 @@
 
 #include "scene.h"
 
+#ifdef SCALING
+SDL_Surface* real_screen;
+#endif
+
 #ifdef GP2X
 #include <unistd.h>
 #endif
@@ -22,8 +26,8 @@
 #include <pspkernel.h>
 #endif 
 
-#ifdef SCALING
-#include "get_resolution.h"
+#ifndef SDL_TRIPLEBUF
+#define SDL_TRIPLEBUF SDL_DOUBLEBUF
 #endif
 
 void main_init( void );
@@ -77,7 +81,7 @@ int main(int argc, char *argv[])
 	flags = SDL_HWSURFACE | SDL_FULLSCREEN | SDL_DOUBLEBUF | SDL_HWPALETTE;
 #elif defined(PSPUMODE)
 	flags = SDL_HWSURFACE | SDL_FULLSCREEN | SDL_DOUBLEBUF | SDL_HWPALETTE;
-#elif defined(GCW)
+#elif defined(GCW0)
 	flags = SDL_HWSURFACE | SDL_TRIPLEBUF;
 #elif defined(DREAMCAST)
 	flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
@@ -86,18 +90,19 @@ int main(int argc, char *argv[])
 #endif
 
 	SDL_ShowCursor(SDL_DISABLE);
-	
+
 #ifdef SCALING
-	Get_Resolution();
-	real_screen = SDL_SetVideoMode(screen_scale.w_display, screen_scale.h_display, DEPTH, SDL_SWSURFACE | SDL_NOFRAME);
+	real_screen = SDL_SetVideoMode(0, 0, DEPTH, flags | SDL_NOFRAME);
 	g_screen = SDL_CreateRGBSurface(SDL_SWSURFACE, DISPLY_WIDTH, DISPLY_HEIGHT, DEPTH, 0,0,0,0);
 #else
 	g_screen = SDL_SetVideoMode(DISPLY_WIDTH, DISPLY_HEIGHT, DEPTH, flags);
 #endif
 
+#if DEPTH == 8
 	tmp = SDL_LoadBMP("image/color.bmp");	
 	SetGscreenPalette( tmp );
 	SDL_FreeSurface(tmp);
+#endif
 	
 	if (!g_screen)
 	{
@@ -150,7 +155,9 @@ void main_init( void )
 void ExitProgram(void)
 {
 	char path_config[512];
+#ifndef RELATIVE_PATH
 	char path_folder[512];
+#endif
 
 #ifdef MINGW
 	sprintf(path_config, "save/config");
@@ -158,6 +165,8 @@ void ExitProgram(void)
 #elif defined(_TINSPIRE)
 	sprintf(path_config, "./save/config.tns");
 	sprintf(path_folder, "./save");
+#elif defined(RELATIVE_PATH)
+	sprintf(path_config, "config.dat");
 #else		
 	sprintf(path_config, "%s/.ganbare/config", getenv("HOME"));
 	sprintf(path_folder, "%s/.ganbare", getenv("HOME"));
@@ -188,8 +197,10 @@ void main_init_config( void )
 {
 	int i;
 	char path_config[512];
+#ifndef RELATIVE_PATH
 	char path_folder[512];
-		
+#endif
+	
 #ifdef MINGW
 	sprintf(path_config, "save/config");
 	sprintf(path_folder, "save");
@@ -199,6 +210,8 @@ void main_init_config( void )
 #elif defined(DREAMCAST)
 	sprintf(path_config, "/cd/.ganbare/config");
 	sprintf(path_folder, "/cd/.ganbare");
+#elif defined(RELATIVE_PATH)
+	sprintf(path_config, "config.dat");
 #else		
 	sprintf(path_config, "%s/.ganbare/config", getenv("HOME"));
 	sprintf(path_folder, "%s/.ganbare", getenv("HOME"));
@@ -208,6 +221,8 @@ void main_init_config( void )
 	mkdir(path_folder);
 #elif defined(_TINSPIRE)
 	mkdir(path_folder, 0755);
+#elif defined(RELATIVE_PATH)
+
 #else	
 	mkdir(path_folder, 0755);
 #endif

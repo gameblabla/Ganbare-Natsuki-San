@@ -153,6 +153,9 @@ void title_keys( void )
 #elif defined(_TINSPIRE)
 	sprintf(path_work, "./save/work.sav.tns");
 	sprintf(path_item, "./save/item_wk.sav.tns");
+#elif defined(RELATIVE_PATH)
+	sprintf(path_work, "work.sav");
+	sprintf(path_item, "item_wk.sav");
 #else
 	sprintf(path_work, "%s/.ganbare/work.sav", getenv("HOME"));
 	sprintf(path_item, "%s/.ganbare/item_wk.sav", getenv("HOME"));

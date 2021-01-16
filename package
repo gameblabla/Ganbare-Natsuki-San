@@ -3,7 +3,7 @@
 mkdir -p opk
 cp ./gnp.elf opk/gnp.elf
 cp ./data/assets/gnp.png opk/icon.png
-cp -r ./data/4by3/data opk/
+cp -r ./data/data opk/
 cp -r ./data/4by3/image opk/
 cp -r ./data/sound opk/
 
@@ -20,7 +20,7 @@ esac
 
 print '[Desktop Entry]
 Type=Application
-Name=Ganbare Natsuki-san
+Name=Ganbare
 Comment=Puzzle/Platform game
 Exec=gnp.elf
 Icon=icon

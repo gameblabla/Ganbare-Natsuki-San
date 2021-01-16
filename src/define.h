@@ -2,8 +2,6 @@
 #ifndef DEFINE_H
 #define DEFINE_H
 
-#include "gp2x.h"
-
 #define WP 65536
 #define WWP (WP*2)
 
@@ -34,12 +32,16 @@
 
 #if defined(DREAMCAST)
 	#define DEPTH 16
-#elif defined(GCW)
-	#define DEPTH 16
+#elif defined(GCW0)
+	#define DEPTH 8
 #elif defined(PSPUMODE)
 	#define DEPTH 16
 #elif defined(GP2X)
 	#define DEPTH 16
+#elif defined(CLASSICMAC)
+	#define DEPTH 8
+	#define RELATIVE_PATH
+	#define SCALING
 #else
 	#define DEPTH 32
 #endif

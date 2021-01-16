@@ -3,8 +3,8 @@
 #ifndef NOSOUND
 #include <SDL/SDL_mixer.h>
 #endif
-#include "include/general.h"
-#include "include/util_snd.h"
+#include "general.h"
+#include "util_snd.h"
 #include "define.h"
 
 #ifdef DREAMCAST

@@ -10,8 +10,8 @@
 #include "util_snd.h"
 #include "extern.h"
 #include "act.h" 
-#include "include/dconv.h" 
-#include "include/general.h" 
+#include "dconv.h" 
+#include "general.h" 
 
 #include "refresh.h"
 
@@ -335,6 +335,9 @@ void act_init( void )
 #elif defined(DREAMCAST)
 	sprintf(path_work, "/ram/work.sav");
 	sprintf(path_item, "/ram/item_wk.sav");
+#elif defined(RELATIVE_PATH)
+	sprintf(path_work, "work.sav");
+	sprintf(path_item, "item_wk.sav");
 #else	
 	sprintf(path_work, "%s/.ganbare/work.sav", getenv("HOME"));
 	sprintf(path_item, "%s/.ganbare/item_wk.sav", getenv("HOME"));
@@ -2157,7 +2160,9 @@ void save_file_w( )
 	char path_config[512];
 	char path_item[512];
 	char path_work[512];
+#ifndef RELATIVE_PATH
 	char path_folder[512];
+#endif
 	
 #ifdef MINGW
 	sprintf(path_config, "save/config");
@@ -2179,6 +2184,11 @@ void save_file_w( )
 
 	sprintf(path_work, "./save/work.sav.tns");
 	sprintf(path_item, "./save/item_wk.sav.tns");
+	
+#elif defined(RELATIVE_PATH)
+	sprintf(path_config, "config.dat");
+	sprintf(path_work, "work.sav");
+	sprintf(path_item, "item_wk.sav");
 #else		
 	sprintf(path_config, "%s/.ganbare/config", getenv("HOME"));
 	sprintf(path_folder, "%s/.ganbare", getenv("HOME"));
@@ -2191,6 +2201,8 @@ void save_file_w( )
 	mkdir(path_folder);
 #elif defined(_TINSPIRE)
 	mkdir(path_folder, 0755);	
+#elif defined(RELATIVE_PATH)
+	
 #elif defined(DREAMCAST)
 
 #else	

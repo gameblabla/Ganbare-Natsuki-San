@@ -1,7 +1,7 @@
 #ifndef __FUNCTION
 #define __FUNCTION
 
-#include "include/general.h"
+#include "general.h"
 
 enum Joystick_SDL { sdljbTriangle = 0, sdljbCircle, sdljbCross, sdljbSquare, sdljbLTrig, sdljbRTrig, sdljbDown, sdljbLeft, sdljbUp, sdljbRight, sdljbSelect, sdljbStart, sdljbHome };
 

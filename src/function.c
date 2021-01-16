@@ -11,8 +11,8 @@
 #include "function.h"
 #include "extern.h"
 #include "util_snd.h"
-#include "include/general.h"
-#include "include/dconv.h"
+#include "general.h"
+#include "dconv.h"
 
 enum Joystick_SDL SDLJoyBtn;
 
@@ -558,7 +558,13 @@ void SetGscreenPalette( SDL_Surface *surface )
 		{
 			pal = surface->format->palette;
 			if(pal){
+				#ifdef SCALING
+				extern SDL_Surface* real_screen;
+				SDL_SetPalette(real_screen, SDL_LOGPAL|SDL_PHYSPAL, pal->colors, 0, 256);
 				SDL_SetPalette(g_screen, SDL_LOGPAL|SDL_PHYSPAL, pal->colors, 0, 256);
+				#else
+				SDL_SetPalette(g_screen, SDL_LOGPAL|SDL_PHYSPAL, pal->colors, 0, 256);
+				#endif
 			}
 		}
 	}

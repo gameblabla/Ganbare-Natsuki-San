@@ -1,9 +1,9 @@
+#include "define.h"
 #ifdef SCALING
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL/SDL.h>
 #include "refresh.h"
-#include "get_resolution.h"
 
 extern SDL_Surface *g_screen;
 
