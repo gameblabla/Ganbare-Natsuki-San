@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <string.h>
 #include <sys/stat.h>
 
@@ -21,7 +20,7 @@ void act_relese( void );
 void act_keys( void );
 void fram_set( );
 void jmp_st( );
-void jmp( );
+void g_jmp( );
 void idou_l( int32_t ankr_flag );
 void idou_r( int32_t ankr_flag );
 void cleaer_ankr( int32_t ankr_flag );
@@ -98,7 +97,8 @@ int32_t replay_file_load( void );
 int32_t GetKyori( int32_t i1, int32_t i2 );
 void debugdisp( void );
 
-char string[1024];
+/* Size was 1024, reduce it to 30 as that's the minimum required here. - Gameblabla */
+static char string[30];
 
 static int32_t scene_exit;
 static int32_t sn = 0;									/* 場面用変数これを変えることによって描画関数内の処理を変える		*/
@@ -254,14 +254,18 @@ static int32_t p_ef[1000] ;							/* 汎用バッファ（足跡等）														*/
 static int32_t kane[200];								/* アイテム用バッファ */
 
 static int32_t Jump_counts = 0;
-static int32_t save_data[512];							/* 保存情報 */
+static int32_t save_data[400];							/* 保存情報 */
 static int32_t test[5];
 static int32_t rayer[5];								/* 背景スクロール量 */
 static int32_t play_time[5];
 /* リプレイ２０分 */
-static int32_t replay[60 * 60 * 10];	/* フレーム＊秒＊分 */
+
+#define MAX_REPLAY_SIZE 60 * 60 * 10
+#define SUPER_MAX_REPLAY_SIZE 60 * 60 * 20
+
+static int32_t replay[MAX_REPLAY_SIZE];	/* フレーム＊秒＊分 */
 static int32_t replay_time = 1;
-static int32_t replay_time_MAX = 60 * 60 * 10;	/* 最大時間 */
+static int32_t replay_time_MAX = MAX_REPLAY_SIZE;	/* 最大時間 */
 static int32_t replay_load_key[10];
 static int32_t replay_save_flag = 0;				/* 保存を行うか 1:しない */
 static int32_t rrkey[5];								/* 入力キー方向 */
@@ -295,8 +299,6 @@ void act_main( void )
 {
 	int32_t exit_code;
 	
-	exit_code = 0;
-
 	act_init( );		// 初期化
 	
 	while( scene_exit )
@@ -326,8 +328,8 @@ void act_init( void )
 	int32_t wk;
 	int32_t d_num;
 	
-	char path_item[512];
-	char path_work[512];
+	char path_item[96];
+	char path_work[96];
 
 #ifdef MINGW
 	sprintf(path_work, "save/work.sav");
@@ -355,7 +357,7 @@ void act_init( void )
 	stage = 0;								/* ステージ番号 */
 	Jump_counts = 0;
 	replay_time = 1;
-	replay_time_MAX = 60 * 60 * 20;	/* 最大時間 */
+	replay_time_MAX = SUPER_MAX_REPLAY_SIZE;	/* 最大時間 */
 	replay_save_flag = 0;				/* 保存を行うか 1:しない */
 	one_event = 0;							/* 重なって発生するイベントの前回重なっていたかのフラグ */
 
@@ -393,7 +395,7 @@ void act_init( void )
 	
 	ResetGameFlag2( );
 	LoadGameFlag2(path_work);
-	for ( i = 0; i < 512; i++ )
+	for ( i = 0; i < sizeof(save_data); i++ )
 	{
 		save_data[i] = gameflag2[i];
 	}
@@ -748,7 +750,8 @@ void act_keys( void )
 				play_time[2] = play_time[2] + 1;
 				if ( play_time[2] >= 60 )
 				{
-					if ( play_time[2] >= 10 )
+					/* Always true due to previous condition - Gameblabla */
+					//if ( play_time[2] >= 10 )
 					{
 						play_time[2] = 10;
 					}
@@ -784,7 +787,7 @@ void act_keys( void )
 	}
 	if ( player[9] == 0 )
 	{
-		jmp( );
+		g_jmp( );
 	}
 	
 	
@@ -1312,8 +1315,11 @@ void act_keys( void )
 													player[2] = 21;		/* 空中 */
 													player[13] = 0;
 													player[14] = -1;
-													px = ( player[0] + player[30] + 16 ) / 32;
-													py = ( ( ( ( player[1] + player[31] + 16 ) + 16 ) / 32 ) );
+													
+													/* It gets set and then reassigned right after. This code makes no sense - Gameblabla */
+													//px = ( player[0] + player[30] + 16 ) / 32;
+													//py = ( ( ( ( player[1] + player[31] + 16 ) + 16 ) / 32 ) );
+													
 					//								player[32] = player[0] + player[30];
 					//								player[33] = player[1] + player[31];
 													player[32] = item[1 + ( ii * 10 )];
@@ -1697,14 +1703,14 @@ void jmp_st( )
 }
 
 /* ジャンプＹ位置計算 */
-void jmp( )
+/* Renamed from jmp() because that function name could be problematic - Gameblabla */
+void g_jmp( )
 {
 	int32_t y1;
 	int32_t px1 ;
 	int32_t px2 ;
 	int32_t py ;
 	int32_t py3 ;
-	
 
 	player[13]++;
 	if ( player[13] >= 11 )
@@ -2084,7 +2090,7 @@ void act_drow( void )
 		item_disp( );
 //			enm_disp( );
 //			e_shot_disp( );
-//			jmp( );
+//			g_jmp( );
 		playerdisp( );
 //			p_shot_disp( );
 //			p_mgc_disp( );
@@ -2102,7 +2108,7 @@ void act_drow( void )
 		item_disp( );
 		enm_disp( );
 		e_shot_disp( );
-		jmp( );
+		g_jmp( );
 		playerdisp( );
 		p_shot_disp( );
 		p_mgc_disp( );
@@ -2157,11 +2163,11 @@ void act_drow( void )
 void save_file_w( )
 {
 	int32_t i;
-	char path_config[512];
-	char path_item[512];
-	char path_work[512];
+	char path_config[96];
+	char path_item[96];
+	char path_work[96];
 #ifndef RELATIVE_PATH
-	char path_folder[512];
+	char path_folder[96];
 #endif
 	
 #ifdef MINGW
@@ -2527,9 +2533,6 @@ void bakdisp1()
 	int i;
 
 	x = 0;
-	y = 0;
-	b_x = 0;
-	b_y = 0;
 	i = 0;
 	
 	if ( gameflag[67] == 1 )
@@ -3306,7 +3309,7 @@ void mapdisp()
 void stage_start( )
 {
 	int x = 0;
-	int y = 0;
+	int y;
 	int rec = 0;
 	int rec2 = 0;
 
@@ -3357,7 +3360,7 @@ void stage_claer( )
 	int rec2 = 0;
 	int fead = 0;
 	int x = 0;
-	int y = 0;
+	int y;
 	
 	stage_hosei = 0;
 	if ( stage == 2 )
@@ -3471,7 +3474,7 @@ void stage_end( )
 	int rec2 = 0;
 	int fead = 0;
 	int x = 0;
-	int y = 0;
+	int y;
 
 	demo[0]++;
 
@@ -3824,8 +3827,6 @@ void item_disp( )
 	int32_t disp_y_j;
 
 	k_f = 0;
-	disp_x_j = 0;
-	disp_y_j = 0;
 	
 	for ( i = 0; i < 50; i++ )
 	{
@@ -4379,13 +4380,9 @@ void enm_disp()
 	int32_t isclaer;
 	int32_t disp_x_j;
 	int32_t disp_y_j;
-
-	disp_x_j = 0;
-	disp_y_j = 0;
 	
 	isclaer = 0; 
 	size_hosei_x = 0;
-	size_hosei_y = 0;
 	p_h = 32;	/* プレイヤーの当たり判定 */
 	size = 0;
 	
@@ -4760,8 +4757,11 @@ void e_shot_set( int32_t type , int32_t i , int32_t x, int32_t y )
 	int32_t ii;
 	int32_t j;
 	int32_t rg;
+	/* See below. - Gameblabla */
+	/*
 	int32_t mx;
 	int32_t my;
+	*/
 	
 	/* 発生位置X */
 	/* 発生位置Y */
@@ -4776,9 +4776,10 @@ void e_shot_set( int32_t type , int32_t i , int32_t x, int32_t y )
 			}
 			if ( type == 1061 )							/* ヤドカリ */
 			{
-				mx = ( ( 32 / 2 ) - 5 ) + player[0] - x;
-				my = ( ( 32 / 2 ) - 5 ) + player[1] - y;
-				rg = funcTan2( mx, my );
+				/* Same issue here. rg = funcTan2 gets unused. Therefore, mx and my also get unused. - Gameblabla*/
+				//mx = ( ( 32 / 2 ) - 5 ) + player[0] - x;
+				//my = ( ( 32 / 2 ) - 5 ) + player[1] - y;
+				//rg = funcTan2( mx, my );
 				rg = ( 90 );
 				mgc_e[ii * 10 + 1] = x << 16;		/* X */
 				mgc_e[ii * 10 + 2] = y << 16;		/* Y */
@@ -4878,7 +4879,8 @@ void enmjmp( int32_t i )
 	if ( enemy[13 + ( i * 20 )] == 10 ) 
 	{
 		/* 今回の位置 */
-		px = ( enemy[1 + ( i * 20 )] + 32 ) / 32;
+		// Seems to not get used here - Gameblabla
+		//px = ( enemy[1 + ( i * 20 )] + 32 ) / 32;
 		px1 = ( enemy[1 + ( i * 20 )] + size ) / 32;
 		px2 = ( enemy[1 + ( i * 20 )] + size ) / 32;
 		py = ( 16 - ( ( enemy[2 + ( i * 20 )] + 28 ) / 32 ) );
@@ -5517,7 +5519,8 @@ void replay_input_load( void )
 	}
 	if ( input_keys >= 1 )
 	{
-		input_keys = input_keys - 1;
+		// Never get used and it doesn't make sense anyway - Gameblabla
+		//input_keys = input_keys - 1;
 		replay_load_key[0] = 1 ;	
 	}
 }
@@ -5562,12 +5565,27 @@ int32_t replay_file_load( void )
 	return( rc );
 }
 
+// Square root of integer
+static const int32_t ftbl[33]={0,1,1,2,2,4,5,8,11,16,22,32,45,64,90,128,181,256,362,512,724,1024,1448,2048,2896,4096,5792,8192,11585,16384,23170,32768,46340};
+static const int32_t ftbl2[32]={ 32768,33276,33776,34269,34755,35235,35708,36174,36635,37090,37540,37984,38423,38858,39287,39712,40132,40548,40960,41367,41771,42170,42566,42959,43347,43733,44115,44493,44869,45241,45611,45977};
+
+static int32_t int_sqrt ( int32_t val )
+{
+    int32_t cnt=0;
+    int32_t t=val;
+    while (t) {cnt++;t>>=1;}
+    if (6>=cnt) t=(val<<(6-cnt));
+    else t=(val>>(cnt-6));
+    return (ftbl[cnt]*ftbl2[t&31])>>15;
+}
+
 
 int32_t GetKyori( int32_t i1, int32_t i2 )
 {
 	int32_t rc = 0;
 	
-	rc = ( int32_t )sqrt( ( i1 * i1 ) + ( i2 * i2 ) );
+	//rc = ( int32_t )sqrt( ( i1 * i1 ) + ( i2 * i2 ) );
+	rc = ( int32_t )int_sqrt( ( i1 * i1 ) + ( i2 * i2 ) );
 	
 	return ( rc );
 }

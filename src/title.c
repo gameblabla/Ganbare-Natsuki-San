@@ -43,14 +43,13 @@ static int kane[200];
 static int uracount = 0;
 
 static int title_no = 0;
-static char string[1024];
+/* Size was 1024, reduce it to 29 as that's the minimum here. - Gameblabla */
+static char string[29];
 
 void title_main( void )
 {
 	int exit_code;
-	
-	exit_code = 0;
-	
+
 	title_init( );		
 	
 	while( scene_exit )
@@ -141,8 +140,8 @@ void title_relese( void )
 
 void title_keys( void )
 {
-	char path_item[512];
-	char path_work[512];
+	char path_item[96];
+	char path_work[96];
 
 #ifdef MINGW
 	sprintf(path_work, "save/work.sav");

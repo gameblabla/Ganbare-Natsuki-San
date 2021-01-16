@@ -26,8 +26,6 @@ void logo_main( void )
 {
 	int exit_code;
 	
-	exit_code = 0;
-	
 	logo_init( );	
 	
 	while( scene_exit )

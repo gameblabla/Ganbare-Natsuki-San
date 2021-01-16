@@ -33,13 +33,12 @@ static int b[2] = {0,0};
 static int tolal_time[5];
 static int tolal_time2[5];
 static int tolal_time3[5];
-static char string[1024];
+/* Size was 1024, reduce it to 20 as that's the minimum here. - Gameblabla */
+static char string[20];
 
 void option_main( void )
 {
 	int exit_code;
-	
-	exit_code = 0;
 	
 	option_init( );		
 	

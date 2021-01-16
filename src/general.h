@@ -61,6 +61,4 @@ typedef union REG32{
 #endif
 #endif
 
-#include <math.h>
-
 #endif /* _GENERAL_ */

@@ -167,9 +167,9 @@ void main_init( void )
 
 void ExitProgram(void)
 {
-	char path_config[512];
+	char path_config[96];
 #ifndef RELATIVE_PATH
-	char path_folder[512];
+	char path_folder[96];
 #endif
 
 #ifdef MINGW
@@ -209,9 +209,9 @@ void ExitProgram(void)
 void main_init_config( void )
 {
 	int i;
-	char path_config[512];
+	char path_config[96];
 #ifndef RELATIVE_PATH
-	char path_folder[512];
+	char path_folder[96];
 #endif
 	
 #ifdef MINGW
@@ -239,8 +239,6 @@ void main_init_config( void )
 #else	
 	mkdir(path_folder, 0755);
 #endif
-	
-	i = 0;
 	
 	if ( ! ( LoadGameFlag(path_config) == 0 ) )
 	{

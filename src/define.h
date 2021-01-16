@@ -33,7 +33,7 @@
 #if defined(DREAMCAST)
 	#define DEPTH 16
 #elif defined(GCW0)
-	#define DEPTH 8
+	#define DEPTH 16
 #elif defined(PSPUMODE)
 	#define DEPTH 16
 #elif defined(GP2X)

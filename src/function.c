@@ -25,8 +25,12 @@ int LoadGameFlag2( char *fn );
 int SaveGameFlag2( char *fn );
 int SaveFile( char *fn, int32_t *buff, int32_t size );
 int LoadFile( char *fn, int32_t *buff, int32_t size );
+
+/* Unused - Gameblabla */
+/*
 int32_t GetConfig( char* fn, char* cParam );
 int32_t LogFileWrite( char* fn, char* cParam );
+*/
 
 int32_t LoadBitmap( char *fname , int bmpindex, int flag );
 void ReleaseBitmap( int bmpindex );
@@ -37,10 +41,18 @@ void BltNumericImage( int32_t value, int32_t length, int32_t x, int32_t y, int32
 void BltNumericImage2( int32_t value, int32_t length, int32_t x, int32_t y, int32_t plane, int32_t num_stpos_x, int32_t num_stpos_y, int32_t num_width, int32_t num_height );
 int32_t get2keta( int32_t val, int32_t st );
 void SetGscreenPalette( SDL_Surface *surface );
-void SetPalette(int getbmpindex, int setbmpindex);
+
+/* Unused, SetGscreenPalette gets used instead. Oh and the name of the function itself can conflict with some libraries- gameblabla */
+//void SetPalette(int getbmpindex, int setbmpindex);
+
+
+// Also unused.
+/*
 void CreateSurface( int bmpindex, int size_x, int size_y  );
 void SwapToSecondary( int bmpindex );
 void SaveBmp( int bmpindex, char *fn );
+*/
+
 void drawGRPline(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Uint32 color);
 void pointSDLsurface( int32_t px, int32_t py, Uint32 color);
 void putSDLpixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
@@ -71,32 +83,32 @@ int32_t funcTan2( int32_t posX, int32_t posY );
 static int key_eventPress[GP2X_BUTTON_MAX];
 static int key_eventPress_old[GP2X_BUTTON_MAX];
 static int key_eventPush[GP2X_BUTTON_MAX];
-int	pad_type;
-int	pads;
-int	trgs;
-int	reps;
+static int	pad_type;
+static int	pads;
+static int	trgs;
+static int	reps;
 
 #ifdef SDL_JOYSTICK
-SDL_Joystick *joys;
+static SDL_Joystick *joys;
 #endif
-Uint8 *keys;
+static Uint8 *keys;
 
 //static int pads_old;
 // 画像表示用
 static SDL_Surface* bitmap[BMPBUFF_MAX];
-static SDL_Surface* g_surface_bakup;
+//static SDL_Surface* g_surface_bakup;
 // 定時処理用
-static int32_t prvTickCount;
-static int32_t nowTick;
+static Uint32 prvTickCount;
+static Uint32 nowTick;
 //static int frame;
 
 #ifdef GP2X
-static const int INTERVAL_BASE = 16;
+#define INTERVAL_BASE 16
 #else
-static const int INTERVAL_BASE = 16;
+#define INTERVAL_BASE 16
 #endif
 
-SDL_Event event;
+static SDL_Event event;
 
 // 音楽再生
 static int32_t sound_vol;
@@ -376,7 +388,9 @@ int LoadFile( char *fn, int32_t *buff, int32_t size )
 	return ( rc );
 }
 
-int32_t GetConfig( char* fn, char* cParam )
+/* These two are unused */
+
+/*int32_t GetConfig( char* fn, char* cParam )
 {
 	FILE *fp;	
 	char *sp;
@@ -433,8 +447,9 @@ int32_t GetConfig( char* fn, char* cParam )
 	}
 	return( rc );
 }
+*/
 
-int32_t LogFileWrite( char* fn, char* cParam )
+/*int32_t LogFileWrite( char* fn, char* cParam )
 {
 	FILE *fp;	
 	int32_t rc;
@@ -462,15 +477,16 @@ int32_t LogFileWrite( char* fn, char* cParam )
 		sync( );
 #endif
 	}
+	fclose(fp);
 	return( rc );
-}
+}*/
 
 
 int32_t LoadBitmap( char *fname , int bmpindex, int flag )
 {
 	int32_t rc;
 	SDL_Surface* tmp;
-	char filename[1024];
+	char filename[128];
 
 	memset( &filename[0], '\0', sizeof( filename ) );
 	rc = 0;
@@ -568,6 +584,9 @@ void SetGscreenPalette( SDL_Surface *surface )
 		}
 	}
 }
+
+/* Unused, the previous function is used instead. - Gameblabla */
+/*
 void SetPalette(int getbmpindex, int setbmpindex)
 {
 	SDL_Surface *surface;
@@ -588,6 +607,10 @@ void SetPalette(int getbmpindex, int setbmpindex)
 		}
 	}
 }
+*/
+
+/* These are apparently never used. */
+/*
 void SaveBmp( int bmpindex, char *fn )
 {
 	if ( bmpindex >= 0 )
@@ -599,6 +622,7 @@ void SaveBmp( int bmpindex, char *fn )
 		SDL_SaveBMP(g_screen, fn);
 	}
 }
+
 void CreateSurface( int bmpindex, int size_x, int size_y  )
 {
 	SDL_Surface* tmp;
@@ -637,7 +661,7 @@ void SwapToSecondary( int bmpindex )
 		g_screen = bitmap[bmpindex];
 	}
 }
-
+*/
 
 void ClearSecondary( void )
 {
@@ -740,50 +764,84 @@ void KeyInput( void )
 	}	
 
 #else
-	int x = 0, y = 0;
 	int pad = 0;
-
-	keys = SDL_GetKeyState(NULL);
+	
+	#ifdef SDL_JOYSTICK
+	int	btn1 = 0, btn2 = 0, btn3 = 0, btn4 = 0, btn5 = 0, btn6 = 0, btn7 = 0, btn8 = 0, btn9 = 0, btnA = 0;
+	#endif
 
 #ifdef SDL_JOYSTICK
+	int x, y;
 	if(joys){
 		x = SDL_JoystickGetAxis(joys, 0);
 		y = SDL_JoystickGetAxis(joys, 1);
 	}
 #endif
 
+	keys = SDL_GetKeyState(NULL);
+
 	if(pad_type == 0)
 	{
-		if(keys[SDLK_RIGHT] == SDL_PRESSED || keys[SDLK_KP6] == SDL_PRESSED || x > JOYSTICK_AXIS){
+		if(keys[SDLK_RIGHT] == SDL_PRESSED || keys[SDLK_KP6] == SDL_PRESSED
+		#ifdef SDL_JOYSTICK
+		 || x > JOYSTICK_AXIS
+		#endif
+		){
 			pad |= PAD_RIGHT;
 		}
-		if(keys[SDLK_LEFT] == SDL_PRESSED || keys[SDLK_KP4] == SDL_PRESSED || x < -JOYSTICK_AXIS){
+		if(keys[SDLK_LEFT] == SDL_PRESSED || keys[SDLK_KP4] == SDL_PRESSED
+		#ifdef SDL_JOYSTICK
+		|| x < -JOYSTICK_AXIS
+		#endif
+		){
 			pad |= PAD_LEFT;
 		}
-		if(keys[SDLK_DOWN] == SDL_PRESSED || keys[SDLK_KP2] == SDL_PRESSED || y > JOYSTICK_AXIS){
+		if(keys[SDLK_DOWN] == SDL_PRESSED || keys[SDLK_KP2] == SDL_PRESSED
+		#ifdef SDL_JOYSTICK
+		|| y > JOYSTICK_AXIS
+		#endif
+		){
 			pad |= PAD_DOWN;
 		}
-		if(keys[SDLK_UP] == SDL_PRESSED || keys[SDLK_KP8] == SDL_PRESSED || y < -JOYSTICK_AXIS){
+		if(keys[SDLK_UP] == SDL_PRESSED || keys[SDLK_KP8] == SDL_PRESSED
+		#ifdef SDL_JOYSTICK
+		|| y < -JOYSTICK_AXIS
+		#endif
+		){
 			pad |= PAD_UP;
 		}
 	}
 	else if(pad_type == 1)
 	{
-		if(keys[SDLK_d] == SDL_PRESSED || keys[SDLK_KP6] == SDL_PRESSED || x > JOYSTICK_AXIS){
+		if(keys[SDLK_d] == SDL_PRESSED || keys[SDLK_KP6] == SDL_PRESSED
+		#ifdef SDL_JOYSTICK
+		|| x > JOYSTICK_AXIS
+		#endif
+		){
 			pad |= PAD_RIGHT;
 		}
-		if(keys[SDLK_a] == SDL_PRESSED || keys[SDLK_KP4] == SDL_PRESSED || x < -JOYSTICK_AXIS){
+		if(keys[SDLK_a] == SDL_PRESSED || keys[SDLK_KP4] == SDL_PRESSED
+		#ifdef SDL_JOYSTICK
+		|| x < -JOYSTICK_AXIS
+		#endif
+		){
 			pad |= PAD_LEFT;
 		}
-		if(keys[SDLK_s] == SDL_PRESSED || keys[SDLK_KP2] == SDL_PRESSED || y > JOYSTICK_AXIS){
+		if(keys[SDLK_s] == SDL_PRESSED || keys[SDLK_KP2] == SDL_PRESSED
+		#ifdef SDL_JOYSTICK
+		|| y > JOYSTICK_AXIS
+		#endif
+		){
 			pad |= PAD_DOWN;
 		}
-		if(keys[SDLK_w] == SDL_PRESSED || keys[SDLK_KP8] == SDL_PRESSED || y < -JOYSTICK_AXIS){
+		if(keys[SDLK_w] == SDL_PRESSED || keys[SDLK_KP8] == SDL_PRESSED
+		#ifdef SDL_JOYSTICK
+		|| y < -JOYSTICK_AXIS
+		#endif
+		){
 			pad |= PAD_UP;
 		}
 	}
-
-	int	btn1 = 0, btn2 = 0, btn3 = 0, btn4 = 0, btn5 = 0, btn6 = 0, btn7 = 0, btn8 = 0, btn9 = 0, btnA = 0;
 
 #ifdef SDL_JOYSTICK
 	if(joys){
@@ -801,40 +859,73 @@ void KeyInput( void )
 #endif	
 	if(pad_type == 0)
 	{
-		if(keys[SDLK_LCTRL] == SDL_PRESSED || btn1){
+		if(keys[SDLK_LCTRL] == SDL_PRESSED
+#ifdef SDL_JOYSTICK
+		 || btn1
+#endif
+		 ){
 			pad |= PAD_BUTTON1;
 		}
 #ifdef _TINSPIRE
-		if(keys[SDLK_LSHIFT] == SDL_PRESSED || btn2){
+		if(keys[SDLK_LSHIFT] == SDL_PRESSED){
 #else
-		if(keys[SDLK_LALT] == SDL_PRESSED || btn2){
+		if(keys[SDLK_LALT] == SDL_PRESSED
+#ifdef SDL_JOYSTICK
+		 || btn2
+#endif
+		){
 #endif
 			pad |= PAD_BUTTON2;
 		}
-		if(keys[SDLK_RETURN] == SDL_PRESSED || btn3){
+		if(keys[SDLK_RETURN] == SDL_PRESSED
+		#ifdef SDL_JOYSTICK
+		|| btn3
+		#endif
+		){
 			pad |= PAD_BUTTON3;
 		}
 	}
 	else if(pad_type == 1)
 	{
-		if(keys[SDLK_BACKSLASH] == SDL_PRESSED || btn1){
+		if(keys[SDLK_BACKSLASH] == SDL_PRESSED
+#ifdef SDL_JOYSTICK
+		 || btn1
+#endif
+		){
 			pad |= PAD_BUTTON1;
 		}
-		if(keys[SDLK_RSHIFT] == SDL_PRESSED || btn2){
+		if(keys[SDLK_RSHIFT] == SDL_PRESSED
+#ifdef SDL_JOYSTICK
+		 || btn2
+#endif
+		){
 			pad |= PAD_BUTTON2;
 		}
-		if(keys[SDLK_p] == SDL_PRESSED || btn3){
+		if(keys[SDLK_p] == SDL_PRESSED
+		#ifdef SDL_JOYSTICK
+		|| btn3
+		#endif
+		){
 			pad |= PAD_BUTTON3;
 		}
 	}
 
-	if(keys[SDLK_F1] == SDL_PRESSED || btn7){
+	if(keys[SDLK_F1] == SDL_PRESSED
+		#ifdef SDL_JOYSTICK
+		|| btn7
+		#endif
+	){
 		pad |= PAD_BUTTON7;
 	}
-	if(keys[SDLK_F2] == SDL_PRESSED || btn8){
+	if(keys[SDLK_F2] == SDL_PRESSED
+#ifdef SDL_JOYSTICK
+		 || btn8
+#endif
+	){
 		pad |= PAD_BUTTON8;
 	}
 	
+#ifdef SDL_JOYSTICK
 	if(btn4){
 		pad |= PAD_BUTTON4;
 	}
@@ -850,7 +941,7 @@ void KeyInput( void )
 	if(btnA){
 		pad |= PAD_BUTTONA;
 	}
-	
+#endif
 	
 #endif
 
@@ -996,7 +1087,6 @@ int IsPushCancelKey( void )
 
 void FPSWait( void )
 {
-	int interval = INTERVAL_BASE;
 	Uint32 leftTick;
 
 	//サウンドの制御
@@ -1005,12 +1095,12 @@ void FPSWait( void )
 	SDL_PollEvent(&event);
 /*
 	nowTick = SDL_GetTicks();
-	frame = (nowTick - prvTickCount) / interval;
+	frame = (nowTick - prvTickCount) / INTERVAL_BASE;
 	if(frame <= 0){
 #ifdef GP2X
 		wait(prvTickCount + interval - nowTick);
 #else
-		SDL_Delay(prvTickCount + interval - nowTick);
+		SDL_Delay(prvTickCount + INTERVAL_BASE - nowTick);
 #endif
 	}
 	prvTickCount = SDL_GetTicks();
@@ -1021,7 +1111,7 @@ void FPSWait( void )
 	while (true)
 	{
 	 	nowTick = SDL_GetTicks();
- 		leftTick = prvTickCount + interval - nowTick;
+ 		leftTick = prvTickCount + INTERVAL_BASE - nowTick;
  		if(leftTick < 1 || leftTick > 9999)
  		{
 			break;
@@ -1179,6 +1269,8 @@ void BltNumericImage2( int32_t value, int32_t length, int32_t x, int32_t y, int3
 	int32_t i;			// 桁数分のforループで使用
 	int32_t dv;		// 割り算で使用する値
 	int32_t x_hosei;	//右詰め補正値
+	int buf;
+	int t = 1;
 	
 	// value が負の値の場合、正の値に置き換える
 	if ( value < 0 )
@@ -1187,8 +1279,8 @@ void BltNumericImage2( int32_t value, int32_t length, int32_t x, int32_t y, int3
 	}
 	
 	/* 2002.10.21 D.K start */
-	int buf = value;
-	int t = 1;
+	buf = value;
+	
 	while(true)
 	{
 		t++;
@@ -1239,7 +1331,7 @@ void BltNumericImage2( int32_t value, int32_t length, int32_t x, int32_t y, int3
 
 int32_t funcSin( int32_t rdo )
 {
-	int32_t ang = 0;
+	int32_t ang;
 	int32_t rc = 0;
 	
 	if ( ( rdo >= 0 ) && ( rdo < 180 ) )
@@ -1259,7 +1351,7 @@ int32_t funcSin( int32_t rdo )
 }
 int32_t funcCos( int32_t rdo )
 {
-	int32_t ang = 0;
+	int32_t ang;
 	int32_t rc = 0;
 	
 	if ( ( rdo >= 0 ) && ( rdo < 180 ) )

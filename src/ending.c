@@ -24,9 +24,7 @@ static int scene_exit;
 void ending_main( void )
 {
 	int exit_code;
-	
-	exit_code = 0;
-	
+
 	ending_init( );	
 	
 	while( scene_exit )

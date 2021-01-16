@@ -19,7 +19,7 @@ extern int32_t LogFileWrite( char* fn, char* cParam );
 extern int32_t LoadBitmap( char *fname, int bmpindex, int flag );
 extern void ReleaseBitmap( int bmpindex );
 extern void Blt( int bmpindex, int dstX, int dstY );
-extern void BltRect(int bmpindex, int srcX, int srcY, int dstX, int dstY, int width, int height);
+extern void BltRect( int bmpindex, int dstX, int dstY, int srcX, int srcY, int width, int height);
 extern void ClearSecondary( void );
 extern void BltNumericImage( int32_t value, int32_t length, int32_t x, int32_t y, int32_t plane, int32_t num_stpos_x, int32_t num_stpos_y, int32_t num_width, int32_t num_height );
 extern void BltNumericImage2( int32_t value, int32_t length, int32_t x, int32_t y, int32_t plane, int32_t num_stpos_x, int32_t num_stpos_y, int32_t num_width, int32_t num_height );
