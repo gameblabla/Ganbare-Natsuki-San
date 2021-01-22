@@ -1,0 +1,31 @@
+# path to RETRO68
+PREFIX=$(RETRO68)/powerpc-apple-macos
+CC=$(RETRO68)/bin/powerpc-apple-macos-gcc
+CXX=$(RETRO68)/bin/powerpc-apple-macos-g++
+REZ=$(RETRO68)/bin/Rez
+
+SDL_INCLUDE=$(PREFIX)/include/SDL
+
+CFLAGS = -D__MACOS__ -DCLASSICMAC -DMSB_FIRST -Wall -Wextra -Ofast -fdata-sections -ffunction-sections -I$(SDL_INCLUDE)
+CXXFLAGS = $(CFLAGS)
+
+LDFLAGS=-lRetroConsole -lSDL_mixer -lm -lSDL -lDialogsLib -Wl,--as-needed -Wl,--gc-sections 
+RINCLUDES=$(PREFIX)/RIncludes
+REZFLAGS=-I$(RINCLUDES)
+	
+OBJS  = src/ram.o src/util_snd.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o src/refresh.o
+#SOURCES = $(patsubst %.o, %.c, $(OBJS))
+	
+CFLAGS += $(DEFS)
+
+HelloWorld.bin HelloWorld.APPL HelloWorld.dsk: HelloWorld.xcoff
+	MakePEF HelloWorld.xcoff -o HelloWorld.pef
+	$(REZ) $(REZFLAGS) ./SDL.r -I$(RINCLUDES) -DCFRAG_NAME="\"HelloWorld\"" -o HelloWorld.bin --cc HelloWorld.dsk --cc HelloWorld.APPL --cc %HelloWorld.ad -t APPL -c ???? --data HelloWorld.pef
+
+
+HelloWorld.xcoff: $(OBJS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LDFLAGS)	# C++ used for linking because RetroConsole needs it
+
+.PHONY: clean
+clean:
+	rm -f HelloWorld.bin HelloWorld.APPL HelloWorld.dsk HelloWorld.xcoff HelloWorld.xcoff.gdb $(OBJS)

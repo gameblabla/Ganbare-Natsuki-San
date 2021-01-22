@@ -5,9 +5,6 @@
 #include "define.h"
 
 SDL_Surface *g_screen;
-int32_t g_scene;
-int32_t gameflag[513];
-int32_t gameflag2[513];
-
-
-
+Sint32 g_scene;
+Sint32 gameflag[GAMEFLAG_SIZE];
+Sint32 gameflag2[GAMEFLAG_SIZE];

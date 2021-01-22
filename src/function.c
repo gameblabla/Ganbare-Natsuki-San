@@ -23,23 +23,23 @@ int LoadGameFlag( char *fn );
 int SaveGameFlag( char *fn );
 int LoadGameFlag2( char *fn );
 int SaveGameFlag2( char *fn );
-int SaveFile( char *fn, int32_t *buff, int32_t size );
-int LoadFile( char *fn, int32_t *buff, int32_t size );
+int SaveFile( char *fn, Sint32 *buff, Sint32 size );
+int LoadFile( char *fn, Sint32 *buff, Sint32 size );
 
 /* Unused - Gameblabla */
 /*
-int32_t GetConfig( char* fn, char* cParam );
-int32_t LogFileWrite( char* fn, char* cParam );
+Sint32 GetConfig( char* fn, char* cParam );
+Sint32 LogFileWrite( char* fn, char* cParam );
 */
 
-int32_t LoadBitmap( char *fname , int bmpindex, int flag );
+Sint32 LoadBitmap( char *fname , int bmpindex, int flag );
 void ReleaseBitmap( int bmpindex );
 void BltRect(int bmpindex, int srcX, int srcY, int dstX, int dstY, int width, int height);
 void Blt( int bmpindex, int dstX, int dstY );
 void ClearSecondary( void );
-void BltNumericImage( int32_t value, int32_t length, int32_t x, int32_t y, int32_t plane, int32_t num_stpos_x, int32_t num_stpos_y, int32_t num_width, int32_t num_height );
-void BltNumericImage2( int32_t value, int32_t length, int32_t x, int32_t y, int32_t plane, int32_t num_stpos_x, int32_t num_stpos_y, int32_t num_width, int32_t num_height );
-int32_t get2keta( int32_t val, int32_t st );
+void BltNumericImage( Sint32 value, Sint32 length, Sint32 x, Sint32 y, Sint32 plane, Sint32 num_stpos_x, Sint32 num_stpos_y, Sint32 num_width, Sint32 num_height );
+void BltNumericImage2( Sint32 value, Sint32 length, Sint32 x, Sint32 y, Sint32 plane, Sint32 num_stpos_x, Sint32 num_stpos_y, Sint32 num_width, Sint32 num_height );
+Sint32 get2keta( Sint32 val, Sint32 st );
 void SetGscreenPalette( SDL_Surface *surface );
 
 /* Unused, SetGscreenPalette gets used instead. Oh and the name of the function itself can conflict with some libraries- gameblabla */
@@ -53,8 +53,8 @@ void SwapToSecondary( int bmpindex );
 void SaveBmp( int bmpindex, char *fn );
 */
 
-void drawGRPline(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Uint32 color);
-void pointSDLsurface( int32_t px, int32_t py, Uint32 color);
+void drawGRPline(Sint32 x1, Sint32 y1, Sint32 x2, Sint32 y2, Uint32 color);
+void pointSDLsurface( Sint32 px, Sint32 py, Uint32 color);
 void putSDLpixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
 
 int IsPushKey( int keycode );
@@ -75,20 +75,19 @@ void soundInitBuffer(void);
 void soundRelease(void);
 void soundLoadBuffer(Sint32 num, Uint8 *fname, int loop);
 
-int32_t funcSin( int32_t rdo );
-int32_t funcCos( int32_t rdo );
-int32_t funcTan2( int32_t posX, int32_t posY );
+Sint32 funcSin( Sint32 rdo );
+Sint32 funcCos( Sint32 rdo );
+Sint32 funcTan2( Sint32 posX, Sint32 posY );
 
 // キー取得用
 static int key_eventPress[GP2X_BUTTON_MAX];
 static int key_eventPress_old[GP2X_BUTTON_MAX];
 static int key_eventPush[GP2X_BUTTON_MAX];
 static int	pad_type;
+#ifdef SDL_JOYSTICK
 static int	pads;
 static int	trgs;
 static int	reps;
-
-#ifdef SDL_JOYSTICK
 static SDL_Joystick *joys;
 #endif
 static Uint8 *keys;
@@ -111,7 +110,7 @@ static Uint32 nowTick;
 static SDL_Event event;
 
 // 音楽再生
-static int32_t sound_vol;
+static Sint32 sound_vol;
 
 void FunctionInit( void )
 {
@@ -135,8 +134,19 @@ void ResetGameFlag( void )
 int LoadGameFlag( char *fn )
 {
 	int rc = 0;
+#ifdef SDLFILE
+	SDL_RWops *rw = SDL_RWFromFile(fn, "rb");
+	if (!rw)
+	{
+		rc = -1;
+	}
+	else 
+	{
+		SDL_RWread(rw, &gameflag[0], sizeof( gameflag ), 1);
+		SDL_RWclose(rw);
+	}
+#else
 	FILE *fp;
-
 #ifdef _TINSPIRE
 	char buf[192];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
@@ -160,14 +170,26 @@ int LoadGameFlag( char *fn )
 		sync( );
 #endif
 	}
+#endif
 	
 	return ( rc );
 }
 int SaveGameFlag( char *fn )
 {
 	int rc = 0;
+#ifdef SDLFILE
+	SDL_RWops *rw = SDL_RWFromFile(fn, "wb");
+	if (!rw)
+	{
+		rc = -1;
+	}
+	else 
+	{
+		SDL_RWwrite(rw, &gameflag[0], 1, sizeof( gameflag ));
+		SDL_RWclose(rw);
+	}
+#else
 	FILE *fp;
-
 #ifdef _TINSPIRE
 	char buf[255];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
@@ -200,8 +222,6 @@ int SaveGameFlag( char *fn )
 	}
 	
 #elif defined(DREAMCAST)
-
-
 	char buf[255];
 	snprintf(buf, sizeof(buf), "/cd/%s", fn);
 	
@@ -232,8 +252,6 @@ int SaveGameFlag( char *fn )
 			fclose( fp );
 		}
 	}
-	
-	
 #else
 	if ( ( fp = fopen( fn, "wb" ) ) == NULL )
 	{
@@ -250,6 +268,8 @@ int SaveGameFlag( char *fn )
 	}
 	
 #endif
+
+#endif
 	
 	return ( rc );
 }
@@ -262,16 +282,30 @@ void ResetGameFlag2( void )
 int LoadGameFlag2( char *fn )
 {
 	int rc = 0;
-	FILE *fp;	
-	
-	printf("Fopen : %s\n", fn);
-	
+#ifdef MSB_FIRST
+	int32_t tmp, i;
+#endif
+
+#ifdef SDLFILE
+	SDL_RWops *rw = SDL_RWFromFile(fn, "rb");
+	if (!rw)
+	{
+		rc = -1;
+	}
+	else 
+	{
+		SDL_RWread(rw, &gameflag2[0], sizeof( gameflag ), 1);
+		SDL_RWclose(rw);
+	}
+#else
+	FILE *fp;
+
 #ifdef _TINSPIRE
-	char buf[192];
+	char buf[127];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
 #elif defined(DREAMCAST)
-	char buf[192];
+	char buf[127];
 	snprintf(buf, sizeof(buf), "/cd/%s", fn);
 	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
 #else
@@ -290,6 +324,15 @@ int LoadGameFlag2( char *fn )
 		sync( );
 #endif
 	}
+#endif
+	
+	#ifdef MSB_FIRST
+	for(i=0;i<GAMEFLAG_SIZE;i++)
+	{
+		tmp = gameflag2[i];
+		gameflag2[i] = __builtin_bswap32(tmp);
+	}
+	#endif
 	
 	return ( rc );
 }
@@ -297,14 +340,39 @@ int LoadGameFlag2( char *fn )
 int SaveGameFlag2( char *fn )
 {
 	int rc = 0;
-	FILE *fp;	
+#ifdef MSB_FIRST
+	Sint32 bgameflag2[GAMEFLAG_SIZE], i;
+#endif
 
+#ifdef SDLFILE
+	SDL_RWops *rw = SDL_RWFromFile(fn, "wb");
+	if (!rw)
+	{
+		printf("file open error!!\n");
+		rc = -1;
+	}
+	else 
+	{
+#ifdef MSB_FIRST
+		memcpy(bgameflag2, gameflag2, sizeof(bgameflag2));
+		for(i=0;i<GAMEFLAG_SIZE;i++)
+		{
+			bgameflag2[i] = __builtin_bswap32(gameflag2[i]);
+		}
+		SDL_RWwrite(rw, &bgameflag2[0], 1, sizeof(gameflag));
+#else
+		SDL_RWwrite(rw, &gameflag2[0], 1, sizeof(gameflag));
+#endif
+		SDL_RWclose(rw);
+	}
+#else
+	FILE *fp;
 #ifdef _TINSPIRE
-	char buf[192];
+	char buf[127];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "wb" ) ) == NULL )
 #elif defined(DREAMCAST)
-	char buf[192];
+	char buf[127];
 	snprintf(buf, sizeof(buf), "/cd/%s", fn);
 	if ( ( fp = fopen( buf, "wb" ) ) == NULL )
 #else
@@ -316,26 +384,49 @@ int SaveGameFlag2( char *fn )
 	}
 	else 
 	{
+#ifdef MSB_FIRST
+		memcpy(bgameflag2, gameflag2, sizeof(bgameflag2));
+		for(i=0;i<GAMEFLAG_SIZE;i++)
+		{
+			bgameflag2[i] = __builtin_bswap32(gameflag2[i]);
+		}
+		fwrite( &bgameflag2[0], 1, sizeof( gameflag ), fp ); 
+#else
 		fwrite( &gameflag2[0], 1, sizeof( gameflag ), fp ); 
+#endif
 		fclose( fp );
 #ifdef GP2X
 		sync( );
 #endif
 	}
+#endif
 	
 	return ( rc );
 }
-int SaveFile( char *fn, int32_t *buff, int32_t size )
+int SaveFile( char *fn, Sint32 *buff, Sint32 size )
 {
 	int rc = 0;
+#ifdef SDLFILE
+	SDL_RWops *rw = SDL_RWFromFile(fn, "wb");
+	if (!rw)
+	{
+		printf("file open error!!\n");
+		rc = -1;
+	}
+	else 
+	{
+		SDL_RWwrite(rw, buff, 1,size);
+		SDL_RWclose(rw);
+	}
+#else
 	FILE *fp;	
 
 #ifdef _TINSPIRE
-	char buf[192];
+	char buf[127];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "wb" ) ) == NULL )
 #elif defined(DREAMCAST)
-	char buf[192];
+	char buf[127];
 	snprintf(buf, sizeof(buf), "/cd/%s", fn);
 	if ( ( fp = fopen( buf, "wb" ) ) == NULL )
 #else
@@ -353,21 +444,35 @@ int SaveFile( char *fn, int32_t *buff, int32_t size )
 		sync( );
 #endif
 	}
-	
+#endif
+
 	return ( rc );
 }
-int LoadFile( char *fn, int32_t *buff, int32_t size )
+int LoadFile( char *fn, Sint32 *buff, Sint32 size )
 {
 	int rc = 0;
+#ifdef SDLFILE
+	SDL_RWops *rw = SDL_RWFromFile(fn, "rb");
+	if (!rw)
+	{
+		printf("file open error!!\n");
+		rc = -1;
+	}
+	else 
+	{
+		SDL_RWread(rw, buff, size, 1);
+		SDL_RWclose(rw);
+	}
+#else
 	FILE *fp;	
 	
 #ifdef _TINSPIRE
-	char buf[192];
+	char buf[127];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
 #elif defined(DREAMCAST)
-	char buf[192];
-	snprintf(buf, sizeof(buf), "%s.tns", fn);
+	char buf[127];
+	snprintf(buf, sizeof(buf), "/cd/%s", fn);
 	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
 #else
 	if ( ( fp = fopen( fn, "rb" ) ) == NULL )
@@ -384,20 +489,21 @@ int LoadFile( char *fn, int32_t *buff, int32_t size )
 		sync( );
 #endif
 	}
+#endif
 	
 	return ( rc );
 }
 
 /* These two are unused */
 
-/*int32_t GetConfig( char* fn, char* cParam )
+/*Sint32 GetConfig( char* fn, char* cParam )
 {
 	FILE *fp;	
 	char *sp;
 	char s[256];
 	char s2[256];
 	memset( s, '\0', sizeof( s ) );
-	int32_t rc;
+	Sint32 rc;
 	
 	rc = 0;
 
@@ -449,10 +555,10 @@ int LoadFile( char *fn, int32_t *buff, int32_t size )
 }
 */
 
-/*int32_t LogFileWrite( char* fn, char* cParam )
+/*Sint32 LogFileWrite( char* fn, char* cParam )
 {
 	FILE *fp;	
-	int32_t rc;
+	Sint32 rc;
 	
 	rc = 0;
 
@@ -482,9 +588,9 @@ int LoadFile( char *fn, int32_t *buff, int32_t size )
 }*/
 
 
-int32_t LoadBitmap( char *fname , int bmpindex, int flag )
+Sint32 LoadBitmap( char *fname , int bmpindex, int flag )
 {
-	int32_t rc;
+	Sint32 rc;
 	SDL_Surface* tmp;
 	char filename[128];
 
@@ -1210,11 +1316,11 @@ int Set_Volume( int vol )
 /*-[戻り値]---------------------------------------------------------*/
 /*	無し															*/
 
-void BltNumericImage( int32_t value, int32_t length, int32_t x, int32_t y, int32_t plane, int32_t num_stpos_x, int32_t num_stpos_y, int32_t num_width, int32_t num_height )
+void BltNumericImage( Sint32 value, Sint32 length, Sint32 x, Sint32 y, Sint32 plane, Sint32 num_stpos_x, Sint32 num_stpos_y, Sint32 num_width, Sint32 num_height )
 {
-	int32_t blt_num;	// １桁の数値を格納する
-	int32_t i;			// 桁数分のforループで使用
-	int32_t dv;		// 割り算で使用する値
+	Sint32 blt_num;	// １桁の数値を格納する
+	Sint32 i;			// 桁数分のforループで使用
+	Sint32 dv;		// 割り算で使用する値
 
 	// value が負の値の場合、正の値に置き換える
 	if ( value < 0 )
@@ -1263,12 +1369,12 @@ void BltNumericImage( int32_t value, int32_t length, int32_t x, int32_t y, int32
 /*-[戻り値]---------------------------------------------------------*/
 /*	無し															*/
 /********************************************************************/
-void BltNumericImage2( int32_t value, int32_t length, int32_t x, int32_t y, int32_t plane, int32_t num_stpos_x, int32_t num_stpos_y, int32_t num_width, int32_t num_height )
+void BltNumericImage2( Sint32 value, Sint32 length, Sint32 x, Sint32 y, Sint32 plane, Sint32 num_stpos_x, Sint32 num_stpos_y, Sint32 num_width, Sint32 num_height )
 {
-	int32_t blt_num;	// １桁の数値を格納する
-	int32_t i;			// 桁数分のforループで使用
-	int32_t dv;		// 割り算で使用する値
-	int32_t x_hosei;	//右詰め補正値
+	Sint32 blt_num;	// １桁の数値を格納する
+	Sint32 i;			// 桁数分のforループで使用
+	Sint32 dv;		// 割り算で使用する値
+	Sint32 x_hosei;	//右詰め補正値
 	int buf;
 	int t = 1;
 	
@@ -1329,10 +1435,10 @@ void BltNumericImage2( int32_t value, int32_t length, int32_t x, int32_t y, int3
 	return;
 }
 
-int32_t funcSin( int32_t rdo )
+Sint32 funcSin( Sint32 rdo )
 {
-	int32_t ang;
-	int32_t rc = 0;
+	Sint32 ang;
+	Sint32 rc = 0;
 	
 	if ( ( rdo >= 0 ) && ( rdo < 180 ) )
 	{
@@ -1349,10 +1455,10 @@ int32_t funcSin( int32_t rdo )
 	
 	return( rc );
 }
-int32_t funcCos( int32_t rdo )
+Sint32 funcCos( Sint32 rdo )
 {
-	int32_t ang;
-	int32_t rc = 0;
+	Sint32 ang;
+	Sint32 rc = 0;
 	
 	if ( ( rdo >= 0 ) && ( rdo < 180 ) )
 	{
@@ -1371,18 +1477,18 @@ int32_t funcCos( int32_t rdo )
 }
 
 
-int32_t funcTan2( int32_t posX, int32_t posY )
+Sint32 funcTan2( Sint32 posX, Sint32 posY )
 {
-	int32_t rc = 0;
+	Sint32 rc = 0;
 	
 	rc = MOTatan( ( posX ) * 256, ( posY * -1 ) * 256 );
 	
 	return( rc );
 }
 
-int32_t get2keta( int32_t val, int32_t st )
+Sint32 get2keta( Sint32 val, Sint32 st )
 {
-	int32_t rc = 0;
+	Sint32 rc = 0;
 	
 	val = val / st;
 	rc = val % 100;

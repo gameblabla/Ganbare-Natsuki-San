@@ -1,7 +1,7 @@
 #ifndef	_GENERAL_
 #define _GENERAL_
 
-#include <stdint.h>
+#include <SDL.h>
 
 enum
 {
@@ -53,10 +53,10 @@ enum
 
 typedef union REG32{
 	struct{
-		uint16_t low;
-		uint16_t high;
+		Uint16 low;
+		Uint16 high;
 	}half;
-	uint32_t full;
+	Uint32 full;
 }REG32;
 
 #include <stdio.h>

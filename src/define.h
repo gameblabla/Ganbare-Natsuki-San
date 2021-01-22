@@ -2,6 +2,10 @@
 #ifndef DEFINE_H
 #define DEFINE_H
 
+#include "paths.h"
+
+#define GAMEFLAG_SIZE 513
+
 #define WP 65536
 #define WWP (WP*2)
 
@@ -48,9 +52,21 @@
 	#define RELATIVE_PATH
 	#define SCALING
 	#define MIDI_MUSIC
+	//#define SDLFILE
+	
+	#define FINAL_RESOLUTION_WIDTH 640
+	#define FINAL_RESOLUTION_HEIGHT 480
 #else
-	#define DEPTH 32
+	/* Zero means it will use whatever is available */
+	#define DEPTH 0
+	#define FINAL_RESOLUTION_WIDTH 0
+	#define FINAL_RESOLUTION_HEIGHT 0
 #endif
+
+#ifndef RELATIVE_PATH
+#include <sys/stat.h>
+#endif
+
 
 #define BMPBUFF_MAX (128)
 

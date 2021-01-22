@@ -49,19 +49,19 @@ void ending_init( void )
 {
 	scene_exit = 1;
 
-	LoadBitmap("image/bak/1.bmp",1,false);
-	LoadBitmap("image/end/1.bmp",2,true);	
+	LoadBitmap(BAK_IMAGE_PATH "1.bmp",1,false);
+	LoadBitmap(END_IMAGE_PATH "1.bmp",2,true);	
 	
 	if ( gameflag[126] == 0 )
 	{ 
-		LoadBitmap("image/end/2.bmp",3,true);
+		LoadBitmap(END_IMAGE_PATH "2.bmp",3,true);
 	}
 	else 
 	{
-		LoadBitmap("image/end/3.bmp",3,true);
+		LoadBitmap(END_IMAGE_PATH "3.bmp",3,true);
 	}
 
-	/*LoadBitmap("image/sys/waku.bmp",109,true);*/
+	/*LoadBitmap(SYS_IMAGE_PATH "waku.bmp",109,true);*/
 	soundPlayBgm( EN_BGM_GAME02 );
 
 }

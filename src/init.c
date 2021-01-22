@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
 #include <time.h>
 #include <string.h>
 #define SDL_MAIN_HANDLED
@@ -46,12 +45,13 @@ int iDoRun;
 int main(int argc, char *argv[])
 {
 	Uint32 flags;
-	#if DEPTH == 8
 	SDL_Surface* tmp;
-	#endif
+	
+	#ifdef MacOS
 	char AppPath[1024];
 	char AppPathw[1024];
-
+	#endif
+	
 #ifdef PSPUMODE
 	// PSP things
 	//psp_setup_callbacks();
@@ -59,8 +59,11 @@ int main(int argc, char *argv[])
 #endif 
 
 	/* èâä˙âª */
+	#ifdef MacOS
 	memset( &AppPath[0], '\0', sizeof( AppPath ) );
 	memset( &AppPathw[0], '\0', sizeof( AppPath ) );
+	#endif
+	
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		return 1;
 
@@ -87,6 +90,8 @@ int main(int argc, char *argv[])
 	flags = SDL_HWSURFACE | SDL_TRIPLEBUF;
 #elif defined(DREAMCAST)
 	flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
+#elif defined(CLASSICMAC)
+	flags = SDL_HWSURFACE | SDL_FULLSCREEN | SDL_DOUBLEBUF | SDL_HWPALETTE;
 #else
 	flags = SDL_SWSURFACE;
 #endif
@@ -94,17 +99,20 @@ int main(int argc, char *argv[])
 	SDL_ShowCursor(SDL_DISABLE);
 
 #ifdef SCALING
-	real_screen = SDL_SetVideoMode(0, 0, DEPTH, flags | SDL_NOFRAME);
+	real_screen = SDL_SetVideoMode(FINAL_RESOLUTION_WIDTH, FINAL_RESOLUTION_HEIGHT, DEPTH, flags | SDL_NOFRAME);
 	g_screen = SDL_CreateRGBSurface(SDL_SWSURFACE, DISPLY_WIDTH, DISPLY_HEIGHT, DEPTH, 0,0,0,0);
 #else
 	g_screen = SDL_SetVideoMode(DISPLY_WIDTH, DISPLY_HEIGHT, DEPTH, flags);
 #endif
 
-#if DEPTH == 8
-	tmp = SDL_LoadBMP("image/color.bmp");	
-	SetGscreenPalette( tmp );
-	SDL_FreeSurface(tmp);
+#if DEPTH != 8
+	if (g_screen->format->BitsPerPixel == 8)
 #endif
+	{
+		tmp = SDL_LoadBMP(IMAGE_PATH "color.bmp");	
+		SetGscreenPalette( tmp );
+		SDL_FreeSurface(tmp);
+	}
 	
 	if (!g_screen)
 	{
@@ -112,7 +120,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	
-	SDL_WM_SetCaption("gnp", "");
+	SDL_WM_SetCaption("Ganbare-Natsuki-san", "image/ico.bmp");
+
 
 	FunctionInit( );
 	main_init( );
@@ -133,32 +142,32 @@ void main_init( void )
 #ifndef NOSOUND
 
 #ifdef MIDI_MUSIC
-	soundLoadBuffer(EN_BGM_GAME01, (Uint8 *)"sound/bgm/01.mid", -1);
-	soundLoadBuffer(EN_BGM_GAME02, (Uint8 *)"sound/bgm/02.mid", -1);
-	soundLoadBuffer(EN_BGM_GAME03, (Uint8 *)"sound/bgm/03.mid", -1);
-	soundLoadBuffer(EN_BGM_GAME04, (Uint8 *)"sound/bgm/04.mid", -1);
-	soundLoadBuffer(EN_BGM_GAME05, (Uint8 *)"sound/bgm/05.mid", -1);
-	soundLoadBuffer(EN_BGM_GAME06, (Uint8 *)"sound/bgm/06.mid", -1);
-	soundLoadBuffer(EN_BGM_GAME07, (Uint8 *)"sound/bgm/07.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME01, (Uint8 *)BGM_SOUND_PATH "01.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME02, (Uint8 *)BGM_SOUND_PATH "02.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME03, (Uint8 *)BGM_SOUND_PATH "03.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME04, (Uint8 *)BGM_SOUND_PATH "04.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME05, (Uint8 *)BGM_SOUND_PATH "05.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME06, (Uint8 *)BGM_SOUND_PATH "06.mid", -1);
+	soundLoadBuffer(EN_BGM_GAME07, (Uint8 *)BGM_SOUND_PATH "07.mid", -1);
 #else
-	soundLoadBuffer(EN_BGM_GAME01, (Uint8 *)"sound/bgm/01.ogg", -1);
-	soundLoadBuffer(EN_BGM_GAME02, (Uint8 *)"sound/bgm/02.ogg", -1);
-	soundLoadBuffer(EN_BGM_GAME03, (Uint8 *)"sound/bgm/03.ogg", -1);
-	soundLoadBuffer(EN_BGM_GAME04, (Uint8 *)"sound/bgm/04.ogg", -1);
-	soundLoadBuffer(EN_BGM_GAME05, (Uint8 *)"sound/bgm/05.ogg", -1);
-	soundLoadBuffer(EN_BGM_GAME06, (Uint8 *)"sound/bgm/06.ogg", -1);
-	soundLoadBuffer(EN_BGM_GAME07, (Uint8 *)"sound/bgm/07.ogg", -1);
+	soundLoadBuffer(EN_BGM_GAME01, (Uint8 *)BGM_SOUND_PATH "01.ogg", -1);
+	soundLoadBuffer(EN_BGM_GAME02, (Uint8 *)BGM_SOUND_PATH "02.ogg", -1);
+	soundLoadBuffer(EN_BGM_GAME03, (Uint8 *)BGM_SOUND_PATH "03.ogg", -1);
+	soundLoadBuffer(EN_BGM_GAME04, (Uint8 *)BGM_SOUND_PATH "04.ogg", -1);
+	soundLoadBuffer(EN_BGM_GAME05, (Uint8 *)BGM_SOUND_PATH "05.ogg", -1);
+	soundLoadBuffer(EN_BGM_GAME06, (Uint8 *)BGM_SOUND_PATH "06.ogg", -1);
+	soundLoadBuffer(EN_BGM_GAME07, (Uint8 *)BGM_SOUND_PATH "07.ogg", -1);
 #endif
 	
-	soundLoadBufferSE(EN_SE_ATK1   , (Uint8 *)"sound/se/atk1.wav" );
-	soundLoadBufferSE(EN_SE_DAMEGE , (Uint8 *)"sound/se/damage.wav" );
-	soundLoadBufferSE(EN_SE_L1     , (Uint8 *)"sound/se/l1.wav" );
-	soundLoadBufferSE(EN_SE_LANDING, (Uint8 *)"sound/se/landing.wav" );
-	soundLoadBufferSE(EN_SE_MSG    , (Uint8 *)"sound/se/msg.wav" );
-	soundLoadBufferSE(EN_SE_SELECT , (Uint8 *)"sound/se/select.wav" );
-	soundLoadBufferSE(EN_SE_SW     , (Uint8 *)"sound/se/sw.wav" );
-	soundLoadBufferSE(EN_SE_JUMP   , (Uint8 *)"sound/se/jump.wav" );
-	soundLoadBufferSE(EN_SE_PAWA   , (Uint8 *)"sound/se/puwa.wav" );
+	soundLoadBufferSE(EN_SE_ATK1   , (Uint8 *)SE_SOUND_PATH "atk1.wav" );
+	soundLoadBufferSE(EN_SE_DAMEGE , (Uint8 *)SE_SOUND_PATH "damage.wav" );
+	soundLoadBufferSE(EN_SE_L1     , (Uint8 *)SE_SOUND_PATH "l1.wav" );
+	soundLoadBufferSE(EN_SE_LANDING, (Uint8 *)SE_SOUND_PATH "landing.wav" );
+	soundLoadBufferSE(EN_SE_MSG    , (Uint8 *)SE_SOUND_PATH "msg.wav" );
+	soundLoadBufferSE(EN_SE_SELECT , (Uint8 *)SE_SOUND_PATH "select.wav" );
+	soundLoadBufferSE(EN_SE_SW     , (Uint8 *)SE_SOUND_PATH "sw.wav" );
+	soundLoadBufferSE(EN_SE_JUMP   , (Uint8 *)SE_SOUND_PATH "jump.wav" );
+	soundLoadBufferSE(EN_SE_PAWA   , (Uint8 *)SE_SOUND_PATH "puwa.wav" );
 #endif
 
 	Set_Volume( gameflag[60] );

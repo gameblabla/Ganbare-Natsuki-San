@@ -51,7 +51,7 @@ void logo_init( void )
 	scene_exit = 1;
 	demo = 0;
 	
-	LoadBitmap("image/a_logo.bmp",2,true);	
+	LoadBitmap(IMAGE_PATH "a_logo.bmp",2,true);	
 
 	soundStopBgm(EN_BGM_GAME01);
 }

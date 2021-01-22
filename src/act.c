@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-
 #include <SDL.h>
 #include "define.h"
 #include "function.h"
@@ -21,9 +19,9 @@ void act_keys( void );
 void fram_set( );
 void jmp_st( );
 void g_jmp( );
-void idou_l( int32_t ankr_flag );
-void idou_r( int32_t ankr_flag );
-void cleaer_ankr( int32_t ankr_flag );
+void idou_l( Sint32 ankr_flag );
+void idou_r( Sint32 ankr_flag );
+void cleaer_ankr( Sint32 ankr_flag );
 void act_drow( void );
 void save_file_w( );
 void save_file( );
@@ -32,78 +30,78 @@ void playerdisp( );
 void bakdisp1();
 void bakdisp2( );
 void bak_make( );
-void wait_scl( int32_t type, int32_t d_num );
-void wait_scl2( int32_t d_num ,int32_t init_x, int32_t init_y );
+void wait_scl( Sint32 type, Sint32 d_num );
+void wait_scl2( Sint32 d_num ,Sint32 init_x, Sint32 init_y );
 void wait_scl3( );
 void snack_counter_disp();
 void minimap_disp( void );
 void mapdisp();
-void bgm_midi( int32_t BgmWavNo );
+void bgm_midi( Sint32 BgmWavNo );
 void stage_start( );
 void stage_endj( );
 void stage_claer( );
 void stage_end( );
-void p_shot_set( int32_t type , int32_t muki, int32_t houkou );
+void p_shot_set( Sint32 type , Sint32 muki, Sint32 houkou );
 void p_shot_disp( );
-void p_shot_f_set( int32_t x, int32_t y , int32_t type );
+void p_shot_f_set( Sint32 x, Sint32 y , Sint32 type );
 void p_shot_f_disp( );
-void p_shot_f2_set( int32_t x, int32_t y , int32_t muki );
+void p_shot_f2_set( Sint32 x, Sint32 y , Sint32 muki );
 void p_shot_f2_disp( );
-void item_set( int32_t type, int32_t x, int32_t y, int32_t iti, int32_t g_num );
-int32_t item_sonzai( int32_t map1, int32_t map2 );
+void item_set( Sint32 type, Sint32 x, Sint32 y, Sint32 iti, Sint32 g_num );
+Sint32 item_sonzai( Sint32 map1, Sint32 map2 );
 void item_disp( );
-int32_t item_up( );
-int32_t item_up2( );
-int32_t item_event( );
-void init_event_set_enm( int32_t event_no , int32_t b_num );
-void init_event_set( int32_t event_no , int32_t b_num );
-void event_set( int32_t event_no , int32_t b_num );
-void event_set_enm( int32_t event_no , int32_t b_num );
+Sint32 item_up( );
+Sint32 item_up2( );
+Sint32 item_event( );
+void init_event_set_enm( Sint32 event_no , Sint32 b_num );
+void init_event_set( Sint32 event_no , Sint32 b_num );
+void event_set( Sint32 event_no , Sint32 b_num );
+void event_set_enm( Sint32 event_no , Sint32 b_num );
 void event_disp( );
 void event_save( );
 void load_save_file( );
 void event_kaihuku( );
 void event_return( );
 void event_warp( );
-void enm_set( int32_t type, int32_t x, int32_t y );
-void enm_set2( int32_t type, int32_t x, int32_t y ,int32_t muki );
-int32_t e_hp( int32_t type );
+void enm_set( Sint32 type, Sint32 x, Sint32 y );
+void enm_set2( Sint32 type, Sint32 x, Sint32 y ,Sint32 muki );
+Sint32 e_hp( Sint32 type );
 void enm_disp();
-void e_move( int32_t i );
-void boss_dead( int32_t x, int32_t y );
-void e_shot_set( int32_t type , int32_t i , int32_t x, int32_t y );
+void e_move( Sint32 i );
+void boss_dead( Sint32 x, Sint32 y );
+void e_shot_set( Sint32 type , Sint32 i , Sint32 x, Sint32 y );
 void e_shot_disp( );
-void enmjmp( int32_t i );
-int32_t map1_item_j( int32_t x, int32_t y );
-void kane_set( int32_t x, int32_t y );
+void enmjmp( Sint32 i );
+Sint32 map1_item_j( Sint32 x, Sint32 y );
+void kane_set( Sint32 x, Sint32 y );
 void kane_disp(  );
-void k_jmp( int32_t i );
-void p_jump_f_set( int32_t x, int32_t y );
+void k_jmp( Sint32 i );
+void p_jump_f_set( Sint32 x, Sint32 y );
 void p_jump_f_disp( );
 void screen_BackupPlane( );
 void window_disp( );
 void window_keys( );
-int32_t labs_gnp( int32_t para );
-void p_mgc_set( int32_t muki , int32_t p3 );
+Sint32 labs_gnp( Sint32 para );
+void p_mgc_set( Sint32 muki , Sint32 p3 );
 void p_mgc_disp( );
-void BlendExBltRectW( int32_t plane_no, int32_t x, int32_t y, int32_t sx, int32_t sy, int32_t hx, int32_t hy, int32_t func, int32_t blend );
-void BlendExBltW( int32_t plane_no, int32_t x, int32_t y, int32_t func, int32_t blend );
-void BlendExBltFastW( int32_t plane_no, int32_t x, int32_t y, int32_t func, int32_t blend );
+void BlendExBltRectW( Sint32 plane_no, Sint32 x, Sint32 y, Sint32 sx, Sint32 sy, Sint32 hx, Sint32 hy, Sint32 func, Sint32 blend );
+void BlendExBltW( Sint32 plane_no, Sint32 x, Sint32 y, Sint32 func, Sint32 blend );
+void BlendExBltFastW( Sint32 plane_no, Sint32 x, Sint32 y, Sint32 func, Sint32 blend );
 void replay_input_save( void );
 void replay_input_load( void );
 void replay_file_save_w( void );
-void replay_file_save( int32_t type );
-int32_t replay_file_load( void );
-int32_t GetKyori( int32_t i1, int32_t i2 );
+void replay_file_save( Sint32 type );
+Sint32 replay_file_load( void );
+Sint32 GetKyori( Sint32 i1, Sint32 i2 );
 void debugdisp( void );
 
 /* Size was 1024, reduce it to 30 as that's the minimum required here. - Gameblabla */
 static char string[30];
 
-static int32_t scene_exit;
-static int32_t sn = 0;									/* ê–Ê—p•Ï”‚±‚ê‚ğ•Ï‚¦‚é‚±‚Æ‚É‚æ‚Á‚Ä•`‰æŠÖ”“à‚Ìˆ—‚ğ•Ï‚¦‚é		*/
+static Sint32 scene_exit;
+static Sint32 sn = 0;									/* ê–Ê—p•Ï”‚±‚ê‚ğ•Ï‚¦‚é‚±‚Æ‚É‚æ‚Á‚Ä•`‰æŠÖ”“à‚Ìˆ—‚ğ•Ï‚¦‚é		*/
 
-static int32_t enm1_parameter[10 * 20] = 
+static Sint32 enm1_parameter[10 * 20] = 
 {
 /*   HP */
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 	/* 0–¢g—p */
@@ -122,7 +120,7 @@ static int32_t enm1_parameter[10 * 20] =
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0 	/* 20–¢g—p */
 };
 
-static int32_t enm2_parameter[10 * 20] = 
+static Sint32 enm2_parameter[10 * 20] = 
 {
 /*   HP */
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 	/* 0–¢g—p */
@@ -138,7 +136,7 @@ static int32_t enm2_parameter[10 * 20] =
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0 	/* 20–¢g—p */
 };
 
-static int32_t enm3_parameter[10 * 20] = 
+static Sint32 enm3_parameter[10 * 20] = 
 {
 /*   HP   ‹à UŒ‚ ‘®« ‘Š« */
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 	/* 0–¢g—p */
@@ -154,7 +152,7 @@ static int32_t enm3_parameter[10 * 20] =
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0 	/* 20–¢g—p */
 };
 
-static int32_t enm4_parameter[10 * 20] = 
+static Sint32 enm4_parameter[10 * 20] = 
 {
 /*   HP */
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 	/* 0–¢g—p */
@@ -170,9 +168,9 @@ static int32_t enm4_parameter[10 * 20] =
 	  0,   0,   0,   0,   0,   0,   0,   0,   0,   0 	/* 20–¢g—p */
 };
 
-static int32_t item_data[3] = { 32, 500, 10 };			/* ƒAƒCƒeƒ€‚Ìî•ñ@ƒTƒCƒYAÅ‘å”z’uŒÂ”A1ƒf[ƒ^ƒoƒbƒtƒ@” */
-static int32_t enm_data[3] = { 0, 500, 20 };			/* “G‚Ìî•ñ@—\”õAÅ‘å”z’uŒÂ”A1ƒf[ƒ^ƒoƒbƒtƒ@” */
-static int32_t MapInfo[10] = 
+static Sint32 item_data[3] = { 32, 500, 10 };			/* ƒAƒCƒeƒ€‚Ìî•ñ@ƒTƒCƒYAÅ‘å”z’uŒÂ”A1ƒf[ƒ^ƒoƒbƒtƒ@” */
+static Sint32 enm_data[3] = { 0, 500, 20 };			/* “G‚Ìî•ñ@—\”õAÅ‘å”z’uŒÂ”A1ƒf[ƒ^ƒoƒbƒtƒ@” */
+static Sint32 MapInfo[10] = 
 {
 	20 * 1									/* 0:ƒ}ƒbƒv‚ÌxƒTƒCƒY */
 ,	15 * 1									/* 1:ƒ}ƒbƒv‚ÌyƒTƒCƒY */
@@ -181,7 +179,7 @@ static int32_t MapInfo[10] =
 ,   20										/* 4:ƒwƒbƒ_ƒf[ƒ^•”‚Ìƒf[ƒ^” */
 };
 
-static int32_t player[50];									/* ƒvƒŒƒCƒ„[—pƒoƒbƒtƒ@ */
+static Sint32 player[50];									/* ƒvƒŒƒCƒ„[—pƒoƒbƒtƒ@ */
 											/* player[0] X */
 											/* player[1] Y */
 											/* player[2] ó‘Ô */
@@ -221,56 +219,56 @@ static int32_t player[50];									/* ƒvƒŒƒCƒ„[—pƒoƒbƒtƒ@ */
 											/* player[36] ƒAƒ“ƒJ[‚Á”ò‚Ñ•ûŒü */
 											/* player[37] ƒAƒCƒeƒ€‚ğ’Í‚ñ‚Å‚¢‚é */
 											/* player[38] ƒAƒ“ƒJ[‚ğL‚Î‚µ‚½(Œø‰Ê‰¹—p) */
-static int32_t dp_x;									/* ƒvƒŒƒCƒ„[‚Ì•\¦ˆÊ’ui‰æ–Ê“à‚Ì‘Š‘ÎÀ•Wj */
-static int32_t dp_y;									/* ƒvƒŒƒCƒ„[‚Ì•\¦ˆÊ’ui‰æ–Ê“à‚Ì‘Š‘ÎÀ•Wj */
-static int32_t demo[10];
-static int32_t map1[320];								/* ”wŒi—pƒoƒbƒtƒ@ ƒŒƒCƒ„[1 */
-static int32_t map2[320];								/* ”wŒi—pƒoƒbƒtƒ@ ƒŒƒCƒ„[2 */
-static int32_t map_data[20];
-static int32_t bak_cnt = 0;							/* ”wŒiƒAƒjƒ[ƒVƒ‡ƒ“—pƒJƒEƒ“ƒ^ */
-static int32_t d_x = 0;								/* ”wŒi•\¦ˆÊ’u */
-static int32_t d_y = 0;								/* ”wŒi•\¦ˆÊ’u */
-//static int32_t disp_data[60];							/* ƒZ[ƒuˆê—— */
-static int32_t next_px = 0;							/* ‰æ–ÊØ‚è‘Ö‚¦‚ÌƒLƒƒƒ‰ˆÚ“®‘Îô */
-static int32_t next_py = 0;
+static Sint32 dp_x;									/* ƒvƒŒƒCƒ„[‚Ì•\¦ˆÊ’ui‰æ–Ê“à‚Ì‘Š‘ÎÀ•Wj */
+static Sint32 dp_y;									/* ƒvƒŒƒCƒ„[‚Ì•\¦ˆÊ’ui‰æ–Ê“à‚Ì‘Š‘ÎÀ•Wj */
+static Sint32 demo[10];
+static Sint32 map1[320];								/* ”wŒi—pƒoƒbƒtƒ@ ƒŒƒCƒ„[1 */
+static Sint32 map2[320];								/* ”wŒi—pƒoƒbƒtƒ@ ƒŒƒCƒ„[2 */
+static Sint32 map_data[20];
+static Sint32 bak_cnt = 0;							/* ”wŒiƒAƒjƒ[ƒVƒ‡ƒ“—pƒJƒEƒ“ƒ^ */
+static Sint32 d_x = 0;								/* ”wŒi•\¦ˆÊ’u */
+static Sint32 d_y = 0;								/* ”wŒi•\¦ˆÊ’u */
+//static Sint32 disp_data[60];							/* ƒZ[ƒuˆê—— */
+static Sint32 next_px = 0;							/* ‰æ–ÊØ‚è‘Ö‚¦‚ÌƒLƒƒƒ‰ˆÚ“®‘Îô */
+static Sint32 next_py = 0;
 
-static int32_t atk_rr1 =22;						/* ˜r‚Ì‰ñ“]‘¬“x */
-static int32_t atk_rr2 = 1;						/* ˜r‚Ì‰ñ“]‘¬“x */
-//int32_t atk_rr = 360 / 32;						/* ˜r‚Ì‰ñ“]‘¬“x */
+static Sint32 atk_rr1 =22;						/* ˜r‚Ì‰ñ“]‘¬“x */
+static Sint32 atk_rr2 = 1;						/* ˜r‚Ì‰ñ“]‘¬“x */
+//Sint32 atk_rr = 360 / 32;						/* ˜r‚Ì‰ñ“]‘¬“x */
 
-static int32_t stage = 0;								/* ƒXƒe[ƒW”Ô† */
+static Sint32 stage = 0;								/* ƒXƒe[ƒW”Ô† */
 
-static int32_t pshot[10 * 10];							/* ƒvƒŒƒCƒ„[UŒ‚—pî•ñ */
-static int32_t pshotf[10 * 40];						/* ƒvƒŒƒCƒ„[UŒ‚—pî•ñ */
-static int32_t pshotf2[10 * 80];						/* ƒvƒŒƒCƒ„[UŒ‚—pî•ñ */
-static int32_t pmshot[20 * 40];						/* ƒvƒŒƒCƒ„[UŒ‚—pî•ñ */
-static int32_t pjumpf[100];							/* ƒvƒŒƒCƒ„[UŒ‚—pî•ñ */
-static int32_t item[10 * 50];							/* ƒAƒCƒeƒ€—pƒoƒbƒtƒ@ */
-static int32_t item_wk[5*100];							/* ’n–Ê ‚»‚Ì‘¼‚Ìƒ}ƒbƒvî•ñ */
-static int32_t enemy[40 * 20];								/* “Gî•ñ															*/
-static int32_t mgc_e[10 * 20] ;						/* MGC•\¦î•ñ														*/
-static int32_t p_ef[1000] ;							/* ”Ä—pƒoƒbƒtƒ@i‘«Õ“™j														*/
-//static int32_t life_a[5];								/* HPƒAƒjƒ[ƒVƒ‡ƒ“—p */
-static int32_t kane[200];								/* ƒAƒCƒeƒ€—pƒoƒbƒtƒ@ */
+static Sint32 pshot[10 * 10];							/* ƒvƒŒƒCƒ„[UŒ‚—pî•ñ */
+static Sint32 pshotf[10 * 40];						/* ƒvƒŒƒCƒ„[UŒ‚—pî•ñ */
+static Sint32 pshotf2[10 * 80];						/* ƒvƒŒƒCƒ„[UŒ‚—pî•ñ */
+static Sint32 pmshot[20 * 40];						/* ƒvƒŒƒCƒ„[UŒ‚—pî•ñ */
+static Sint32 pjumpf[100];							/* ƒvƒŒƒCƒ„[UŒ‚—pî•ñ */
+static Sint32 item[10 * 50];							/* ƒAƒCƒeƒ€—pƒoƒbƒtƒ@ */
+static Sint32 item_wk[5*100];							/* ’n–Ê ‚»‚Ì‘¼‚Ìƒ}ƒbƒvî•ñ */
+static Sint32 enemy[40 * 20];								/* “Gî•ñ															*/
+static Sint32 mgc_e[10 * 20] ;						/* MGC•\¦î•ñ														*/
+static Sint32 p_ef[1000] ;							/* ”Ä—pƒoƒbƒtƒ@i‘«Õ“™j														*/
+//static Sint32 life_a[5];								/* HPƒAƒjƒ[ƒVƒ‡ƒ“—p */
+static Sint32 kane[200];								/* ƒAƒCƒeƒ€—pƒoƒbƒtƒ@ */
 
-static int32_t Jump_counts = 0;
-static int32_t save_data[400];							/* •Û‘¶î•ñ */
-static int32_t test[5];
-static int32_t rayer[5];								/* ”wŒiƒXƒNƒ[ƒ‹—Ê */
-static int32_t play_time[5];
+static Sint32 Jump_counts = 0;
+static Sint32 save_data[400];							/* •Û‘¶î•ñ */
+static Sint32 test[5];
+static Sint32 rayer[5];								/* ”wŒiƒXƒNƒ[ƒ‹—Ê */
+static Sint32 play_time[5];
 /* ƒŠƒvƒŒƒC‚Q‚O•ª */
 
 #define MAX_REPLAY_SIZE 60 * 60 * 10
 #define SUPER_MAX_REPLAY_SIZE 60 * 60 * 20
 
-static int32_t replay[MAX_REPLAY_SIZE];	/* ƒtƒŒ[ƒ€–•b–•ª */
-static int32_t replay_time = 1;
-static int32_t replay_time_MAX = MAX_REPLAY_SIZE;	/* Å‘åŠÔ */
-static int32_t replay_load_key[10];
-static int32_t replay_save_flag = 0;				/* •Û‘¶‚ğs‚¤‚© 1:‚µ‚È‚¢ */
-static int32_t rrkey[5];								/* “ü—ÍƒL[•ûŒü */
+static Sint32 replay[MAX_REPLAY_SIZE];	/* ƒtƒŒ[ƒ€–•b–•ª */
+static Sint32 replay_time = 1;
+static Sint32 replay_time_MAX = MAX_REPLAY_SIZE;	/* Å‘åŠÔ */
+static Sint32 replay_load_key[10];
+static Sint32 replay_save_flag = 0;				/* •Û‘¶‚ğs‚¤‚© 1:‚µ‚È‚¢ */
+static Sint32 rrkey[5];								/* “ü—ÍƒL[•ûŒü */
 
-//static int32_t event_buff[100];
+//static Sint32 event_buff[100];
 /* event_buff[0]	•¶š—p³¨İÄŞ³•\¦ */
 /* event_buff[1]	Šç•\¦ */
 /* event_buff[2]	·°“ü—Í‘Ò‚¿ */
@@ -286,10 +284,10 @@ static int32_t rrkey[5];								/* “ü—ÍƒL[•ûŒü */
 /* TextLayer( 10 )‚Í²ÍŞİÄ‚Åg—piŒÅ’èj */
 /* ƒvƒŒ[ƒ“80`90‚Í²ÍŞİÄ‚Åg—p */
 /* wav30‚Í²ÍŞİÄ‚Åg—p */
-//static int32_t file_handle = 0	;
-static int32_t one_event = 0;							/* d‚È‚Á‚Ä”­¶‚·‚éƒCƒxƒ“ƒg‚Ì‘O‰ñd‚È‚Á‚Ä‚¢‚½‚©‚Ìƒtƒ‰ƒO */
-//static int32_t start_plyer_disp = 1;					/* ŠJn‚É•\¦‚·‚é‚©ƒtƒ‰ƒO */
-//static int32_t start_effct_disp = 0;					/* ŠJn‚ÉŒø‰Ê‚ğ•\¦‚·‚é‚©ƒtƒ‰ƒO */
+//static Sint32 file_handle = 0	;
+static Sint32 one_event = 0;							/* d‚È‚Á‚Ä”­¶‚·‚éƒCƒxƒ“ƒg‚Ì‘O‰ñd‚È‚Á‚Ä‚¢‚½‚©‚Ìƒtƒ‰ƒO */
+//static Sint32 start_plyer_disp = 1;					/* ŠJn‚É•\¦‚·‚é‚©ƒtƒ‰ƒO */
+//static Sint32 start_effct_disp = 0;					/* ŠJn‚ÉŒø‰Ê‚ğ•\¦‚·‚é‚©ƒtƒ‰ƒO */
 
 #define DEBUG_DISP (0)
 
@@ -297,7 +295,7 @@ static int32_t one_event = 0;							/* d‚È‚Á‚Ä”­¶‚·‚éƒCƒxƒ“ƒg‚Ì‘O‰ñd‚È‚Á‚Ä‚¢‚
 // ƒƒCƒ“ŠÖ”
 void act_main( void )
 {
-	int32_t exit_code;
+	Sint32 exit_code;
 	
 	act_init( );		// ‰Šú‰»
 	
@@ -322,11 +320,11 @@ void act_main( void )
 
 void act_init( void )
 {
-	int32_t i;
-	int32_t x;
-	int32_t y;
-	int32_t wk;
-	int32_t d_num;
+	Sint32 i;
+	Sint32 x;
+	Sint32 y;
+	Sint32 wk;
+	Sint32 d_num;
 	
 	char path_item[96];
 	char path_work[96];
@@ -412,7 +410,7 @@ void act_init( void )
 
 
 	ResetGameFlag2( );
-	sprintf(string,"data/%d/%d_%d.map", ( int )stage , ( int )1, ( int )d_num );
+	sprintf(string,MAP_DATA_PATH "%d_%d.map", ( int )stage , ( int )1, ( int )d_num );
 	if ( LoadGameFlag2(string) == 0 )
 	{
 		for ( i = 0; i <= 319; i++ )
@@ -432,6 +430,7 @@ void act_init( void )
 		}
 		sn = 10;
 	}
+	
 	for ( i = 0 ; i < 20 ; i++ )
 	{
 		map_data[i] = gameflag2[i + 320];
@@ -441,7 +440,7 @@ void act_init( void )
 	{
 		if ( map_data[11 + i] != 0 )
 		{
-			sprintf(string,"image/bak/%d.bmp", ( int )map_data[11 + i] );
+			sprintf(string,BAK_IMAGE_PATH "%d.bmp", ( int )map_data[11 + i] );
 			if ( LoadBitmap(string,110 + i , 0 ) != 0 )	
 			{
 				ReleaseBitmap(110 + i);
@@ -453,7 +452,7 @@ void act_init( void )
 	player[1] = ( map_data[10] * 32 ) - 16;
 	
 	ResetGameFlag2( );
-	sprintf(string,"data/%d/%d_%d.map", ( int )stage , ( int )2, ( int )d_num );
+	sprintf(string,MAP_DATA_PATH "%d_%d.map", ( int )stage , ( int )2, ( int )d_num );
 	if ( LoadGameFlag2(string) == 0 )
 	{
 		for ( i = 0; i <= 319; i++ )
@@ -463,7 +462,7 @@ void act_init( void )
 	}
 
 	ResetGameFlag2( );
-	sprintf(string,"data/%d/i%d_%d.map", ( int )stage , ( int )1, ( int )d_num );
+	sprintf(string,MAP_DATA_PATH "i%d_%d.map", ( int )stage , ( int )1, ( int )d_num );
 	if ( LoadGameFlag2(string) == 0 )
 	{
 		for ( x = 0; x <= 19 ; x++ )
@@ -481,7 +480,7 @@ void act_init( void )
 
 	
 	ResetGameFlag2();				/* ƒtƒ@ƒCƒ‹‚È‚µ */
-	sprintf( string,"data/%d/e%d_%d.map", ( int )stage , ( int )1, ( int )d_num );
+	sprintf( string,MAP_DATA_PATH "e%d_%d.map", ( int )stage , ( int )1, ( int )d_num );
 	if ( LoadGameFlag2( string ) == 0 )	/* “G”z’u */
 	{
 		/* “G”z’u */
@@ -648,62 +647,62 @@ void act_init( void )
 		}
 	}
 
-	sprintf(string,"image/player/ri%d.bmp", ( int )gameflag[122] );
+	sprintf(string,PLAYER_IMAGE_PATH "ri%d.bmp", ( int )gameflag[122] );
 	LoadBitmap(string,1,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/player/mgc1.bmp",2,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/player/atk1.bmp",3,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/player/atk2.bmp",4,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(PLAYER_IMAGE_PATH "mgc1.bmp",2,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(PLAYER_IMAGE_PATH "atk1.bmp",3,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(PLAYER_IMAGE_PATH "atk2.bmp",4,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
 
-	LoadBitmap("image/player/atkf.bmp",5,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(PLAYER_IMAGE_PATH "atkf.bmp",5,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
 
-	sprintf(string,"image/map/map%d_1.bmp", ( int )stage );
+	sprintf(string,MAP_IMAGE_PATH "map%d_1.bmp", ( int )stage );
 	
 	printf("Map = %s \n", string);
 	
 	LoadBitmap(string,10,true);				
-	sprintf(string,"image/map/map%d_2.bmp", ( int )stage );
+	sprintf(string,MAP_IMAGE_PATH "map%d_2.bmp", ( int )stage );
 	LoadBitmap(string,11,true);
-	sprintf(string,"image/map/item%d.bmp", ( int )stage );
+	sprintf(string,MAP_IMAGE_PATH "item%d.bmp", ( int )stage );
 	LoadBitmap(string,12,true);
 
 
-	LoadBitmap("image/sys/map_f0.bmp",15,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/sys/map_f1.bmp",16,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/sys/map_f2.bmp",17,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/sys/fonts2.bmp",18,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/sys/sc.bmp",19,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "map_f0.bmp",15,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "map_f1.bmp",16,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "map_f2.bmp",17,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "fonts2.bmp",18,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "sc.bmp",19,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
 
-	LoadBitmap("image/sys/p_data.bmp",20,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/sys/skill.bmp",21,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/sys/hp.bmp",22,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/sys/hp2.bmp",23,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "p_data.bmp",20,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "skill.bmp",21,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "hp.bmp",22,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "hp2.bmp",23,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
 	
-	LoadBitmap("image/sys/pause.bmp",24,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "pause.bmp",24,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
 	
-	LoadBitmap("image/enm/e32.bmp",40,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/enm/e48.bmp",41,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/enm/e64.bmp",42,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(ENM_IMAGE_PATH "e32.bmp",40,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(ENM_IMAGE_PATH "e48.bmp",41,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(ENM_IMAGE_PATH "e64.bmp",42,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
 	
-	LoadBitmap("image/enm/e_shot.bmp",50,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(ENM_IMAGE_PATH "e_shot.bmp",50,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
 
-	LoadBitmap("image/player/font_d.bmp",51,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/player/hp.bmp",52,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(PLAYER_IMAGE_PATH "font_d.bmp",51,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(PLAYER_IMAGE_PATH "hp.bmp",52,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
 	
 
-	LoadBitmap("image/sys/menu.bmp",60,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/title/scl.bmp",61,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/sys/window_item.bmp",62,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "menu.bmp",60,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(TITLE_IMAGE_PATH "scl.bmp",61,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "window_item.bmp",62,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
 
-	LoadBitmap("image/player/arm.bmp",65,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/player/arm2.bmp",66,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/sys/input.bmp",67,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/sys/new.bmp",68,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/sys/new2.bmp",69,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/sys/mini_map.bmp",70,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
-	LoadBitmap("image/bak/0.bmp",72,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(PLAYER_IMAGE_PATH "arm.bmp",65,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(PLAYER_IMAGE_PATH "arm2.bmp",66,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "input.bmp",67,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "new.bmp",68,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "new2.bmp",69,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(SYS_IMAGE_PATH "mini_map.bmp",70,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
+	LoadBitmap(BAK_IMAGE_PATH "0.bmp",72,true);					//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
 
-	/*LoadBitmap("image/sys/waku.bmp",109,true);*/				
-	LoadBitmap("image/color.bmp",127,false);
+	/*LoadBitmap(SYS_IMAGE_PATH "waku.bmp",109,true);*/				
+	LoadBitmap(IMAGE_PATH "color.bmp",127,false);
 
 
 
@@ -711,7 +710,7 @@ void act_init( void )
 
 void act_relese( void )
 {
-	int32_t i;
+	Sint32 i;
 	
 	save_file_w( );
 
@@ -726,16 +725,16 @@ void act_relese( void )
 
 void act_keys( void )
 {
-	int32_t i;
-	int32_t old_x;
-	int32_t muki;
-	int32_t muki2;
-	int32_t px;
-	int32_t py;
-	int32_t kaiten;
-	int32_t rr;
-	int32_t rg;
-	int32_t ii;
+	Sint32 i;
+	Sint32 old_x;
+	Sint32 muki;
+	Sint32 muki2;
+	Sint32 px;
+	Sint32 py;
+	Sint32 kaiten;
+	Sint32 rr;
+	Sint32 rg;
+	Sint32 ii;
 	
 	if ( sn == 1 )
 	{
@@ -1683,9 +1682,9 @@ void fram_set( )
 /* ‚·‚¢’†‚Ìê‡‚ÍƒWƒƒƒ“ƒv—Í‘‰Á */
 void jmp_st( )
 {
-	int32_t px1 ;
-	int32_t px2 ;
-	int32_t py2 ;
+	Sint32 px1 ;
+	Sint32 px2 ;
+	Sint32 py2 ;
 
 	px1 = ( player[0] + 10 ) / 32;
 	px2 = ( player[0] + 22 ) / 32;
@@ -1706,11 +1705,11 @@ void jmp_st( )
 /* Renamed from jmp() because that function name could be problematic - Gameblabla */
 void g_jmp( )
 {
-	int32_t y1;
-	int32_t px1 ;
-	int32_t px2 ;
-	int32_t py ;
-	int32_t py3 ;
+	Sint32 y1;
+	Sint32 px1 ;
+	Sint32 px2 ;
+	Sint32 py ;
+	Sint32 py3 ;
 
 	player[13]++;
 	if ( player[13] >= 11 )
@@ -1918,13 +1917,13 @@ void g_jmp( )
 
 }
 
-void idou_l( int32_t ankr_flag )
+void idou_l( Sint32 ankr_flag )
 {
-	int32_t px ;
-	int32_t py1 ;
-	int32_t py2 ;
+	Sint32 px ;
+	Sint32 py1 ;
+	Sint32 py2 ;
 
-	int32_t i;
+	Sint32 i;
 
 
 	/* ¡‰ñ‚ÌˆÊ’u */
@@ -1976,13 +1975,13 @@ void idou_l( int32_t ankr_flag )
 
 }
 /* ©•ª‚Ì¶‰E‚ÉˆÚ“®‰Â”\‚©H */
-void idou_r( int32_t ankr_flag )
+void idou_r( Sint32 ankr_flag )
 {
-	int32_t px ;
-	int32_t py1 ;
-	int32_t py2 ;
+	Sint32 px ;
+	Sint32 py1 ;
+	Sint32 py2 ;
 
-	int32_t i;
+	Sint32 i;
 
 	/* ¡‰ñ‚ÌˆÊ’u */
 	px = ( player[0] + 21 + player[29]  ) / 32;
@@ -2032,7 +2031,7 @@ void idou_r( int32_t ankr_flag )
 
 }
 
-void cleaer_ankr( int32_t ankr_flag )
+void cleaer_ankr( Sint32 ankr_flag )
 {
 	if ( ankr_flag != 0 )
 	{
@@ -2162,7 +2161,7 @@ void act_drow( void )
 /* ˆêƒtƒ@ƒCƒ‹•Û‘¶ */
 void save_file_w( )
 {
-	int32_t i;
+	Sint32 i;
 	char path_config[96];
 	char path_item[96];
 	char path_work[96];
@@ -2247,8 +2246,8 @@ void save_file_w( )
 /* Player sprite - Displayed according to the screen scrolling - Gameblabla */
 void playerdisp( )
 {
-	int32_t i;
-	int32_t arm_muki;
+	Sint32 i;
+	Sint32 arm_muki;
 	
 	arm_muki = 0;
 	
@@ -2714,15 +2713,15 @@ void bak_make( )
 
 
 /* ‚v‚`‚h‚s‚Â‚«ƒXƒNƒ[ƒ‹ */
-void wait_scl( int32_t type, int32_t d_num )
+void wait_scl( Sint32 type, Sint32 d_num )
 {
 /*  
 	0:ã	1:‰º	2:¶	3:‰E
 	‚æ‚İ‚±‚Şƒtƒ@ƒCƒ‹‚m‚n
 */
-	int32_t i;
-	int32_t x;
-	int32_t y;
+	Sint32 i;
+	Sint32 x;
+	Sint32 y;
 
 	screen_BackupPlane( );
 
@@ -2762,7 +2761,7 @@ void wait_scl( int32_t type, int32_t d_num )
 	}
 
 	ResetGameFlag2( );
-	sprintf(string,"data/%d/%d_%d.map", (int)stage , (int)1, (int)d_num );
+	sprintf(string,MAP_DATA_PATH "%d_%d.map", (int)stage , (int)1, (int)d_num );
 	LoadGameFlag2(string);
 	{
 		for ( i = 0; i <= 319; i++ )
@@ -2777,7 +2776,7 @@ void wait_scl( int32_t type, int32_t d_num )
 	
 	for ( i = 0 ; i < 5 ; i++ )
 	{
-		sprintf(string,"image/bak/%d.bmp", (int)map_data[11 + i] );
+		sprintf(string,BAK_IMAGE_PATH "%d.bmp", (int)map_data[11 + i] );
 		
 		if ( ( i == 0 ) || ( map_data[11 + i] != 0 ) )
 		{
@@ -2790,7 +2789,7 @@ void wait_scl( int32_t type, int32_t d_num )
 	}
 
 	ResetGameFlag2( );
-	sprintf(string,"data/%d/%d_%d.map", (int)stage , (int)2, (int)d_num );
+	sprintf(string,MAP_DATA_PATH "%d_%d.map", (int)stage , (int)2, (int)d_num );
 	if ( LoadGameFlag2(string) == 0 )
 	{
 		for ( i = 0; i <= 319; i++ )
@@ -2802,7 +2801,7 @@ void wait_scl( int32_t type, int32_t d_num )
 
 
 	ResetGameFlag2( );
-	sprintf(string,"data/%d/i%d_%d.map", (int)stage , (int)1, (int)d_num );
+	sprintf(string,MAP_DATA_PATH "i%d_%d.map", (int)stage , (int)1, (int)d_num );
 	if ( LoadGameFlag2(string) == 0 )
 	{
 		for ( x = 0; x <= 19 ; x++ )
@@ -2818,7 +2817,7 @@ void wait_scl( int32_t type, int32_t d_num )
 	}
 
 	ResetGameFlag2();
-	sprintf( string,"data/%d/e%d_%d.map", (int)stage , (int)1, (int)d_num );
+	sprintf( string,MAP_DATA_PATH "e%d_%d.map", (int)stage , (int)1, (int)d_num );
 	LoadGameFlag2( string );
 	for ( x = 0; x <= 19 ; x++ )
 	{
@@ -2857,11 +2856,11 @@ void wait_scl( int32_t type, int32_t d_num )
 }
 
 
-void wait_scl2( int32_t d_num ,int32_t init_x, int32_t init_y )
+void wait_scl2( Sint32 d_num ,Sint32 init_x, Sint32 init_y )
 {
-	int32_t i;
-	int32_t x;
-	int32_t y;
+	Sint32 i;
+	Sint32 x;
+	Sint32 y;
 
 	for ( i = 0; i < 100; i++ )
 	{
@@ -2898,7 +2897,7 @@ void wait_scl2( int32_t d_num ,int32_t init_x, int32_t init_y )
 	}
 
 	ResetGameFlag2( );
-	sprintf(string,"data/%d/%d_%d.map", (int)stage , (int)1, (int)d_num );
+	sprintf(string,MAP_DATA_PATH "%d_%d.map", (int)stage , (int)1, (int)d_num );
 	LoadGameFlag2(string);
 	if ( LoadGameFlag2(string) == 0 )
 	{
@@ -2914,7 +2913,7 @@ void wait_scl2( int32_t d_num ,int32_t init_x, int32_t init_y )
 	
 	for ( i = 0 ; i < 5 ; i++ )
 	{
-		sprintf(string,"image/bak/%d.bmp", (int)map_data[11 + i] );
+		sprintf(string,BAK_IMAGE_PATH "%d.bmp", (int)map_data[11 + i] );
 		
 		if ( ( i == 0 ) || ( map_data[11 + i] != 0 ) )
 		{
@@ -2927,7 +2926,7 @@ void wait_scl2( int32_t d_num ,int32_t init_x, int32_t init_y )
 	}
 	
 	ResetGameFlag2( );
-	sprintf(string,"data/%d/%d_%d.map", (int)stage , (int)2, (int)d_num );
+	sprintf(string,MAP_DATA_PATH "%d_%d.map", (int)stage , (int)2, (int)d_num );
 	if ( LoadGameFlag2(string) == 0 )
 	{
 		for ( i = 0; i <= 319; i++ )
@@ -2939,7 +2938,7 @@ void wait_scl2( int32_t d_num ,int32_t init_x, int32_t init_y )
 
 
 	ResetGameFlag2( );
-	sprintf(string,"data/%d/i%d_%d.map", (int)stage , (int)1, (int)d_num );
+	sprintf(string,MAP_DATA_PATH "i%d_%d.map", (int)stage , (int)1, (int)d_num );
 	if ( LoadGameFlag2(string) == 0 )
 	{
 		for ( x = 0; x <= 19 ; x++ )
@@ -2955,7 +2954,7 @@ void wait_scl2( int32_t d_num ,int32_t init_x, int32_t init_y )
 	}
 
 	ResetGameFlag2();
-	sprintf( string,"data/%d/e%d_%d.map", (int)stage , (int)1, (int)d_num );
+	sprintf( string,MAP_DATA_PATH "e%d_%d.map", (int)stage , (int)1, (int)d_num );
 	LoadGameFlag2( string );
 
 	for ( x = 0; x <= 19 ; x++ )
@@ -2982,10 +2981,10 @@ void wait_scl2( int32_t d_num ,int32_t init_x, int32_t init_y )
 
 void wait_scl3( )
 {
-	int32_t i;
-	int32_t x;
-	int32_t y;
-	int32_t d_num;
+	Sint32 i;
+	Sint32 x;
+	Sint32 y;
+	Sint32 d_num;
 	
 	d_num = save_data[3];
 
@@ -3024,7 +3023,7 @@ void wait_scl3( )
 	}
 
 	ResetGameFlag2( );
-	sprintf(string,"data/%d/%d_%d.map", (int)stage , (int)1, (int)d_num );
+	sprintf(string,MAP_DATA_PATH "%d_%d.map", (int)stage , (int)1, (int)d_num );
 	LoadGameFlag2(string);
 	{
 		for ( i = 0; i <= 319; i++ )
@@ -3039,7 +3038,7 @@ void wait_scl3( )
 	
 	for ( i = 0 ; i < 5 ; i++ )
 	{
-		sprintf(string,"image/bak/%d.bmp", (int)map_data[11 + i] );
+		sprintf(string,BAK_IMAGE_PATH "%d.bmp", (int)map_data[11 + i] );
 		
 		if ( ( i == 0 ) || ( map_data[11 + i] != 0 ) )
 		{
@@ -3052,7 +3051,7 @@ void wait_scl3( )
 	}
 	
 	ResetGameFlag2( );
-	sprintf(string,"data/%d/%d_%d.map", (int)stage , (int)2, (int)d_num );
+	sprintf(string,MAP_DATA_PATH "%d_%d.map", (int)stage , (int)2, (int)d_num );
 	if ( LoadGameFlag2(string) == 0 )
 	{
 		for ( i = 0; i <= 319; i++ )
@@ -3063,7 +3062,7 @@ void wait_scl3( )
 	bak_make();
 
 	ResetGameFlag2( );
-	sprintf(string,"data/%d/i%d_%d.map", (int)stage , (int)1, (int)d_num );
+	sprintf(string,MAP_DATA_PATH "i%d_%d.map", (int)stage , (int)1, (int)d_num );
 	if ( LoadGameFlag2(string) == 0 )
 	{
 		for ( x = 0; x <= 19 ; x++ )
@@ -3079,7 +3078,7 @@ void wait_scl3( )
 	}
 
 	ResetGameFlag2();
-	sprintf( string,"data/%d/e%d_%d.map", (int)stage , (int)1, (int)d_num );
+	sprintf( string,MAP_DATA_PATH "e%d_%d.map", (int)stage , (int)1, (int)d_num );
 	LoadGameFlag2( string );
 	
 	player[15] = player[0];
@@ -3090,8 +3089,8 @@ void wait_scl3( )
 
 void snack_counter_disp()
 {
-	int32_t count;
-	int32_t i;
+	Sint32 count;
+	Sint32 i;
 
 	count = 0;
 	for(i = 0; i < 20; i++)
@@ -3110,13 +3109,13 @@ void snack_counter_disp()
 
 void minimap_disp( void )
 {
-	int32_t px;
-	int32_t py;
-	int32_t size;
-	int32_t height;
-	int32_t i;
-	int32_t x;
-	int32_t y;
+	Sint32 px;
+	Sint32 py;
+	Sint32 size;
+	Sint32 height;
+	Sint32 i;
+	Sint32 x;
+	Sint32 y;
 
 	px   = 2;
 	py   = 12;
@@ -3149,7 +3148,7 @@ void minimap_disp( void )
 void mapdisp()
 {
 	int stage_hosei;
-	int32_t wk;
+	Sint32 wk;
 	
 	stage_hosei = 0;
 	if ( stage == 2 )
@@ -3523,9 +3522,9 @@ void stage_end( )
 }
 
 
-void p_shot_set( int32_t type , int32_t muki, int32_t houkou )
+void p_shot_set( Sint32 type , Sint32 muki, Sint32 houkou )
 {
-	int32_t i;
+	Sint32 i;
 		
 	for ( i = 0; i < 10; i++ )
 	{
@@ -3549,7 +3548,7 @@ void p_shot_set( int32_t type , int32_t muki, int32_t houkou )
 
 void p_shot_disp( )
 {
-	int32_t i;
+	Sint32 i;
 	
 	for ( i = 0; i < 10; i++ )
 	{
@@ -3643,9 +3642,9 @@ void p_shot_disp( )
 	}
 }
 
-void p_shot_f_set( int32_t x, int32_t y , int32_t type )
+void p_shot_f_set( Sint32 x, Sint32 y , Sint32 type )
 {
-	int32_t i;
+	Sint32 i;
 	
 	for ( i = 0; i < 40; i++ )
 	{
@@ -3663,7 +3662,7 @@ void p_shot_f_set( int32_t x, int32_t y , int32_t type )
 }
 void p_shot_f_disp( )
 {
-	int32_t i;
+	Sint32 i;
 	
 	for ( i = 0; i < 40; i++ )
 	{
@@ -3685,13 +3684,13 @@ void p_shot_f_disp( )
 		}
 	}
 }
-void p_shot_f2_set( int32_t x, int32_t y , int32_t muki )
+void p_shot_f2_set( Sint32 x, Sint32 y , Sint32 muki )
 {
-	int32_t i;
-	int32_t k; 
-	int32_t ii;
-	int32_t rg;
-	int32_t max;
+	Sint32 i;
+	Sint32 k; 
+	Sint32 ii;
+	Sint32 rg;
+	Sint32 max;
 	
 
 	max = 10;
@@ -3722,7 +3721,7 @@ void p_shot_f2_set( int32_t x, int32_t y , int32_t muki )
 }
 void p_shot_f2_disp( )
 {
-	int32_t ii;
+	Sint32 ii;
 
 	for ( ii = 0; ii < 80; ii++ )
 	{
@@ -3748,9 +3747,9 @@ void p_shot_f2_disp( )
 }
 
 
-void item_set( int32_t type, int32_t x, int32_t y, int32_t iti, int32_t g_num )
+void item_set( Sint32 type, Sint32 x, Sint32 y, Sint32 iti, Sint32 g_num )
 {
-	int32_t i;
+	Sint32 i;
 	
 	if ( iti != 0 )
 	{
@@ -3792,10 +3791,10 @@ void item_set( int32_t type, int32_t x, int32_t y, int32_t iti, int32_t g_num )
 		}
 	}
 }
-int32_t item_sonzai( int32_t map1, int32_t map2 )
+Sint32 item_sonzai( Sint32 map1, Sint32 map2 )
 {
-	int32_t i;
-	int32_t rc;
+	Sint32 i;
+	Sint32 rc;
 
 	rc = 1;
 	for ( i = 0; i < 100; i++ )
@@ -3818,13 +3817,13 @@ int32_t item_sonzai( int32_t map1, int32_t map2 )
 
 void item_disp( )
 {
-	int32_t i;
-	int32_t k;
-	int32_t bx;
-	int32_t by;
-	int32_t k_f;
-	int32_t disp_x_j;
-	int32_t disp_y_j;
+	Sint32 i;
+	Sint32 k;
+	Sint32 bx;
+	Sint32 by;
+	Sint32 k_f;
+	Sint32 disp_x_j;
+	Sint32 disp_y_j;
 
 	k_f = 0;
 	
@@ -4109,11 +4108,11 @@ void item_disp( )
 	}
 }
 
-int32_t item_up( )
+Sint32 item_up( )
 {
-	int32_t i;
-	int32_t bx;
-	int32_t by;
+	Sint32 i;
+	Sint32 bx;
+	Sint32 by;
 	
 	for ( i = 0; i < 50; i++ )
 	{
@@ -4158,11 +4157,11 @@ int32_t item_up( )
 	}
 	return( -1 );
 }
-int32_t item_up2( )
+Sint32 item_up2( )
 {
-	int32_t i;
-	int32_t bx;
-	int32_t by;
+	Sint32 i;
+	Sint32 bx;
+	Sint32 by;
 	
 	for ( i = 0; i < 50; i++ )
 	{
@@ -4189,11 +4188,11 @@ int32_t item_up2( )
 }
 
 /* ƒAƒCƒeƒ€‚Éd‚È‚Á‚Äã‚ª‰Ÿ‚³‚ê‚½‚ÌƒCƒxƒ“ƒg */
-int32_t item_event( )
+Sint32 item_event( )
 {
-	int32_t i;
-	int32_t rc;
-	int32_t r_f;
+	Sint32 i;
+	Sint32 rc;
+	Sint32 r_f;
 	
 	rc = 0;
 	
@@ -4232,12 +4231,12 @@ int32_t item_event( )
 
 
 //“Gì¬
-void enm_set( int32_t type, int32_t x, int32_t y )
+void enm_set( Sint32 type, Sint32 x, Sint32 y )
 {	
-	int32_t i;
-	int32_t size;
-	int32_t syu;
-	int32_t j;
+	Sint32 i;
+	Sint32 size;
+	Sint32 syu;
+	Sint32 j;
 
 	for ( i = 0; i < 20; i++ )
 	{
@@ -4257,7 +4256,7 @@ void enm_set( int32_t type, int32_t x, int32_t y )
 			enemy[3 + ( i * 20 )] = size;
 			if ( size >= 4 )	/* ƒ{ƒX */
 			{
-				sprintf(string,"image/enm/boss%d.bmp", (int)syu );
+				sprintf(string,ENM_IMAGE_PATH "boss%d.bmp", (int)syu );
 				LoadBitmap(string,43,true);								//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
 				syu = 1;
 			}
@@ -4289,12 +4288,12 @@ void enm_set( int32_t type, int32_t x, int32_t y )
 }
 
 //“Gì¬
-void enm_set2( int32_t type, int32_t x, int32_t y ,int32_t muki )
+void enm_set2( Sint32 type, Sint32 x, Sint32 y ,Sint32 muki )
 {	
-	int32_t i;
-	int32_t size;
-	int32_t syu;
-	int32_t j;
+	Sint32 i;
+	Sint32 size;
+	Sint32 syu;
+	Sint32 j;
 
 	for ( i = 0; i < 20; i++ )
 	{
@@ -4314,7 +4313,7 @@ void enm_set2( int32_t type, int32_t x, int32_t y ,int32_t muki )
 			enemy[3 + ( i * 20 )] = size;
 			if ( size >= 4 )	/* ƒ{ƒX */
 			{
-				sprintf(string,"image/enm/boss%d.bmp", (int)syu );
+				sprintf(string,ENM_IMAGE_PATH "boss%d.bmp", (int)syu );
 				LoadBitmap(string,43,true);								//ƒvƒŒ[ƒ“ƒiƒ“ƒo[‚Q‚ÉƒVƒXƒeƒ€—p‚a‚l‚o‚ğ“Ç‚İ‚Ş
 				syu = 1;
 			}
@@ -4347,9 +4346,9 @@ void enm_set2( int32_t type, int32_t x, int32_t y ,int32_t muki )
 
 
 /* “G‚Ì‚g‚o‚ğİ’èie_set‚Åg‚í‚ê‚éj */
-int32_t e_hp( int32_t type )
+Sint32 e_hp( Sint32 type )
 {
-	int32_t rc;
+	Sint32 rc;
 	rc = 1;
 	if ( ( type / 100 ) == 1 )	/* 32 */
 	{
@@ -4372,14 +4371,14 @@ int32_t e_hp( int32_t type )
 
 void enm_disp()
 {	
-	int32_t i;
-	int32_t size ;
-	int32_t p_h;
-	int32_t size_hosei_x;
-	int32_t size_hosei_y;
-	int32_t isclaer;
-	int32_t disp_x_j;
-	int32_t disp_y_j;
+	Sint32 i;
+	Sint32 size ;
+	Sint32 p_h;
+	Sint32 size_hosei_x;
+	Sint32 size_hosei_y;
+	Sint32 isclaer;
+	Sint32 disp_x_j;
+	Sint32 disp_y_j;
 	
 	isclaer = 0; 
 	size_hosei_x = 0;
@@ -4708,7 +4707,7 @@ void enm_disp()
 	} 
 }
 
-void e_move( int32_t i )
+void e_move( Sint32 i )
 {
 	
 	if ( enemy[6 + ( i * 20 )] > 0 )
@@ -4726,12 +4725,12 @@ void e_move( int32_t i )
 }
 
 /* ƒ{ƒX‚ğ“|‚µ‚½‰‰o */
-void boss_dead( int32_t x, int32_t y )
+void boss_dead( Sint32 x, Sint32 y )
 {
 /*	
-	int32_t i;
-	int32_t xx;
-	int32_t yy;
+	Sint32 i;
+	Sint32 xx;
+	Sint32 yy;
 	for ( i = 0; i < 100; i++ ) 
 	{
 //		BltFromBackupPlane();		//	ƒoƒbƒNƒAƒbƒvƒvƒŒ[ƒ“‚©‚ç‚ÌBlt
@@ -4752,15 +4751,15 @@ void boss_dead( int32_t x, int32_t y )
 
 //-----------------------------------------------------------------------------------
 /* “GƒVƒ‡ƒbƒg¶¬ */
-void e_shot_set( int32_t type , int32_t i , int32_t x, int32_t y )
+void e_shot_set( Sint32 type , Sint32 i , Sint32 x, Sint32 y )
 {
-	int32_t ii;
-	int32_t j;
-	int32_t rg;
+	Sint32 ii;
+	Sint32 j;
+	Sint32 rg;
 	/* See below. - Gameblabla */
 	/*
-	int32_t mx;
-	int32_t my;
+	Sint32 mx;
+	Sint32 my;
 	*/
 	
 	/* ”­¶ˆÊ’uX */
@@ -4800,9 +4799,9 @@ void e_shot_set( int32_t type , int32_t i , int32_t x, int32_t y )
 /* ƒVƒ‡ƒbƒgˆÚ“® */
 void e_shot_disp( )
 {
-	int32_t i;
-	int32_t p_h;
-	int32_t size ;
+	Sint32 i;
+	Sint32 p_h;
+	Sint32 size ;
 	
 	p_h = 22;	/* ƒvƒŒƒCƒ„[‚Ì“–‚½‚è”»’è */
 	size = 0;
@@ -4852,16 +4851,16 @@ void e_shot_disp( )
 }
 
 /* “G—pƒWƒƒƒ“ƒv */
-void enmjmp( int32_t i )
+void enmjmp( Sint32 i )
 {
-	int32_t y1;
-	int32_t px ;
-	int32_t px1 ;
-	int32_t px2 ;
-	int32_t py ;
+	Sint32 y1;
+	Sint32 px ;
+	Sint32 px1 ;
+	Sint32 px2 ;
+	Sint32 py ;
 
-	int32_t size;
-	int32_t e10;
+	Sint32 size;
+	Sint32 e10;
 
 	if ( enemy[3 + ( i * 20 )] == 1 )
 	{
@@ -4987,12 +4986,12 @@ void enmjmp( int32_t i )
 
 
 /* ˆÚ“®Œã‚ÌÀ•W‚Ìƒ}ƒX‚ğ•Ô‚· */
-int32_t map1_item_j( int32_t x, int32_t y )
+Sint32 map1_item_j( Sint32 x, Sint32 y )
 {
-	int32_t px ;
-	int32_t py ;
-	int32_t i;
-	int32_t rc;
+	Sint32 px ;
+	Sint32 py ;
+	Sint32 i;
+	Sint32 rc;
 	
 	px = ( x ) / 32;
 	py = ( 15 - ( ( y + 16 ) / 32 ) );
@@ -5034,9 +5033,9 @@ int32_t map1_item_j( int32_t x, int32_t y )
 }
 
 
-void kane_set( int32_t x, int32_t y )
+void kane_set( Sint32 x, Sint32 y )
 {
-	int32_t i;
+	Sint32 i;
 	
 	for ( i = 0; i < 20; i++ )
 	{
@@ -5059,7 +5058,7 @@ void kane_set( int32_t x, int32_t y )
 
 void kane_disp(  )
 {
-	int32_t i;
+	Sint32 i;
 	
 	for ( i = 0; i < 20; i++ )
 	{
@@ -5109,13 +5108,13 @@ void kane_disp(  )
 	}
 }
 /* ƒWƒƒƒ“ƒv‚xˆÊ’uŒvZ */
-void k_jmp( int32_t i )
+void k_jmp( Sint32 i )
 {
-	int32_t y1;
-	int32_t px1 ;
-	int32_t px2 ;
-	int32_t py ;
-	int32_t py3 ;
+	Sint32 y1;
+	Sint32 px1 ;
+	Sint32 px2 ;
+	Sint32 py ;
+	Sint32 py3 ;
 
 	if ( kane[6 + ( i * 10 )] == 10 ) 
 	{
@@ -5186,9 +5185,9 @@ void k_jmp( int32_t i )
 
 }
 
-void p_jump_f_set( int32_t x, int32_t y )
+void p_jump_f_set( Sint32 x, Sint32 y )
 {
-	int32_t i;
+	Sint32 i;
 	
 	for ( i = 0; i < 10; i++ )
 	{
@@ -5206,7 +5205,7 @@ void p_jump_f_set( int32_t x, int32_t y )
 
 void p_jump_f_disp( )
 {
-	int32_t i;
+	Sint32 i;
 	
 	for ( i = 0; i < 10; i++ )
 	{
@@ -5291,9 +5290,9 @@ void window_keys( )
 
 
 /* â‘Î’l‚ğ•Ô‚· */
-int32_t labs_gnp( int32_t para )
+Sint32 labs_gnp( Sint32 para )
 {
-	int32_t rc;
+	Sint32 rc;
 	
 	rc = para;
 	
@@ -5305,13 +5304,13 @@ int32_t labs_gnp( int32_t para )
 }
 
 /* –‚–@¶¬ */
-void p_mgc_set( int32_t muki , int32_t p3 )
+void p_mgc_set( Sint32 muki , Sint32 p3 )
 {
-	int32_t i;
-	int32_t k; 
-	int32_t ii;
-	int32_t rg;
-	int32_t max;
+	Sint32 i;
+	Sint32 k; 
+	Sint32 ii;
+	Sint32 rg;
+	Sint32 max;
 	
 	rg = 0;
 	
@@ -5376,7 +5375,7 @@ void p_mgc_set( int32_t muki , int32_t p3 )
 
 void p_mgc_disp( )
 {
-	int32_t ii;
+	Sint32 ii;
 	
 	for ( ii = 0; ii < 40; ii++ )
 	{
@@ -5421,7 +5420,7 @@ void p_mgc_disp( )
 
 void replay_input_save( void )
 {
-	int32_t input_keys;
+	Sint32 input_keys;
 	input_keys = 0;
 	
 	/* ƒL[ˆ—‚ÍŠî–{“I‚Éplayer[2]‚ª‰½ó‘Ô‚Ì‚ÉƒL[‚ğ“ü‚ê‚½‚ç‚Ç‚¤‚È‚é‚ğ‹Lq‚µ‚Ä‚¢‚­ */
@@ -5471,8 +5470,8 @@ void replay_input_save( void )
 
 void replay_input_load( void )
 {
-	int32_t i;
-	int32_t input_keys;
+	Sint32 i;
+	Sint32 input_keys;
 	input_keys = 0;
 	
 	for ( i = 0; i < 10 ; i++ )
@@ -5531,7 +5530,7 @@ void replay_file_save_w( void )
 	SaveFile( string, &replay[0], sizeof( replay ) );
 
 }
-void replay_file_save( int32_t type )
+void replay_file_save( Sint32 type )
 {
 	if ( type == 0 )
 	{
@@ -5544,9 +5543,9 @@ void replay_file_save( int32_t type )
 	SaveFile( string, &replay[0], sizeof( replay ) );
 }
 
-int32_t replay_file_load( void )
+Sint32 replay_file_load( void )
 {
-	int32_t rc ;
+	Sint32 rc ;
 	rc = 1;
 	
 	if ( gameflag[125] == 0 )
@@ -5566,13 +5565,13 @@ int32_t replay_file_load( void )
 }
 
 // Square root of integer
-static const int32_t ftbl[33]={0,1,1,2,2,4,5,8,11,16,22,32,45,64,90,128,181,256,362,512,724,1024,1448,2048,2896,4096,5792,8192,11585,16384,23170,32768,46340};
-static const int32_t ftbl2[32]={ 32768,33276,33776,34269,34755,35235,35708,36174,36635,37090,37540,37984,38423,38858,39287,39712,40132,40548,40960,41367,41771,42170,42566,42959,43347,43733,44115,44493,44869,45241,45611,45977};
+static const Sint32 ftbl[33]={0,1,1,2,2,4,5,8,11,16,22,32,45,64,90,128,181,256,362,512,724,1024,1448,2048,2896,4096,5792,8192,11585,16384,23170,32768,46340};
+static const Sint32 ftbl2[32]={ 32768,33276,33776,34269,34755,35235,35708,36174,36635,37090,37540,37984,38423,38858,39287,39712,40132,40548,40960,41367,41771,42170,42566,42959,43347,43733,44115,44493,44869,45241,45611,45977};
 
-static int32_t int_sqrt ( int32_t val )
+static Sint32 int_sqrt ( Sint32 val )
 {
-    int32_t cnt=0;
-    int32_t t=val;
+    Sint32 cnt=0;
+    Sint32 t=val;
     while (t) {cnt++;t>>=1;}
     if (6>=cnt) t=(val<<(6-cnt));
     else t=(val>>(cnt-6));
@@ -5580,12 +5579,12 @@ static int32_t int_sqrt ( int32_t val )
 }
 
 
-int32_t GetKyori( int32_t i1, int32_t i2 )
+Sint32 GetKyori( Sint32 i1, Sint32 i2 )
 {
-	int32_t rc = 0;
+	Sint32 rc = 0;
 	
-	//rc = ( int32_t )sqrt( ( i1 * i1 ) + ( i2 * i2 ) );
-	rc = ( int32_t )int_sqrt( ( i1 * i1 ) + ( i2 * i2 ) );
+	//rc = ( Sint32 )sqrt( ( i1 * i1 ) + ( i2 * i2 ) );
+	rc = ( Sint32 )int_sqrt( ( i1 * i1 ) + ( i2 * i2 ) );
 	
 	return ( rc );
 }

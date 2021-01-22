@@ -79,28 +79,28 @@ void option_init( void )
 	memset( tolal_time3, 0, sizeof( tolal_time3 ) );
 	memset( string, 0, sizeof( string ) );
 
-	LoadBitmap("image/title/title2.bmp",2,true);				
-	LoadBitmap("image/title/scl.bmp",3,true);		
-	LoadBitmap("image/title/title5.bmp",4,true);	
-	LoadBitmap("image/title/potion_bak.bmp",5, false );	
-	LoadBitmap("image/sys/fonts2.bmp",6,true);	
+	LoadBitmap(TITLE_IMAGE_PATH "title2.bmp",2,true);				
+	LoadBitmap(TITLE_IMAGE_PATH "scl.bmp",3,true);		
+	LoadBitmap(TITLE_IMAGE_PATH "title5.bmp",4,true);	
+	LoadBitmap(TITLE_IMAGE_PATH "potion_bak.bmp",5, false );	
+	LoadBitmap(SYS_IMAGE_PATH "fonts2.bmp",6,true);	
 
 	if ( gameflag[126] == 1 )
 	{
-		LoadBitmap("image/title/option2.bmp",7,1);				
+		LoadBitmap(TITLE_IMAGE_PATH "option2.bmp",7,1);				
 	}
 	else 
 	{
-		LoadBitmap("image/title/option1.bmp",7,1);			
+		LoadBitmap(TITLE_IMAGE_PATH "option1.bmp",7,1);			
 	}
 	
-	LoadBitmap("image/title/lvel.bmp",8,1);			
-	LoadBitmap("image/title/on_off.bmp",9,1);		
-	LoadBitmap("image/title/title_mask.bmp",11,1);
-	LoadBitmap("image/title/none.bmp",12,1);		
-	LoadBitmap("image/title/sima.bmp",13,1);		
+	LoadBitmap(TITLE_IMAGE_PATH "lvel.bmp",8,1);			
+	LoadBitmap(TITLE_IMAGE_PATH "on_off.bmp",9,1);		
+	LoadBitmap(TITLE_IMAGE_PATH "title_mask.bmp",11,1);
+	LoadBitmap(TITLE_IMAGE_PATH "none.bmp",12,1);		
+	LoadBitmap(TITLE_IMAGE_PATH "sima.bmp",13,1);		
 
-	/*LoadBitmap("image/sys/waku.bmp",109,0);*/
+	/*LoadBitmap(SYS_IMAGE_PATH "waku.bmp",109,0);*/
 	
 	tolal_time[0] = 0;
 	tolal_time[1] = 0;
@@ -240,7 +240,7 @@ void option_keys( void )
 		}
 		if( ( mode == 3 ) && ( ag == 1 ) )
 		{
-			sprintf(string,"image/option/%d.bmp", selct[mode] );
+			sprintf(string,OPTION_IMAGE_PATH "%d.bmp", selct[mode] );
 			LoadBitmap( string, 10 , false );
 		}
 	}
@@ -275,7 +275,7 @@ void option_keys( void )
 			{
 				selct[mode] = 99;
 			}
-			sprintf(string,"image/option/%d.bmp", selct[mode] );
+			sprintf(string,OPTION_IMAGE_PATH "%d.bmp", selct[mode] );
 			LoadBitmap( string, 10 , false );
 		}
 	}
@@ -308,7 +308,7 @@ void option_keys( void )
 		else if ( mode == 3 )
 		{
 			ag = 1;
-			sprintf(string,"image/option/%d.bmp", selct[mode] );
+			sprintf(string,OPTION_IMAGE_PATH "%d.bmp", selct[mode] );
 			LoadBitmap( string, 10 , false );
 		}
 		else if ( mode == 1 )	/* se test */

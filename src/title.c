@@ -81,31 +81,31 @@ void title_init( void )
 	uracount = 0;
 	title_no = 0;
 
-	LoadBitmap("image/title/title_natuki.bmp",1,true);
+	LoadBitmap(TITLE_IMAGE_PATH "title_natuki.bmp",1,true);
 
 	if ( gameflag[100] == 1 )
 	{
-		LoadBitmap("image/title/title2_2.bmp",2,true);
+		LoadBitmap(TITLE_IMAGE_PATH "title2_2.bmp",2,true);
 	}
 	else 
 	{
-		LoadBitmap("image/title/title2.bmp",2,true);
+		LoadBitmap(TITLE_IMAGE_PATH "title2.bmp",2,true);
 	}
-	LoadBitmap("image/title/scl.bmp",3,true);
-	LoadBitmap("image/bak/1.bmp",5, false );
+	LoadBitmap(TITLE_IMAGE_PATH "scl.bmp",3,true);
+	LoadBitmap(BAK_IMAGE_PATH "1.bmp",5, false );
 
 	if ( gameflag[126] == 0 )
 	{
-		LoadBitmap("image/title/title5.bmp",7,true);
+		LoadBitmap(TITLE_IMAGE_PATH "title5.bmp",7,true);
 	}
 	else 
 	{
-		LoadBitmap("image/title/title5_ura.bmp",7,true);
+		LoadBitmap(TITLE_IMAGE_PATH "title5_ura.bmp",7,true);
 	}
 
-	LoadBitmap("image/title/title3.bmp",10,true);
-	LoadBitmap("image/sys/fonts2.bmp",18,true);
-	/*LoadBitmap("image/sys/waku.bmp",109,true);*/
+	LoadBitmap(TITLE_IMAGE_PATH "title3.bmp",10,true);
+	LoadBitmap(SYS_IMAGE_PATH "fonts2.bmp",18,true);
+	/*LoadBitmap(SYS_IMAGE_PATH "waku.bmp",109,true);*/
 
 	a[0] = 100;
 	a[1] = 200;
@@ -418,12 +418,12 @@ void title_keys( void )
 					if ( gameflag[126] == 0 )
 					{
 						gameflag[126] = 1;
-						LoadBitmap("image/title/title5_ura.bmp",7,true);
+						LoadBitmap(TITLE_IMAGE_PATH "title5_ura.bmp",7,true);
 					}
 					else 
 					{
 						gameflag[126] = 0;
-						LoadBitmap("image/title/title5.bmp",7,true);				
+						LoadBitmap(TITLE_IMAGE_PATH "title5.bmp",7,true);				
 					}
 					uracount = 0;
 				}
@@ -707,7 +707,7 @@ void title_k_jmp( int i )
 /***************************************************************************/
 int replay_file_find( void )
 {
-	int32_t i;
+	Sint32 i;
 	int file_j;
 	int stage;
 	
@@ -744,7 +744,7 @@ int replay_file_find( void )
 /***************************************************************************/
 int replay_file_find2( void )
 {
-	int32_t i;
+	Sint32 i;
 	int file_j;
 	int stage;
 	

@@ -2,7 +2,7 @@
 #include "general.h"
 #include "dconv.h"
 
-static uint16_t SinTable[1025] =
+static Uint16 SinTable[1025] =
 {
 	0x0000,0x0064,0x00c9,0x012d,0x0192,0x01f6,0x025b,0x02bf,	/*  0.000 */
 	0x0324,0x0388,0x03ed,0x0451,0x04b6,0x051a,0x057f,0x05e3,	/*  0.703 */
@@ -135,7 +135,7 @@ static uint16_t SinTable[1025] =
 	0x0000														/* 90.000 */
 };
 
-static uint16_t AtanTable[1025] =
+static Uint16 AtanTable[1025] =
 {
 	0x0000,0x000a,0x0014,0x001e,0x0028,0x0032,0x003d,0x0047,	 /*    0 0.000000 : 0.00 */
 	0x0051,0x005b,0x0065,0x0070,0x007a,0x0084,0x008e,0x0098,	 /*    8 0.007813 : 0.45 */
@@ -268,15 +268,15 @@ static uint16_t AtanTable[1025] =
 	0x2000														 /* 1024 1.000000 : 45.00 */
 };
 
-int32_t MOTsin(int16_t ang);
-int32_t MOTcos(int16_t ang);
-int16_t MOTatan(int32_t posX,int32_t posY);
+Sint32 MOTsin(int16_t ang);
+Sint32 MOTcos(int16_t ang);
+int16_t MOTatan(Sint32 posX,Sint32 posY);
 
-static int16_t MOTatanSub(int32_t posX, int32_t posY);
+static int16_t MOTatanSub(Sint32 posX, Sint32 posY);
 
-int32_t MOTsin(int16_t ang)
+Sint32 MOTsin(int16_t ang)
 {
-	uint16_t deg;
+	Uint16 deg;
 
 	deg = ang;
 	deg  += 8;
@@ -284,18 +284,18 @@ int32_t MOTsin(int16_t ang)
 
 	switch(deg & 0x0c00){
 		case 0x0000 :
-			return ((int32_t)(SinTable[deg]));
+			return ((Sint32)(SinTable[deg]));
 		case 0x0400 :
 			if((deg = 2048 - deg) < 1024){
-				return ((int32_t)(SinTable[deg]));
+				return ((Sint32)(SinTable[deg]));
 			}else{
 				return (0x10000L);
 			}
 		case 0x0800 :
-			return (0 - (int32_t)(SinTable[deg - 2048]));
+			return (0 - (Sint32)(SinTable[deg - 2048]));
 		case 0x0c00 :
 			if((deg = 4096 - deg) < 1024){
-				return (0 - (int32_t)(SinTable[deg]));
+				return (0 - (Sint32)(SinTable[deg]));
 			}else{
 				return (0 - 0x10000L);
 			}
@@ -304,9 +304,9 @@ int32_t MOTsin(int16_t ang)
 	return -1;
 }
 
-int32_t MOTcos(int16_t ang)
+Sint32 MOTcos(int16_t ang)
 {
-	uint16_t deg;
+	Uint16 deg;
 
 	deg = ang;
 	deg  += 8;
@@ -315,26 +315,26 @@ int32_t MOTcos(int16_t ang)
 	switch(deg & 0x0c00){
 		case 0x0000 :
 			if(deg){
-				return ((int32_t)(SinTable[1024 - deg]));
+				return ((Sint32)(SinTable[1024 - deg]));
 			}else{
 				return (0x10000L);
 			}
 		case 0x0400 :
-			return (0 - (int32_t)(SinTable[deg - 1024]));
+			return (0 - (Sint32)(SinTable[deg - 1024]));
 		case 0x0800 :
 			if((deg = 3072 - deg) < 1024){
-				return (0 - (int32_t)(SinTable[deg]));
+				return (0 - (Sint32)(SinTable[deg]));
 			}else{
 				return (0 - 0x10000L);
 			}
 		case 0x0c00 :
-			return ((int32_t)(SinTable[deg - 3072]));
+			return ((Sint32)(SinTable[deg - 3072]));
 	}
 
 	return -1;
 }
 
-int16_t MOTatan(int32_t posX,int32_t posY)
+int16_t MOTatan(Sint32 posX,Sint32 posY)
 {
 	if(posX >= 0){
 		if(posY < 0){
@@ -351,10 +351,10 @@ int16_t MOTatan(int32_t posX,int32_t posY)
 	}
 }
 
-int16_t MOTatanSub(int32_t posX, int32_t posY)
+int16_t MOTatanSub(Sint32 posX, Sint32 posY)
 {
-	int32_t absX;
-	int32_t absY;
+	Sint32 absX;
+	Sint32 absY;
 
 	if(abs(posX) < 256){
 		return (0x0000);

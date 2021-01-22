@@ -1,5 +1,5 @@
 CC := clang
-CFLAGS  := -Os -g3 -std=gnu99 -fomit-frame-pointer -DCLASSICMAC
+CFLAGS  := -O0 -g3 -std=gnu99 -fomit-frame-pointer -DGCW0 -DMIDI_MUSIC
 LDFLAGS := -lSDL -lSDL_mixer
 SYSROOT = $(shell $CC $CFLAGS $LDFLAGS --print-sysroot 2)
 CFLAGS += `$(SYSROOT)/usr/bin/sdl-config --cflags`

@@ -12,3 +12,15 @@ gnp.exe
 *.opk
 *.o
 *.gcda
+.finf
+.rsrc
+f/
+*.txt
+*.ad
+*.APPL
+*.bin
+*.dsk
+*.pef
+*.xcoff
+check.sh
+*.opk

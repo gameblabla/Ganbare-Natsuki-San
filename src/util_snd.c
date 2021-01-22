@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include <SDL.h>
 #ifndef NOSOUND
 #include <SDL_mixer.h>
@@ -27,26 +26,24 @@ enum{
 
 void soundInitBuffer(void);
 void soundRelease(void);
-void soundLoadBuffer(int num, uint8_t *fname, int loop);
-void soundLoadBuffer2(int num, uint8_t *fname1, uint8_t *fname2);
-void soundLoadBufferSE(int num, uint8_t *fname);
-void soundStopBgm(int num);
+void soundLoadBuffer(Sint32 num, Uint8 *fname, int loop);
+void soundLoadBuffer2(Sint32 num, Uint8 *fname1, Uint8 *fname2);
+void soundLoadBufferSE(Sint32 num, Uint8 *fname);
+void soundStopBgm(Sint32 num);
 void soundStopBgmPlaying(void);
 int soundIsPlayBgm(void);
-void soundPlayBgm(int num);
-void soundPlayFadeFlag(int flag, int time);
+void soundPlayBgm(Sint32 num);
+void soundPlayFadeFlag(Sint32 flag, Sint32 time);
 void soundPlayCtrl(void);
-void soundSetVolumeMaster(int vol);
-void soundSetVolumeBgm(int vol, int num);
-void soundSetVolumeAll(int vol);
-void soundStopSe(int num);
-void soundPlaySe(int num);
-int soundIsPlaySe(int num);
+void soundSetVolumeMaster(Sint32 vol);
+void soundSetVolumeBgm(Sint32 vol, Sint32 num);
+void soundSetVolumeAll(Sint32 vol);
+void soundStopSe(Sint32 num);
+void soundPlaySe(Sint32 num);
+int soundIsPlaySe(Sint32 num);
 void soundStopSeAll(void);
 
 #ifdef NOSOUND
-	typedef int Mix_Music;
-	typedef int Mix_Chunk;
 	static int master_vol;
 	static int play_bgmvol;
 #else
@@ -76,7 +73,7 @@ void soundInitBuffer(void)
 #ifndef NOSOUND
 	int i;
     int audio_rate;
-    uint16_t audio_format;
+    Uint16 audio_format;
     int audio_channels;
     int audio_buffers;
 
@@ -143,18 +140,22 @@ void soundRelease(void)
 #endif
 }
 
-void soundLoadBuffer(int num, uint8_t *fname, int loop)
+void soundLoadBuffer(Sint32 num, Uint8 *fname, int loop)
 {
 #ifndef NOSOUND
 	if(!music[num]){
 		music[num] = Mix_LoadMUS((char *)fname);
+		if (!music[num])
+		{
+			printf("Can't load sound %s, %s\n", fname, Mix_GetError());
+		}
 		musicIntor[num] = 0;
 		musicLoop[num] = loop;
 	}
 #endif
 }
 
-void soundLoadBuffer2(int num, uint8_t *fname1, uint8_t *fname2)
+void soundLoadBuffer2(Sint32 num, Uint8 *fname1, Uint8 *fname2)
 {
 #ifndef NOSOUND
 	if(!music[num]){
@@ -167,17 +168,18 @@ void soundLoadBuffer2(int num, uint8_t *fname1, uint8_t *fname2)
 #endif
 }
 
-void soundLoadBufferSE(int num, uint8_t *fname)
+void soundLoadBufferSE(Sint32 num, Uint8 *fname)
 {
 #ifndef NOSOUND
 	chunk[num] = Mix_LoadWAV((char *)fname);
 	if(!chunk[num]){
+		printf("Can't load sound %s\n", fname);
 		sound_use = FALSE;
 	}
 #endif
 }
 
-void soundStopBgm(int num)
+void soundStopBgm(Sint32 num)
 {
 #ifndef NOSOUND
 	if(!sound_use){
@@ -223,7 +225,7 @@ int soundIsPlayBgm(void)
 	return	0;
 }
 
-void soundPlayBgm(int num)
+void soundPlayBgm(Sint32 num)
 {
 #ifndef NOSOUND
 	if(num < 0 || !music[num]){
@@ -247,7 +249,7 @@ void soundPlayBgm(int num)
 #endif
 }
 
-void soundPlayBgm2(int num)
+void soundPlayBgm2(Sint32 num)
 {
 #ifndef NOSOUND
 	if(num < 0 || !music_loop[num]){
@@ -262,7 +264,7 @@ void soundPlayBgm2(int num)
 #endif
 }
 
-void soundLoadPlayBgm(uint8_t *fname, int loop)
+void soundLoadPlayBgm(Uint8 *fname, Sint32 loop)
 {
 //	soundStopBgmPlaying();
 //	if(music[BGM_TEST]){
@@ -273,7 +275,7 @@ void soundLoadPlayBgm(uint8_t *fname, int loop)
 //	soundPlayBgm(BGM_TEST);
 }
 
-void soundPlayFadeFlag(int flag, int time)
+void soundPlayFadeFlag(Sint32 flag, Sint32 time)
 {
 #ifndef NOSOUND
 	fade_ctrl = flag;
@@ -333,17 +335,17 @@ void soundPlayCtrl(void)
 #endif
 }
 
-void soundSetVolumeMaster(int vol)
+void soundSetVolumeMaster(Sint32 vol)
 {
 	master_vol = vol;
 }
 
-void soundSetVolumeBgm(int vol, int num)
+void soundSetVolumeBgm(Sint32 vol, Sint32 num)
 {
 	play_bgmvol = vol;
 }
 
-void soundSetVolumeAll(int vol)
+void soundSetVolumeAll(Sint32 vol)
 {
 #ifndef NOSOUND
 	int	i;
@@ -361,7 +363,7 @@ void soundSetVolumeAll(int vol)
 #endif
 }
 
-void soundStopSe(int num)
+void soundStopSe(Sint32 num)
 {
 #ifndef NOSOUND
 	int	i;
@@ -375,7 +377,7 @@ void soundStopSe(int num)
 #endif
 }
 
-void soundPlaySe(int num)
+void soundPlaySe(Sint32 num)
 {
 #ifndef NOSOUND
 	int	i;
@@ -398,7 +400,7 @@ void soundPlaySe(int num)
 #endif
 }
 
-int soundIsPlaySe(int num)
+int soundIsPlaySe(Sint32 num)
 {
 #ifndef NOSOUND
 	int	i;

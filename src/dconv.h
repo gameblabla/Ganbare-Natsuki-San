@@ -33,13 +33,13 @@
 /*----------------------------------------------------------------------*/
 /*	外部参照関数の宣言													*/
 /*----------------------------------------------------------------------*/
-extern	uint16_t	DCNVrand( uint16_t );					/* 指定範囲の乱数を取得する			*/
-extern	void	DCNVinitRand( uint16_t );				/* 乱数の発生系列初期化				*/
-extern	void	DCNVshuffleDim( int,uint16_t * );		/* テーブルシャッフル				*/
-extern	void	DCNVshuffleMain( int,uint16_t * );	/* テーブルシャッフル本体			*/
-extern	int32_t	MOTsin( int16_t );					/* sin(a)を計算する					*/
-extern	int32_t	MOTcos( int16_t );					/* cos(a)を計算する					*/
-extern	int16_t	MOTatan( int32_t,int32_t );			/* (posX,posY)への角度を計算する	*/
+extern	Uint16	DCNVrand( Uint16 );					/* 指定範囲の乱数を取得する			*/
+extern	void	DCNVinitRand( Uint16 );				/* 乱数の発生系列初期化				*/
+extern	void	DCNVshuffleDim( int,Uint16 * );		/* テーブルシャッフル				*/
+extern	void	DCNVshuffleMain( int,Uint16 * );	/* テーブルシャッフル本体			*/
+extern	Sint32	MOTsin( int16_t );					/* sin(a)を計算する					*/
+extern	Sint32	MOTcos( int16_t );					/* cos(a)を計算する					*/
+extern	int16_t	MOTatan( Sint32,Sint32 );			/* (posX,posY)への角度を計算する	*/
 
 
 /*----------------------------------------------------------------------*/
