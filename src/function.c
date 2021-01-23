@@ -282,7 +282,7 @@ void ResetGameFlag2( void )
 int LoadGameFlag2( char *fn )
 {
 	int rc = 0;
-#ifdef MSB_FIRST
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN || defined(MSB_FIRST)
 	int32_t tmp, i;
 #endif
 
@@ -326,7 +326,7 @@ int LoadGameFlag2( char *fn )
 	}
 #endif
 	
-	#ifdef MSB_FIRST
+	#if SDL_BYTEORDER == SDL_BIG_ENDIAN || defined(MSB_FIRST)
 	for(i=0;i<GAMEFLAG_SIZE;i++)
 	{
 		tmp = gameflag2[i];
@@ -340,7 +340,7 @@ int LoadGameFlag2( char *fn )
 int SaveGameFlag2( char *fn )
 {
 	int rc = 0;
-#ifdef MSB_FIRST
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN || defined(MSB_FIRST)
 	Sint32 bgameflag2[GAMEFLAG_SIZE], i;
 #endif
 
@@ -353,7 +353,7 @@ int SaveGameFlag2( char *fn )
 	}
 	else 
 	{
-#ifdef MSB_FIRST
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN || defined(MSB_FIRST)
 		memcpy(bgameflag2, gameflag2, sizeof(bgameflag2));
 		for(i=0;i<GAMEFLAG_SIZE;i++)
 		{
@@ -384,7 +384,7 @@ int SaveGameFlag2( char *fn )
 	}
 	else 
 	{
-#ifdef MSB_FIRST
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN || defined(MSB_FIRST)
 		memcpy(bgameflag2, gameflag2, sizeof(bgameflag2));
 		for(i=0;i<GAMEFLAG_SIZE;i++)
 		{
