@@ -13,7 +13,11 @@
 
 #include "scene.h"
 
-#ifdef SCALING
+#ifdef OPENGL_SCALING
+#include <GL/gl.h>
+#endif
+
+#if defined(SCALING) || defined(OPENGL_SCALING)
 SDL_Surface* real_screen;
 #endif
 
@@ -96,13 +100,58 @@ int main(int argc, char *argv[])
 	flags = SDL_SWSURFACE;
 #endif
 
+#ifdef OPENGL_SCALING
+	flags |= SDL_OPENGL;
+#endif
+
 	SDL_ShowCursor(SDL_DISABLE);
 
-#ifdef SCALING
-	real_screen = SDL_SetVideoMode(FINAL_RESOLUTION_WIDTH, FINAL_RESOLUTION_HEIGHT, DEPTH, flags | SDL_NOFRAME);
-	g_screen = SDL_CreateRGBSurface(SDL_SWSURFACE, DISPLY_WIDTH, DISPLY_HEIGHT, DEPTH, 0,0,0,0);
+#if defined(SCALING) || defined(OPENGL_SCALING)
+	real_screen = SDL_SetVideoMode(FINAL_RESOLUTION_WIDTH, FINAL_RESOLUTION_HEIGHT,
+	#ifdef OPENGL_SCALING
+	0,
+	#else
+	DEPTH,
+	#endif
+	flags | SDL_NOFRAME);
+	g_screen = SDL_CreateRGBSurface(SDL_SWSURFACE, DISPLY_WIDTH, DISPLY_HEIGHT,
+	#ifdef OPENGL_SCALING
+	16,
+	#else
+	DEPTH,
+	#endif
+	0,0,0,0);
 #else
 	g_screen = SDL_SetVideoMode(DISPLY_WIDTH, DISPLY_HEIGHT, DEPTH, flags);
+#endif
+
+#ifdef OPENGL_SCALING
+	glPushAttrib(GL_ENABLE_BIT);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_TEXTURE_2D);
+
+	/* This allows alpha blending of 2D textures with the scene */
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glViewport(0, 0, real_screen->w, real_screen->h);
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glOrtho(0.0, (GLdouble)real_screen->w, (GLdouble)real_screen->h, 0.0, 0.0, 1.0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+
+	/* http://risky-safety.org/~zinnia/sdl/sourcetour/extra1/ */
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4d(1.0f, 1.0f, 1.0f, 1.0f);
 #endif
 
 #if DEPTH != 8

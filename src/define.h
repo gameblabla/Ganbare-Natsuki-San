@@ -59,8 +59,16 @@
 #else
 	/* Zero means it will use whatever is available */
 	#define DEPTH 0
-	#define FINAL_RESOLUTION_WIDTH 0
-	#define FINAL_RESOLUTION_HEIGHT 0
+	// This assumes that 3D acceleration is available for scaling
+	#define OPENGL_SCALING
+#endif
+
+#ifndef FINAL_RESOLUTION_WIDTH
+#define FINAL_RESOLUTION_WIDTH 0
+#endif
+
+#ifndef FINAL_RESOLUTION_HEIGHT
+#define FINAL_RESOLUTION_HEIGHT 0
 #endif
 
 #ifndef RELATIVE_PATH
