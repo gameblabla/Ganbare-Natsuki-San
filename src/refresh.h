@@ -2,7 +2,7 @@
 #define REFRESH_H
 
 #include <SDL.h>
-#if defined(SCALING) || defined(OPENGL_SCALING)
+#if defined(SCALING) || defined(OPENGL_SCALING) || defined(RS90)
 	extern void RefreshScreen(SDL_Surface* tmp);
 	extern SDL_Surface* real_screen;
 #else

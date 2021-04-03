@@ -669,6 +669,16 @@ void Blt( int bmpindex, int dstX, int dstY )
 }
 void SetGscreenPalette( SDL_Surface *surface )
 {
+#ifdef RS90
+	extern uint8_t drm_palette[3][256];
+	#define UINT16_16(val) ((uint32_t)(val * (float)(1<<16)))
+	static const uint32_t YUV_MAT[3][3] = {
+		{UINT16_16(0.2999f),   UINT16_16(0.587f),    UINT16_16(0.114f)},
+		{UINT16_16(0.168736f), UINT16_16(0.331264f), UINT16_16(0.5f)},
+		{UINT16_16(0.5f),      UINT16_16(0.418688f), UINT16_16(0.081312f)}
+	};
+	uint16_t i;
+#endif
     Uint8 bpp;
 	SDL_Palette *pal;
 
@@ -689,6 +699,14 @@ void SetGscreenPalette( SDL_Surface *surface )
 			}
 		}
 	}
+#ifdef RS90
+	for(i=0;i<256;i++)
+	{
+		drm_palette[0][i] = ( ( UINT16_16(  0) + YUV_MAT[0][0] * pal->colors[i].r + YUV_MAT[0][1] * pal->colors[i].g + YUV_MAT[0][2] * pal->colors[i].b) >> 16 );
+		drm_palette[1][i] = ( ( UINT16_16(128) - YUV_MAT[1][0] * pal->colors[i].r - YUV_MAT[1][1] * pal->colors[i].g + YUV_MAT[1][2] * pal->colors[i].b) >> 16 );
+		drm_palette[2][i] = ( ( UINT16_16(128) + YUV_MAT[2][0] * pal->colors[i].r - YUV_MAT[2][1] * pal->colors[i].g - YUV_MAT[2][2] * pal->colors[i].b) >> 16 );
+	}
+#endif
 }
 
 /* Unused, the previous function is used instead. - Gameblabla */
@@ -966,6 +984,7 @@ void KeyInput( void )
 	if(pad_type == 0)
 	{
 		if(keys[SDLK_LCTRL] == SDL_PRESSED
+		|| keys[SDLK_x] == SDL_PRESSED
 #ifdef SDL_JOYSTICK
 		 || btn1
 #endif
@@ -976,6 +995,8 @@ void KeyInput( void )
 		if(keys[SDLK_LSHIFT] == SDL_PRESSED){
 #else
 		if(keys[SDLK_LALT] == SDL_PRESSED
+		|| keys[SDLK_SPACE] == SDL_PRESSED
+		|| keys[SDLK_c] == SDL_PRESSED
 #ifdef SDL_JOYSTICK
 		 || btn2
 #endif

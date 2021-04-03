@@ -1,5 +1,5 @@
 #include "define.h"
-#if defined(SCALING) || defined(OPENGL_SCALING)
+#if defined(SCALING) || defined(OPENGL_SCALING) || defined(RS90)
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL.h>
@@ -9,6 +9,10 @@
 #include "refresh.h"
 
 extern SDL_Surface *g_screen;
+#ifdef RS90
+uint8_t drm_palette[3][256];
+static uint8_t* dst_yuv[3];
+#endif
 
 #if defined(SCALING)
 static void Simple2x(unsigned char *srcPtr, unsigned int srcPitch, unsigned char *dstPtr, unsigned int dstPitch, unsigned int width, unsigned int height)
@@ -64,7 +68,8 @@ void RefreshScreen(SDL_Surface* tmp)
 		     g_screen->w, g_screen->h,
 		     0,
 		     GL_RGB,
-		     GL_UNSIGNED_SHORT_5_6_5,
+		     //GL_UNSIGNED_SHORT_5_6_5,
+		     GL_UNSIGNED_SHORT,
 		     g_screen->pixels);
 		     
 	dx = 0;
@@ -96,7 +101,39 @@ void RefreshScreen(SDL_Surface* tmp)
 	glEnd();
 	
 	SDL_GL_SwapBuffers( );
+#elif defined(RS90)
+	uint_fast8_t plane;
+	uint8_t *srcbase = g_screen->pixels;
+	dst_yuv[0] = real_screen->pixels;
+	dst_yuv[1] = dst_yuv[0] + DISPLY_HEIGHT * real_screen->pitch;
+	dst_yuv[2] = dst_yuv[1] + DISPLY_HEIGHT * real_screen->pitch;
+    for (plane=0; plane<3; plane++) /* The three Y, U and V planes */
+    {
+        uint32_t y;
+        register uint8_t *pal = drm_palette[plane];
+        for (y=0; y < DISPLY_HEIGHT; y++)   /* The number of lines to copy */
+        {
+            register uint8_t *src = srcbase + (y*DISPLY_WIDTH);
+            register uint8_t *end = src + DISPLY_WIDTH;
+            register uint32_t *dst = (uint32_t *)&dst_yuv[plane][DISPLY_WIDTH * y];
+
+             __builtin_prefetch(pal, 0, 1 );
+             __builtin_prefetch(src, 0, 1 );
+             __builtin_prefetch(dst, 1, 0 );
+
+            while (src < end)       /* The actual line data to copy */
+            {
+                register uint32_t pix;
+                pix  = pal[*src++];
+                pix |= (pal[*src++])<<8;
+                pix |= (pal[*src++])<<16;
+                pix |= (pal[*src++])<<24;
+                *dst++ = pix;
+            }
+        }
+    }
 	
+	SDL_Flip(real_screen);
 #else
 	if (real_screen->w == 640 && real_screen->h == 480)
 	{

@@ -47,20 +47,28 @@
 	#define DEPTH 16
 #elif defined(GP2X)
 	#define DEPTH 16
+#elif defined(MINGW)
+	#define DEPTH 8
+	#define SCALING
+	#define MIDI_MUSIC
+#elif defined(RS90)
+	#define DEPTH 8
+	#define FINAL_RESOLUTION_WIDTH 240
+	#define FINAL_RESOLUTION_HEIGHT 160
 #elif defined(CLASSICMAC)
 	#define DEPTH 8
 	#define RELATIVE_PATH
 	#define SCALING
 	#define MIDI_MUSIC
-	//#define SDLFILE
+	#define SDLFILE
 	
 	#define FINAL_RESOLUTION_WIDTH 640
 	#define FINAL_RESOLUTION_HEIGHT 480
 #else
 	/* Zero means it will use whatever is available */
 	#define DEPTH 0
-	// This assumes that 3D acceleration is available for scaling
-	#define OPENGL_SCALING
+	// OpenGL scaling
+	//#define OPENGL_SCALING
 #endif
 
 #ifndef FINAL_RESOLUTION_WIDTH

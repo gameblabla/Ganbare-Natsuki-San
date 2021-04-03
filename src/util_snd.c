@@ -91,6 +91,8 @@ void soundInitBuffer(void)
 	audio_channels = SND_CHANNEL;
 	audio_buffers = SND_BUFFER;
 	if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) < 0){
+		printf("Mix_Init: Failed to init required ogg and mod support!\n");
+		printf("Mix_Init: %s\n", Mix_GetError());
 		sound_use = FALSE;
 	}else{
 		sound_use = TRUE;
