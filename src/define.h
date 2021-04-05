@@ -51,10 +51,12 @@
 	#define DEPTH 8
 	#define SCALING
 	#define MIDI_MUSIC
+#elif defined(TEST_8BPP)
+	#define DEPTH 8
 #elif defined(RS90)
 	#define DEPTH 8
-	#define FINAL_RESOLUTION_WIDTH 240
-	#define FINAL_RESOLUTION_HEIGHT 160
+	#define FINAL_RESOLUTION_WIDTH 320
+	#define FINAL_RESOLUTION_HEIGHT 240
 #elif defined(CLASSICMAC)
 	#define DEPTH 8
 	#define RELATIVE_PATH
