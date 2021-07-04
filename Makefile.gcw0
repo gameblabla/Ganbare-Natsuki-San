@@ -1,5 +1,5 @@
 CC = /opt/gcw0-toolchain/usr/bin/mipsel-linux-gcc
-CFLAGS  = -O3 -flto -mips32r2 -DGCW -Wall
+CFLAGS  = -O3 -flto -mips32r2 -DGCW0 -Wall
 LDFLAGS = -lc -lgcc -lm -lSDL -lasound -lSDL_mixer -lvorbisidec -logg -lmpg123 -lSDL_image -lpng -lz -flto -s
 SYSROOT = $(shell $(CC) --print-sysroot)
 CFLAGS += `$(SYSROOT)/usr/bin/sdl-config --cflags`

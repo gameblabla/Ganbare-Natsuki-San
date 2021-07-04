@@ -43,6 +43,8 @@
 	#define DEPTH 16
 #elif defined(GCW0)
 	#define DEPTH 16
+	#define FINAL_RESOLUTION_WIDTH 320
+	#define FINAL_RESOLUTION_HEIGHT 240
 #elif defined(PSPUMODE)
 	#define DEPTH 16
 #elif defined(GP2X)

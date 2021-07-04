@@ -669,44 +669,21 @@ void Blt( int bmpindex, int dstX, int dstY )
 }
 void SetGscreenPalette( SDL_Surface *surface )
 {
-#ifdef RS90
-	extern uint8_t drm_palette[3][256];
-	#define UINT16_16(val) ((uint32_t)(val * (float)(1<<16)))
-	static const uint32_t YUV_MAT[3][3] = {
-		{UINT16_16(0.2999f),   UINT16_16(0.587f),    UINT16_16(0.114f)},
-		{UINT16_16(0.168736f), UINT16_16(0.331264f), UINT16_16(0.5f)},
-		{UINT16_16(0.5f),      UINT16_16(0.418688f), UINT16_16(0.081312f)}
-	};
-	uint16_t i;
-#endif
     Uint8 bpp;
-	SDL_Palette *pal;
-
     if(surface)
     {
 	    bpp = surface->format->BytesPerPixel;
 		if(bpp <= 1)
 		{
-			pal = surface->format->palette;
-			if(pal){
-				#ifdef SCALING
-				extern SDL_Surface* real_screen;
-				SDL_SetPalette(real_screen, SDL_LOGPAL|SDL_PHYSPAL, pal->colors, 0, 256);
-				SDL_SetPalette(g_screen, SDL_LOGPAL|SDL_PHYSPAL, pal->colors, 0, 256);
-				#else
-				SDL_SetPalette(g_screen, SDL_LOGPAL|SDL_PHYSPAL, pal->colors, 0, 256);
-				#endif
-			}
+			#ifdef SCALING
+			extern SDL_Surface* real_screen;
+			SDL_SetPalette(real_screen, SDL_LOGPAL|SDL_PHYSPAL, surface->format->palette->colors, 0, 256);
+			SDL_SetPalette(g_screen, SDL_LOGPAL|SDL_PHYSPAL, surface->format->palette->colors, 0, 256);
+			#else
+			SDL_SetPalette(g_screen, SDL_LOGPAL|SDL_PHYSPAL, surface->format->palette->colors, 0, 256);
+			#endif
 		}
 	}
-#ifdef RS90
-	for(i=0;i<256;i++)
-	{
-		drm_palette[0][i] = ( ( UINT16_16(  0) + YUV_MAT[0][0] * pal->colors[i].r + YUV_MAT[0][1] * pal->colors[i].g + YUV_MAT[0][2] * pal->colors[i].b) >> 16 );
-		drm_palette[1][i] = ( ( UINT16_16(128) - YUV_MAT[1][0] * pal->colors[i].r - YUV_MAT[1][1] * pal->colors[i].g + YUV_MAT[1][2] * pal->colors[i].b) >> 16 );
-		drm_palette[2][i] = ( ( UINT16_16(128) + YUV_MAT[2][0] * pal->colors[i].r - YUV_MAT[2][1] * pal->colors[i].g - YUV_MAT[2][2] * pal->colors[i].b) >> 16 );
-	}
-#endif
 }
 
 /* Unused, the previous function is used instead. - Gameblabla */

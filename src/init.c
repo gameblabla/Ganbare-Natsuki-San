@@ -17,7 +17,7 @@
 #include <GL/gl.h>
 #endif
 
-#if defined(SCALING) || defined(OPENGL_SCALING) || defined(RS90)
+#if defined(SCALING) || defined(OPENGL_SCALING)
 SDL_Surface* real_screen;
 #endif
 
@@ -92,14 +92,14 @@ int main(int argc, char *argv[])
 	flags = SDL_HWSURFACE | SDL_FULLSCREEN | SDL_DOUBLEBUF | SDL_HWPALETTE;
 #elif defined(GCW0)
 	flags = SDL_HWSURFACE | SDL_TRIPLEBUF;
+#elif defined(RS90)
+	flags = SDL_HWSURFACE | SDL_TRIPLEBUF | SDL_YUV444;
 #elif defined(DREAMCAST)
 	flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
 #elif defined(CLASSICMAC)
 	flags = SDL_HWSURFACE | SDL_FULLSCREEN | SDL_DOUBLEBUF | SDL_HWPALETTE;
 #elif defined(MINGW)
 	flags = SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_HWPALETTE | SDL_FULLSCREEN;
-#elif defined(RS90)
-	flags = SDL_HWSURFACE | SDL_YUV444 | SDL_ANYFORMAT | SDL_FULLSCREEN;
 #else
 	flags = SDL_SWSURFACE;
 #endif
@@ -110,12 +110,10 @@ int main(int argc, char *argv[])
 
 	SDL_ShowCursor(SDL_DISABLE);
 
-#if defined(SCALING) || defined(OPENGL_SCALING) || defined(RS90)
+#if defined(SCALING) || defined(OPENGL_SCALING)
 	real_screen = SDL_SetVideoMode(FINAL_RESOLUTION_WIDTH, FINAL_RESOLUTION_HEIGHT,
 	#ifdef OPENGL_SCALING
 	0,
-	#elif defined(RS90)
-	24,
 	#else
 	DEPTH,
 	#endif

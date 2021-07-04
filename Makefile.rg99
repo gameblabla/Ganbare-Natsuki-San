@@ -1,0 +1,33 @@
+# Software Name
+PROGRAM = gnp.elf
+
+# Compiler
+CC = /opt/rs90-toolchain/bin/mipsel-linux-gcc
+LDFLAGS =  -nodefaultlibs -lc -lgcc -lSDL -lSDL_mixer -lmikmod -lvorbisidec -logg  -no-pie -Wl,--as-needed -Wl,--gc-sections -flto -s
+CFLAGS = -Ofast -fdata-sections -ffunction-sections -mno-fp-exceptions -mno-check-zero-division -mframe-header-opt -fsingle-precision-constant -fno-common -mips32 -mno-mips16 -mplt -mno-shared -flto
+CFLAGS	+= -DGCW0
+SYSROOT = $(shell $(CC) --print-sysroot)
+CFLAGS += `$(SYSROOT)/usr/bin/sdl-config --cflags`
+
+# Include
+INCLUDES := 
+
+CFLAGS +=  -Isrc
+CFILES =  src/ram.c src/util_snd.c src/function.c src/dconv.c src/scene.c src/title.c src/init.c src/act.c src/option.c src/ending.c src/logo.c src/refresh.c
+
+#
+#========================================(Compile)
+#
+
+OFILES = $(SFILES:.S=.o) $(CFILES:.c=.o)
+
+$(PROGRAM):	$(OFILES)
+			$(CC) $(CFLAGS) $(OFILES) -o $@ $(LDFLAGS)
+
+all: $(PROGRAM)
+
+%.o: %.c
+	 $(CC) $(ALL_INCLUDES) $(CFLAGS) -c $< -o $@
+
+clean:
+	 -rm -f $(OFILES) $(MAPFILE) $(PROGRAM)
