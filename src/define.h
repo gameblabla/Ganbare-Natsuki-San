@@ -41,6 +41,8 @@
 
 #if defined(DREAMCAST)
 	#define DEPTH 16
+	#define FINAL_RESOLUTION_WIDTH 320
+	#define FINAL_RESOLUTION_HEIGHT 240
 #elif defined(GCW0)
 	#define DEPTH 16
 	#define FINAL_RESOLUTION_WIDTH 320
@@ -135,15 +137,15 @@ enum {
 	EN_BGM_GAME07,
 };
 enum {
-	EN_SE_ATK1   ,
-	EN_SE_DAMEGE ,
-	EN_SE_L1     ,
-	EN_SE_LANDING,
-	EN_SE_MSG    ,
-	EN_SE_SELECT ,
-	EN_SE_SW     ,
-	EN_SE_JUMP   ,
-	EN_SE_PAWA   ,
+	EN_SE_ATK1   = 0,
+	EN_SE_DAMEGE = 1,
+	EN_SE_L1     = 2,
+	EN_SE_LANDING= 3,
+	EN_SE_MSG    = 4,
+	EN_SE_SELECT = 5,
+	EN_SE_SW     = 6,
+	EN_SE_JUMP   = 7,
+	EN_SE_PAWA   = 8,
 };
 
 #endif

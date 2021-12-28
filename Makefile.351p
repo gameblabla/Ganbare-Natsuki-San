@@ -1,0 +1,35 @@
+# Software Name
+PROGRAM = gnp.elf
+
+# Compiler
+CC = /opt/bittboy-toolchain/bin/arm-linux-gcc
+
+# Linker
+LDFLAGS = -lc -lgcc -lSDL_mixer -lasound -lmikmod -lmpg123 -lvorbisidec -logg -lSDL -lm -lSDL_image -ljpeg -lpng -lstdc++ -flto -s
+CFLAGS = -Ofast -fdata-sections -ffunction-sections -fno-PIC -Wall -flto -DGCW0
+
+# Include
+INCLUDES := 
+
+CFLAGS +=  -Isrc
+CFILES =  src/ram.c src/util_snd.c src/function.c src/dconv.c src/scene.c src/title.c src/init.c src/act.c src/option.c src/ending.c src/logo.c
+
+SYSROOT = $(shell $(CC) --print-sysroot)
+CFLAGS += `$(SYSROOT)/usr/bin/sdl-config --cflags`
+
+#
+#========================================(Compile)
+#
+
+OFILES = $(SFILES:.S=.o) $(CFILES:.c=.o)
+
+$(PROGRAM):	$(OFILES)
+			$(CC) $(CFLAGS) $(OFILES) -o $@ $(LDFLAGS)
+
+all: $(PROGRAM)
+
+%.o: %.c
+	 $(CC) $(ALL_INCLUDES) $(CFLAGS) -c $< -o $@
+
+clean:
+	 -rm -f $(OFILES) $(MAPFILE) $(PROGRAM)

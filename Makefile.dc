@@ -1,23 +1,60 @@
 CC = kos-cc
 SH_DIRECTORY=/opt/toolchains/dc/sh-elf/bin/
 
-CFLAGS  = -Os -fomit-frame-pointer  -fdata-sections -ffunction-sections -Wall -DDREAMCAST -DSDL_JOYSTICK -DNOSOUND
+CFLAGS  = -Ofast -flto -Wall -Wextra -DDREAMCAST
 CXXFLAGS = $(CFLAGS)
-LDFLAGS = -lSDL -lm -Wl,--as-needed -Wl,--gc-sections -flto -g
+LDFLAGS = -lc -lm -lSDL -lz -s -flto
+
+#CFLAGS  += -DOPUS_MUSIC
+#LDFLAGS += -lopusplay -lopusfile -logg -lopus
+
+CFLAGS  += -DADX_PLAY
+LDFLAGS += -lADX
 
 SYSROOT = $(shell $(CC) --print-sysroot)
 CFLAGS += `$(SYSROOT)/bin/sdl-config --cflags`
 
-OBJS  = src/ram.o src/util_snd.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o
+OBJS  = romdisk.o src/ram.o src/util_snd_dc.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o src/vmu.o
 SOURCES = $(patsubst %.o, %.c, $(OBJS))
 
-all: gnp scramble
+all: gnp
 
-scramble:
-	${SH_DIRECTORY}sh-elf-objcopy -R .stack -O binary gnp GNP.BIN
+#CDDA but due to issues, it's commented out
+#pack:
+#	rm -f IP.BIN
+#	sh-elf-objcopy -R .stack -O binary gnp main.bin
+#	${KOS_BASE}/utils/scramble/scramble main.bin ./cd/1ST_READ.BIN
+#	makeip ip.txt IP.BIN
+#	mkisofs -C 0,$(shell lbacalc track01.raw track02.raw track03.raw track04.raw track05.raw track06.raw track07.raw) -V GANBARE -G IP.BIN -joliet -rock -l -o "ganbare.iso" ./cd
+#	mds4dc -c ganbare.mds ganbare.iso track01.raw track02.raw track03.raw track04.raw track05.raw track06.raw track07.raw
+
+pack:
+	rm -f IP.BIN
+	rm -f -r ./rd
+	rm -f -r ./cd/image
+	mkdir -p ./rd
+	mkdir -p ./rd/image
+	mkdir -p ./rd/image/map
+	cp -r ./data/4by3/image/map ./rd/image/
+	cp -r ./data/data ./rd/
+	cp -r ./data/4by3/image ./cd/
+	sh-elf-objcopy -R .stack -O binary gnp main.bin
+	${KOS_BASE}/utils/scramble/scramble main.bin ./cd/1ST_READ.BIN
+	makeip ip.txt IP.BIN
+	mkisofs -V GANBARE -G IP.BIN -joliet -rock -l -x cd -o "ganbare.iso" ./cd
+	cdi4dc ganbare.iso ganbare.cdi -d
+
+romdisk.img:
+	$(KOS_GENROMFS) -f romdisk.img -d ./rd -v
+
+romdisk.o: romdisk.img
+	$(KOS_BASE)/utils/bin2o/bin2o romdisk.img romdisk romdisk.o
 
 gnp: $(OBJS)
-	$(CC) -o $@ $(OBJS) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 
 clean:
-	rm $(OBJS)
+	rm $(OBJS) 
+	rm -f IP.BIN
+	rm -f -r ./rd
+	rm -f -r ./cd/image

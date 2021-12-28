@@ -29,6 +29,15 @@ SDL_Surface* real_screen;
 #include <pspkernel.h>
 #endif 
 
+#ifdef DREAMCAST
+#include <kos.h>
+#include <SDL/SDL_dreamcast.h>
+#include "vmuicon.h"
+extern uint8_t romdisk[];
+KOS_INIT_FLAGS(INIT_DEFAULT | INIT_MALLOCSTATS);
+KOS_INIT_ROMDISK(romdisk);
+#endif
+
 #ifndef SDL_TRIPLEBUF
 #define SDL_TRIPLEBUF SDL_DOUBLEBUF
 #endif
@@ -95,6 +104,7 @@ int main(int argc, char *argv[])
 #elif defined(RS90)
 	flags = SDL_HWSURFACE | SDL_TRIPLEBUF | SDL_YUV444;
 #elif defined(DREAMCAST)
+	SDL_DC_SetVideoDriver(SDL_DC_DMA_VIDEO);
 	flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
 #elif defined(CLASSICMAC)
 	flags = SDL_HWSURFACE | SDL_FULLSCREEN | SDL_DOUBLEBUF | SDL_HWPALETTE;
@@ -156,6 +166,10 @@ int main(int argc, char *argv[])
 	/* http://risky-safety.org/~zinnia/sdl/sourcetour/extra1/ */
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glColor4d(1.0f, 1.0f, 1.0f, 1.0f);
+#endif
+
+#ifdef DREAMCAST
+	vmu_set_icon(vmu_icon);
 #endif
 
 #if DEPTH != 8
@@ -237,6 +251,9 @@ void ExitProgram(void)
 #ifdef MINGW
 	sprintf(path_config, "save/config");
 	sprintf(path_folder, "save");
+#elif defined(DREAMCAST)
+	sprintf(path_config, "/ram/config");
+	sprintf(path_folder, "/ram");
 #elif defined(_TINSPIRE)
 	sprintf(path_config, "./save/config.tns");
 	sprintf(path_folder, "./save");
@@ -283,8 +300,8 @@ void main_init_config( void )
 	sprintf(path_config, "./save/config.tns");
 	sprintf(path_folder, "./save");
 #elif defined(DREAMCAST)
-	sprintf(path_config, "/cd/.ganbare/config");
-	sprintf(path_folder, "/cd/.ganbare");
+	sprintf(path_config, "/ram/config");
+	sprintf(path_folder, "/ram");
 #elif defined(RELATIVE_PATH)
 	sprintf(path_config, "config.dat");
 #else		
@@ -296,7 +313,7 @@ void main_init_config( void )
 	mkdir(path_folder);
 #elif defined(_TINSPIRE)
 	mkdir(path_folder, 0755);
-#elif defined(RELATIVE_PATH)
+#elif defined(RELATIVE_PATH) || defined(DREAMCAST)
 
 #else	
 	mkdir(path_folder, 0755);

@@ -1,0 +1,35 @@
+CC = kos-cc
+SH_DIRECTORY=/opt/toolchains/dc/sh-elf/bin/
+
+CFLAGS  = -Ofast -flto -Wall -Wextra -DDREAMCAST
+CXXFLAGS = $(CFLAGS)
+LDFLAGS = -lc -lm -lSDL -lz -s -flto
+
+#CFLAGS  += -DOPUS_MUSIC
+#LDFLAGS += -lopusplay -lopusfile -logg -lopus
+
+CFLAGS  += -DADX_PLAY
+LDFLAGS += -lADX
+
+CFLAGS +=  -ml -m4-single-only -Wl,-Ttext=0x8c020000 -Wl,--gc-sections -nodefaultlibs -L/opt/toolchains/dc/kos/lib/dreamcast -L/opt/toolchains/dc/kos/addons/lib/dreamcast -L/opt/toolchains/dc/kos/../kos-ports/lib -DNAOMI
+
+SYSROOT = $(shell $(CC) --print-sysroot)
+CFLAGS += `$(SYSROOT)/bin/sdl-config --cflags`
+
+OBJS  = romdisk.o src/ram.o src/util_snd_dc.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o src/vmu.o
+SOURCES = $(patsubst %.o, %.c, $(OBJS))
+
+all: gnp
+
+romdisk.img:
+	$(KOS_GENROMFS) -f romdisk.img -d ./cd -v
+
+romdisk.o: romdisk.img
+	$(KOS_BASE)/utils/bin2o/bin2o romdisk.img romdisk romdisk.o
+
+gnp: $(OBJS)
+	$(CC) -o $@ $(OBJS) $(LDFLAGS)
+	naomibintool build GNP_NAOMI.BIN -d "Gameblabla" -e $@
+
+clean:
+	rm $(OBJS)

@@ -14,6 +14,10 @@
 #include "general.h"
 #include "dconv.h"
 
+#if defined(DREAMCAST)
+	#include <kos.h>
+#endif
+
 enum Joystick_SDL SDLJoyBtn;
 
 void FunctionInit( void );
@@ -151,15 +155,11 @@ int LoadGameFlag( char *fn )
 	char buf[192];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
-#elif defined(DREAMCAST)
-	char buf[192];
-	snprintf(buf, sizeof(buf), "/cd/%s", fn);
-	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
 #else	
 	if ( ( fp = fopen( fn, "rb" ) ) == NULL )
 #endif
 	{
-		printf("file open error!!\n");
+		printf("file open error!! %s\n", fn);
 		rc = -1;	
 	}
 	else 
@@ -198,7 +198,7 @@ int SaveGameFlag( char *fn )
 	{
 		if ( ( fp = fopen( "save/config.tns", "wb" ) ) == NULL )
 		{
-			printf("file open error!!\n");
+			printf("file open error!! %s\n", fn);
 			rc = -1;
 		}
 		else 
@@ -211,7 +211,7 @@ int SaveGameFlag( char *fn )
 	{
 		if ( ( fp = fopen( buf, "wb" ) ) == NULL )
 		{
-			printf("file open error!!\n");
+			printf("file open error!! %s\n", fn);
 			rc = -1;
 		}
 		else 
@@ -221,41 +221,10 @@ int SaveGameFlag( char *fn )
 		}
 	}
 	
-#elif defined(DREAMCAST)
-	char buf[255];
-	snprintf(buf, sizeof(buf), "/cd/%s", fn);
-	
-	if (strcmp(fn,"/ram/config")==0)
-	{
-		if ( ( fp = fopen( "/ram/config", "wb" ) ) == NULL )
-		{
-			printf("file open error!!\n");
-			rc = -1;
-		}
-		else 
-		{
-			fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
-			fclose( fp );
-		}
-	}
-	else
-	{
-		if ( ( fp = fopen( buf, "wb" ) ) == NULL )
-		{
-			printf("buffer % s \n", buf);
-			printf("file open error!!\n");
-			rc = -1;
-		}
-		else 
-		{
-			fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
-			fclose( fp );
-		}
-	}
 #else
 	if ( ( fp = fopen( fn, "wb" ) ) == NULL )
 	{
-		printf("file open error!!\n");
+		printf("file open error!! %s\n", fn);
 		rc = -1;
 	}
 	else 
@@ -304,15 +273,11 @@ int LoadGameFlag2( char *fn )
 	char buf[127];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
-#elif defined(DREAMCAST)
-	char buf[127];
-	snprintf(buf, sizeof(buf), "/cd/%s", fn);
-	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
 #else
 	if ( ( fp = fopen( fn, "rb" ) ) == NULL )
 #endif
 	{
-		printf("file open error!!\n");
+		printf("file open error!! %s\n", fn);
 		rc = -1;	
 	}
 	else 
@@ -348,7 +313,7 @@ int SaveGameFlag2( char *fn )
 	SDL_RWops *rw = SDL_RWFromFile(fn, "wb");
 	if (!rw)
 	{
-		printf("file open error!!\n");
+		printf("file open error!! %s\n", fn);
 		rc = -1;
 	}
 	else 
@@ -371,15 +336,11 @@ int SaveGameFlag2( char *fn )
 	char buf[127];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "wb" ) ) == NULL )
-#elif defined(DREAMCAST)
-	char buf[127];
-	snprintf(buf, sizeof(buf), "/cd/%s", fn);
-	if ( ( fp = fopen( buf, "wb" ) ) == NULL )
 #else
 	if ( ( fp = fopen( fn, "wb" ) ) == NULL )
 #endif
 	{
-		printf("file open error!!\n");
+		printf("file open error!! %s\n", fn);
 		rc = -1;
 	}
 	else 
@@ -410,7 +371,7 @@ int SaveFile( char *fn, Sint32 *buff, Sint32 size )
 	SDL_RWops *rw = SDL_RWFromFile(fn, "wb");
 	if (!rw)
 	{
-		printf("file open error!!\n");
+		printf("file open error!! %s\n", fn);
 		rc = -1;
 	}
 	else 
@@ -425,15 +386,11 @@ int SaveFile( char *fn, Sint32 *buff, Sint32 size )
 	char buf[127];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "wb" ) ) == NULL )
-#elif defined(DREAMCAST)
-	char buf[127];
-	snprintf(buf, sizeof(buf), "/cd/%s", fn);
-	if ( ( fp = fopen( buf, "wb" ) ) == NULL )
 #else
 	if ( ( fp = fopen( fn, "wb" ) ) == NULL )
 #endif
 	{
-		printf("file open error!!\n");
+		printf("file open error!! %s\n", fn);
 		rc = -1;
 	}
 	else 
@@ -455,7 +412,7 @@ int LoadFile( char *fn, Sint32 *buff, Sint32 size )
 	SDL_RWops *rw = SDL_RWFromFile(fn, "rb");
 	if (!rw)
 	{
-		printf("file open error!!\n");
+		printf("file open error!! %s\n", fn);
 		rc = -1;
 	}
 	else 
@@ -470,15 +427,11 @@ int LoadFile( char *fn, Sint32 *buff, Sint32 size )
 	char buf[127];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
-#elif defined(DREAMCAST)
-	char buf[127];
-	snprintf(buf, sizeof(buf), "/cd/%s", fn);
-	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
 #else
 	if ( ( fp = fopen( fn, "rb" ) ) == NULL )
 #endif
 	{
-		printf("file open error!!\n");
+		printf("file open error!! %s\n", fn);
 		rc = -1;
 	}
 	else 
@@ -510,10 +463,6 @@ int LoadFile( char *fn, Sint32 *buff, Sint32 size )
 #ifdef _TINSPIRE
 	char buf[192];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
-	if ( ( fp = fopen( buf, "r" ) ) == NULL )
-#elif defined(DREAMCAST)
-	char buf[192];
-	snprintf(buf, sizeof(buf), "/cd/%s", fn);
 	if ( ( fp = fopen( buf, "r" ) ) == NULL )
 #else
 	if ( ( fp = fopen( fn, "r" ) ) == NULL )
@@ -566,10 +515,6 @@ int LoadFile( char *fn, Sint32 *buff, Sint32 size )
 	char buf[192];
 	snprintf(buf, sizeof(buf), "%s.tns", fn);
 	if ( ( fp = fopen( buf, "w" ) ) == NULL )
-#elif defined(DREAMCAST)
-	char buf[192];
-	snprintf(buf, sizeof(buf), "/cd/%s", fn);
-	if ( ( fp = fopen( buf, "w" ) ) == NULL )
 #else
 	if ( ( fp = fopen( fn, "w" ) ) == NULL )
 #endif
@@ -602,10 +547,6 @@ Sint32 LoadBitmap( char *fname , int bmpindex, int flag )
 #ifdef _TINSPIRE
 	char buf[128];
 	snprintf(buf, sizeof(buf), "%s.tns", fname);
-	tmp = SDL_LoadBMP( buf );
-#elif defined(DREAMCAST)
-	char buf[128];
-	snprintf(buf, sizeof(buf), "/cd/%s", fname);
 	tmp = SDL_LoadBMP( buf );
 #else
 	tmp = SDL_LoadBMP( fname );
@@ -667,6 +608,7 @@ void Blt( int bmpindex, int dstX, int dstY )
 		SDL_BlitSurface(bitmap[bmpindex], NULL, g_screen, &dstRect);
 	}
 }
+
 void SetGscreenPalette( SDL_Surface *surface )
 {
     Uint8 bpp;
@@ -825,12 +767,18 @@ void closePAD(void)
 #endif
 }
 
+#ifdef DREAMCAST
+/*mouse_state_t *mstate;*/	
+/*unsigned int mouse_x = 0, mouse_y = 0, mouse_x_count = 0, mouse_y_count = 0;*/
+maple_device_t *cont, *kbd/*,  *mouse*/;
+cont_state_t *state;	
+#endif
+
 void KeyInput( void )
 {
 	int i;
-#ifdef PSPUMODE
 	int pad = 0;
-
+#ifdef PSPUMODE
 	keys = SDL_GetKeyState(NULL);
 
 	if(joys){
@@ -848,25 +796,128 @@ void KeyInput( void )
 		if(SDL_JoystickGetButton(joys, sdljbSquare)) pad |= PAD_BUTTON5;
 	}
 #elif defined(DREAMCAST)
-
-	keys = SDL_GetKeyState(NULL);
-	if(joys){
-		int x = 0, y = 0;
-		x = SDL_JoystickGetAxis(joys, 0);
-		y = SDL_JoystickGetAxis(joys, 1);
-		if(SDL_JoystickGetButton(joys,  sdljbUp) || y < -JOYSTICK_AXIS) pad |= PAD_UP;
-		if(SDL_JoystickGetButton(joys,  sdljbLeft) || x < -JOYSTICK_AXIS) pad |= PAD_LEFT;
-		if(SDL_JoystickGetButton(joys,  sdljbDown) || y > JOYSTICK_AXIS) pad |= PAD_DOWN;
-		if(SDL_JoystickGetButton(joys,  sdljbRight) || x > JOYSTICK_AXIS) pad |= PAD_RIGHT;
-		if(SDL_JoystickGetButton(joys, sdljbCross)) pad |= PAD_BUTTON1;
-		if(SDL_JoystickGetButton(joys, sdljbCircle)) pad |= PAD_BUTTON2;
-		if(SDL_JoystickGetButton(joys, sdljbTriangle)) pad |= PAD_BUTTON3;
-		if(SDL_JoystickGetButton(joys, sdljbSquare)) pad |= PAD_BUTTON5;
-	}	
-
-#else
-	int pad = 0;
+	int k;
 	
+	/* No need to check again if pointer exists. */
+	if (!cont)
+	{
+		for(i=0;i<4;i++)
+		{
+			cont = maple_enum_type(i, MAPLE_FUNC_CONTROLLER);
+			if (cont) break;
+		}
+	}
+	if (!kbd)
+	{
+		for(i=0;i<4;i++)
+		{
+			kbd = maple_enum_type(i, MAPLE_FUNC_KEYBOARD);
+			if (kbd) break;
+		}
+	}
+	/*if (!mouse)
+	{
+		for(i=0;i<4;i++)
+		{
+			mouse = maple_enum_type(i, MAPLE_FUNC_MOUSE);
+			if (mouse) break;
+		}
+	}*/
+	
+	if(cont)
+	{
+		state = (cont_state_t *)maple_dev_status(cont);
+		if (state->buttons & CONT_START)
+            pad |= PAD_BUTTON3;
+		if (state->buttons & CONT_X)
+			pad |= PAD_BUTTON4;
+		if (state->buttons & CONT_A) 
+            pad |= PAD_BUTTON1;
+		if (state->buttons & CONT_B) 
+           pad |= PAD_BUTTON2;
+		if (state->buttons & CONT_DPAD_UP || state->joyy < -64) 
+			pad |= PAD_UP;
+		if (state->buttons & CONT_DPAD_DOWN || state->joyy > 64) 
+           pad |= PAD_DOWN;
+		if (state->buttons & CONT_DPAD_LEFT || state->joyx < -64) 
+           pad |= PAD_LEFT;
+		if (state->buttons & CONT_DPAD_RIGHT || state->joyx > 64) 
+           pad |= PAD_RIGHT;
+	}
+	
+	if (kbd)
+	{
+		while((k = kbd_get_key()) != -1)
+		{
+			switch(k)
+			{
+				// Key up
+				case 20992:
+					pad |= PAD_UP;
+				break;
+				//Key Down
+				case 20736:
+					pad |= PAD_DOWN;
+				break;
+				//Key LEFT
+				case 20480:
+					pad |= PAD_LEFT;
+				break;
+				//Key RIGHT
+				case 20224:
+					pad |= PAD_RIGHT;
+				break;
+				//Key SPACE
+				case 32:
+				case 120:
+					pad |= PAD_BUTTON1;
+				break;
+				case 99:
+					pad |= PAD_BUTTON2;
+				break;
+			}
+		}
+	}
+	
+	/*if(mouse)
+	{
+        mstate = (mouse_state_t *)maple_dev_status(mouse);
+        if (mstate)
+        {
+			if (mstate->dx < -1) mouse_x = 1; 
+			else if (mstate->dx > 1) mouse_x = 2; 
+			if (mstate->dy < -1) mouse_y = 1; 
+			else if (mstate->dy > 1) mouse_y = 2; 
+			
+			if (mouse_x > 0)
+			{
+				if (mouse_x == 1) pad |= PAD_LEFT;
+				else if (mouse_x == 2) pad |= PAD_RIGHT;
+				mouse_x_count++;
+				if (mouse_x_count > 5)
+				{
+					mouse_x_count = 0;
+					mouse_x = 0;
+				}
+			}
+			
+			if (mouse_y > 0)
+			{
+				if (mouse_y == 1) pad |= PAD_UP;
+				else if (mouse_y == 2) pad |= PAD_DOWN;
+				mouse_y_count++;
+				if (mouse_y_count > 5)
+				{
+					mouse_y_count = 0;
+					mouse_y = 0;
+				}
+			}
+			if (mstate->buttons & MOUSE_LEFTBUTTON) pad |= PAD_BUTTON1;
+			if (mstate->buttons & MOUSE_RIGHTBUTTON) pad |= PAD_BUTTON2;
+		}
+	}*/
+	
+#else
 	#ifdef SDL_JOYSTICK
 	int	btn1 = 0, btn2 = 0, btn3 = 0, btn4 = 0, btn5 = 0, btn6 = 0, btn7 = 0, btn8 = 0, btn9 = 0, btnA = 0;
 	#endif
@@ -1114,7 +1165,8 @@ void KeyInput( void )
 	{
 		key_eventPress[GP2X_BUTTON_CLICK] = 1;
 	}
-#ifndef GP2X
+	/* Remember to disable this for platforms that use their own input code otherwise this will be triggered all the time - Gameblabla */
+#if !defined(GP2X) && !defined(DREAMCAST)
 	if ( keys[SDLK_ESCAPE] )	// èIóπ
 	{
 		key_eventPress[GP2X_BUTTON_EXIT] = 1;

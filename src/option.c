@@ -285,8 +285,8 @@ void option_keys( void )
 	{
 		if ( mode == 15 )	/* Exit */
 		{
-			gameflag[133] = selct[2];	
-			SaveGameFlag("config/config.fig");
+			gameflag[133] = selct[2];
+			SaveGameFlag(CONFIG_FIG_PATH);
 
 			gameflag[40] = 1;					
 			g_scene = EN_SN_TITLE;
@@ -360,6 +360,9 @@ void option_drow( void )
 	{
 		a[0] = 0;
 	}
+	
+	/* For some obscure reasons, triggers a crash on Dreamcast */
+	#ifndef DREAMCAST
 	for ( x = 0; x < 5; x++ )
 	{
 		for ( y = 0; y < 4; y++ )
@@ -367,6 +370,7 @@ void option_drow( void )
 			Blt( 5, ( x * 100 )- a[0], ( y * 100 ) - a[0] );
 		} 
 	}
+	#endif
 
 	Blt( 1, 10, 90 );
 	

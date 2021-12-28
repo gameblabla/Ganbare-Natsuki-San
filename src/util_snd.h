@@ -43,6 +43,12 @@ extern void soundPlaySe(Sint32 num);
 extern int soundIsPlaySe(Sint32 num);
 extern void soundStopSeAll(void);
 
+#ifdef DREAMCAST
+extern void Pause_Music();
+extern void Resume_Music();
+extern void Stop_Music();
+#endif
+
 extern Sint32 sound_buff[];
 
 #endif /* _UTIL_SND_ */

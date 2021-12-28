@@ -12,6 +12,10 @@
 
 #include "refresh.h"
 
+#ifdef DREAMCAST
+#include "vmu.h"
+#endif
+
 void act_main( void );
 void act_init( void );
 void act_relese( void );
@@ -392,6 +396,13 @@ void act_init( void )
 	}
 	
 	ResetGameFlag2( );
+
+#ifdef DREAMCAST
+	Pause_Music();
+	DC_LoadVMU("gan_work.sav", path_work);
+	DC_LoadVMU("gan_item.sav", path_item);
+#endif
+
 	LoadGameFlag2(path_work);
 	for ( i = 0; i < 400; i++ )
 	{
@@ -406,7 +417,6 @@ void act_init( void )
 	player[20] = 0;
 	player[21] = 32;
 	player[22] = 1;
-
 
 
 	ResetGameFlag2( );
@@ -514,100 +524,6 @@ void act_init( void )
 	{
 	}
 
-
-	if ( gameflag[70] == 1 )
-	{
-		if (
-		     ( ( save_data[3] >  0 ) && ( save_data[3] <=  5 ) ) 
-		  || ( ( save_data[3] > 20 ) && ( save_data[3] <= 25 ) )
-		  || ( ( save_data[3] > 40 ) && ( save_data[3] <= 45 ) )
-		   )
-		{
-			soundPlayBgm( EN_BGM_GAME02 );
-		}
-		if (
-		     ( ( save_data[3] > 45 ) && ( save_data[3] <= 50 ) )
-		   )
-		{
-			if ( stage == 2 )
-			{
-				soundPlayBgm( EN_BGM_GAME07 );
-			}
-			else 
-			{
-				soundPlayBgm( EN_BGM_GAME06 );
-			}
-		}
-		if (
-		     ( ( save_data[3] >  5 ) && ( save_data[3] <= 10 ) ) 
-		  || ( ( save_data[3] > 25 ) && ( save_data[3] <= 30 ) )
-		  || ( ( save_data[3] > 35 ) && ( save_data[3] <= 40 ) )
-		   )
-		{
-			soundPlayBgm( EN_BGM_GAME03 );
-		}
-		if (
-		     ( ( save_data[3] > 10 ) && ( save_data[3] <= 15 ) ) 
-		  || ( ( save_data[3] > 30 ) && ( save_data[3] <= 35 ) )
-		   )
-		{
-			soundPlayBgm( EN_BGM_GAME04 );
-		}
-		if (
-		     ( ( save_data[3] > 15 ) && ( save_data[3] <= 20 ) ) 
-		  || ( ( save_data[3] > 35 ) && ( save_data[3] <= 40 ) )
-		   )
-		{
-			soundPlayBgm( EN_BGM_GAME05 );
-		}
-	}
-	else 
-	{
-		if ( gameflag[71] == 0 )
-		{
-			if ( (save_data[3] ==  1) || (save_data[3] == 21) || (save_data[3] == 41 ))
-			{
-				soundPlayBgm( EN_BGM_GAME02 );
-			}
-			if (save_data[3] == 46)
-			{
-				if ( stage == 2 )
-				{
-					soundPlayBgm( EN_BGM_GAME07 );
-				}
-				else 
-				{
-					soundPlayBgm( EN_BGM_GAME06 );
-				}
-			}
-			if (
-			     ( ( save_data[3] ==  6 ) ) 
-			  || ( ( save_data[3] == 26 ) )
-			   )
-			{
-				soundPlayBgm( EN_BGM_GAME03 );
-			}
-			if (
-			     ( ( save_data[3] == 11 ) ) 
-			  || ( ( save_data[3] == 31 ) )
-			   )
-			{
-				soundPlayBgm( EN_BGM_GAME04 );
-			}
-			if (
-			     ( ( save_data[3] == 16 ) ) 
-			  || ( ( save_data[3] == 36 ) )
-			   )
-			{
-				soundPlayBgm( EN_BGM_GAME05 );
-			}
-		}
-	}
-	
-	
-	gameflag[71] = 0;
-	gameflag[70] = 0;
-
 	if ( gameflag[127] == 1 )	//トータルアタック
 	{
 		wk = get2keta( gameflag[135] , 1 );
@@ -704,8 +620,101 @@ void act_init( void )
 	/*LoadBitmap(SYS_IMAGE_PATH "waku.bmp",109,true);*/				
 	LoadBitmap(IMAGE_PATH "color.bmp",127,false);
 
+	if ( gameflag[70] == 1 )
+	{
+		if (
+		     ( ( save_data[3] >  0 ) && ( save_data[3] <=  5 ) ) 
+		  || ( ( save_data[3] > 20 ) && ( save_data[3] <= 25 ) )
+		  || ( ( save_data[3] > 40 ) && ( save_data[3] <= 45 ) )
+		   )
+		{
+			soundPlayBgm( EN_BGM_GAME02 );
+		}
+		if (
+		     ( ( save_data[3] > 45 ) && ( save_data[3] <= 50 ) )
+		   )
+		{
+			if ( stage == 2 )
+			{
+				soundPlayBgm( EN_BGM_GAME07 );
+			}
+			else 
+			{
+				soundPlayBgm( EN_BGM_GAME06 );
+			}
+		}
+		if (
+		     ( ( save_data[3] >  5 ) && ( save_data[3] <= 10 ) ) 
+		  || ( ( save_data[3] > 25 ) && ( save_data[3] <= 30 ) )
+		  || ( ( save_data[3] > 35 ) && ( save_data[3] <= 40 ) )
+		   )
+		{
+			soundPlayBgm( EN_BGM_GAME03 );
+		}
+		if (
+		     ( ( save_data[3] > 10 ) && ( save_data[3] <= 15 ) ) 
+		  || ( ( save_data[3] > 30 ) && ( save_data[3] <= 35 ) )
+		   )
+		{
+			soundPlayBgm( EN_BGM_GAME04 );
+		}
+		if (
+		     ( ( save_data[3] > 15 ) && ( save_data[3] <= 20 ) ) 
+		  || ( ( save_data[3] > 35 ) && ( save_data[3] <= 40 ) )
+		   )
+		{
+			soundPlayBgm( EN_BGM_GAME05 );
+		}
+	}
+	else 
+	{
+		if ( gameflag[71] == 0 )
+		{
+			if ( (save_data[3] ==  1) || (save_data[3] == 21) || (save_data[3] == 41 ))
+			{
+				soundPlayBgm( EN_BGM_GAME02 );
+			}
+			if (save_data[3] == 46)
+			{
+				if ( stage == 2 )
+				{
+					soundPlayBgm( EN_BGM_GAME07 );
+				}
+				else 
+				{
+					soundPlayBgm( EN_BGM_GAME06 );
+				}
+			}
+			if (
+			     ( ( save_data[3] ==  6 ) ) 
+			  || ( ( save_data[3] == 26 ) )
+			   )
+			{
+				soundPlayBgm( EN_BGM_GAME03 );
+			}
+			if (
+			     ( ( save_data[3] == 11 ) ) 
+			  || ( ( save_data[3] == 31 ) )
+			   )
+			{
+				soundPlayBgm( EN_BGM_GAME04 );
+			}
+			if (
+			     ( ( save_data[3] == 16 ) ) 
+			  || ( ( save_data[3] == 36 ) )
+			   )
+			{
+				soundPlayBgm( EN_BGM_GAME05 );
+			}
+		}
+	}
 
-
+	gameflag[71] = 0;
+	gameflag[70] = 0;
+	
+#ifdef DREAMCAST
+	Resume_Music();
+#endif
 }
 
 void act_relese( void )
@@ -2229,13 +2238,18 @@ void save_file_w( )
 		gameflag2[i] = save_data[i];
 	}
 	SaveGameFlag2(path_work);
-	
+	/*#ifdef DREAMCAST
+	DC_SaveVMU(path_work, "gan_work.sav", "WORK");
+	#endif*/
 	ResetGameFlag2();				
 	for ( i = 0; i < 500; i++ )
 	{
 		gameflag2[i] = item_wk[i];
 	}
 	SaveGameFlag2(path_item);
+	/*#ifdef DREAMCAST
+	DC_SaveVMU(path_work, "gan_item.sav", "ITEM");
+	#endif*/
 }
 
 

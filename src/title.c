@@ -3,6 +3,9 @@
 #include <string.h>
 
 #include <SDL.h>
+#ifdef DREAMCAST
+#include "vmu.h"
+#endif
 #include "define.h"
 #include "function.h"
 #include "util_snd.h"
@@ -73,6 +76,9 @@ void title_main( void )
 
 void title_init( void )
 {
+#ifdef DREAMCAST
+	Stop_Music();
+#endif
 	scene_exit = 1;
 
 	title_no = 0;
@@ -120,7 +126,8 @@ void title_init( void )
 	{
 		gameflag[120] = 50;
 	}
-                                        
+          
+	
 	soundPlayBgm( EN_BGM_GAME01 );
 
 }
@@ -303,6 +310,10 @@ void title_keys( void )
 			gameflag[40] = 10;
 			g_scene = EN_SN_EXIT;
 			scene_exit=0;
+			#ifdef DREAMCAST
+			DC_SaveVMU(path_work, "gan_work.sav", "WORK");
+			DC_SaveVMU(path_item, "gan_item.sav", "ITEM");
+			#endif
 		}
 		else if ( mode == 3 )	/* option */
 		{
@@ -324,9 +335,12 @@ void title_keys( void )
 			gameflag2[2] = 0;
 			gameflag[70] = 1;
 			SaveGameFlag2(path_work);
-
 			ResetGameFlag2( );
 			SaveGameFlag2(path_item);
+			#ifdef DREAMCAST
+			DC_SaveVMU(path_work, "gan_work.sav", "WORK");
+			DC_SaveVMU(path_item, "gan_item.sav", "ITEM");
+			#endif
 
 			gameflag[40] = 4;
 			g_scene = EN_SN_ACT;
@@ -346,9 +360,12 @@ void title_keys( void )
 				gameflag[132] =  1;	
 				gameflag[70] = 1;
 				SaveGameFlag2(path_work);
-
 				ResetGameFlag2( );
 				SaveGameFlag2(path_item);
+				#ifdef DREAMCAST
+				DC_SaveVMU(path_work, "gan_work.sav", "WORK");
+				DC_SaveVMU(path_item, "gan_item.sav", "ITEM");
+				#endif
 
 				gameflag[40] = 4;
 				g_scene = EN_SN_ACT;
@@ -371,9 +388,12 @@ void title_keys( void )
 			gameflag[132] =  0;
 			gameflag[70] = 1;
 			SaveGameFlag2(path_work);
-
 			ResetGameFlag2( );
 			SaveGameFlag2(path_item);
+			#ifdef DREAMCAST
+			DC_SaveVMU(path_work, "gan_work.sav", "WORK");
+			DC_SaveVMU(path_item, "gan_item.sav", "ITEM");
+			#endif
 
 			gameflag[40] = 4;
 			g_scene = EN_SN_ACT;
@@ -396,9 +416,12 @@ void title_keys( void )
 			gameflag[132] =  0;
 			gameflag[70] = 1;
 			SaveGameFlag2(path_work);
-
 			ResetGameFlag2( );
 			SaveGameFlag2(path_item);
+			#ifdef DREAMCAST
+			DC_SaveVMU(path_work, "gan_work.sav", "WORK");
+			DC_SaveVMU(path_item, "gan_item.sav", "ITEM");
+			#endif
 
 			gameflag[40] = 4;
 			g_scene = EN_SN_ACT;
@@ -443,9 +466,12 @@ void title_keys( void )
 				gameflag[132] =  1;	
 				gameflag[70] = 1;
 				SaveGameFlag2(path_work);
-
 				ResetGameFlag2( );
 				SaveGameFlag2(path_item);
+				#ifdef DREAMCAST
+				DC_SaveVMU(path_work, "gan_work.sav", "WORK");
+				DC_SaveVMU(path_item, "gan_item.sav", "ITEM");
+				#endif
 
 				gameflag[40] = 4;
 				g_scene = EN_SN_ACT;
