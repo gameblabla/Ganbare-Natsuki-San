@@ -80,7 +80,7 @@ void soundInitBuffer(void)
 {
 	int i;
 	
-	snd_init();
+	snd_stream_init();
 	for(i=0;i<EN_SE_PAWA+1;i++)
 	{
 		if (!sfx_dc[i]) sfx_dc[i] = snd_sfx_load(sounds_dc[i]);	
@@ -149,7 +149,6 @@ void soundInitBuffer(void)
 
 void soundRelease(void)
 {
-	snd_shutdown();
 	#ifdef OPUS_MUSIC
     if (opusplay_is_playing()){
         opusplay_stop();
@@ -158,6 +157,7 @@ void soundRelease(void)
     #elif defined(ADX_PLAY)
     adx_stop();
 	#endif
+	snd_stream_shutdown();
 }
 
 void soundLoadBuffer(Sint32 num, Uint8 *fname, int loop)
@@ -243,7 +243,6 @@ void soundPlayBgm2(Sint32 num)
 	char tm[64];
 	snprintf(tm, sizeof(tm), BGM_SOUND_PATH"0%d.adx", track);
 	adx_stop();
-	adx_resume();
 	adx_dec( tm, 1 );
 	#else
 	cdrom_cdda_play(track, track+1, 0xF, CDDA_TRACKS);
@@ -383,11 +382,12 @@ void soundStopSe(Sint32 num)
 void soundPlaySe(Sint32 num)
 {	
 	if (num < 0 || num > EN_SE_PAWA) return;
-	#if !defined(ADX_PLAY) && !defined(OPUS_MUSIC)
-	snd_sfx_play_chn(num, sfx_dc[num], sfx_vol, 0x80);
-	#else
-	snd_sfx_play(sfx_dc[num], sfx_vol, 0x80);
+
+	snd_sfx_play_chn(num
+	#if defined(ADX_PLAY) || defined(OPUS_MUSIC)
+	+4
 	#endif
+	, sfx_dc[num], sfx_vol, 0x80);
 }
 
 int soundIsPlaySe(Sint32 num)

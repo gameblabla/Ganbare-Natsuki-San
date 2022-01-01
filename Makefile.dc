@@ -30,6 +30,14 @@ all: gnp
 
 pack:
 	rm -f IP.BIN
+	sh-elf-objcopy -R .stack -O binary gnp main.bin
+	${KOS_BASE}/utils/scramble/scramble main.bin ./cd/1ST_READ.BIN
+	makeip ip.txt IP.BIN
+	mkisofs -V GANBARE -G IP.BIN -joliet -rock -l -x cd -o "ganbare.iso" ./cd
+	cdi4dc ganbare.iso ganbare.cdi -d
+
+romdisk.img:
+	rm -f IP.BIN
 	rm -f -r ./rd
 	rm -f -r ./cd/image
 	mkdir -p ./rd
@@ -38,13 +46,6 @@ pack:
 	cp -r ./data/4by3/image/map ./rd/image/
 	cp -r ./data/data ./rd/
 	cp -r ./data/4by3/image ./cd/
-	sh-elf-objcopy -R .stack -O binary gnp main.bin
-	${KOS_BASE}/utils/scramble/scramble main.bin ./cd/1ST_READ.BIN
-	makeip ip.txt IP.BIN
-	mkisofs -V GANBARE -G IP.BIN -joliet -rock -l -x cd -o "ganbare.iso" ./cd
-	cdi4dc ganbare.iso ganbare.cdi -d
-
-romdisk.img:
 	$(KOS_GENROMFS) -f romdisk.img -d ./rd -v
 
 romdisk.o: romdisk.img
@@ -54,7 +55,7 @@ gnp: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 
 clean:
-	rm $(OBJS) 
+	rm $(OBJS) *.cdi *.iso *.BIN ./gnp romdisk.img
 	rm -f IP.BIN
 	rm -f -r ./rd
 	rm -f -r ./cd/image

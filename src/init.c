@@ -118,7 +118,9 @@ int main(int argc, char *argv[])
 	flags |= SDL_OPENGL;
 #endif
 
+#ifndef DREAMCAST
 	SDL_ShowCursor(SDL_DISABLE);
+#endif
 
 #if defined(SCALING) || defined(OPENGL_SCALING)
 	real_screen = SDL_SetVideoMode(FINAL_RESOLUTION_WIDTH, FINAL_RESOLUTION_HEIGHT,

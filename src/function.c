@@ -771,7 +771,8 @@ void closePAD(void)
 /*mouse_state_t *mstate;*/	
 /*unsigned int mouse_x = 0, mouse_y = 0, mouse_x_count = 0, mouse_y_count = 0;*/
 maple_device_t *cont, *kbd/*,  *mouse*/;
-cont_state_t *state;	
+cont_state_t *state;
+kbd_state_t* first_kbd_state; 
 #endif
 
 void KeyInput( void )
@@ -796,8 +797,6 @@ void KeyInput( void )
 		if(SDL_JoystickGetButton(joys, sdljbSquare)) pad |= PAD_BUTTON5;
 	}
 #elif defined(DREAMCAST)
-	int k;
-	
 	/* No need to check again if pointer exists. */
 	if (!cont)
 	{
@@ -829,54 +828,39 @@ void KeyInput( void )
 		state = (cont_state_t *)maple_dev_status(cont);
 		if (state->buttons & CONT_START)
             pad |= PAD_BUTTON3;
+		if (state->buttons & CONT_Y)
+			pad |= PAD_BUTTON1;
 		if (state->buttons & CONT_X)
-			pad |= PAD_BUTTON4;
+			pad |= PAD_BUTTON2;
 		if (state->buttons & CONT_A) 
             pad |= PAD_BUTTON1;
 		if (state->buttons & CONT_B) 
-           pad |= PAD_BUTTON2;
+			pad |= PAD_BUTTON2;
+           
 		if (state->buttons & CONT_DPAD_UP || state->joyy < -64) 
 			pad |= PAD_UP;
-		if (state->buttons & CONT_DPAD_DOWN || state->joyy > 64) 
+		else if (state->buttons & CONT_DPAD_DOWN || state->joyy > 64) 
            pad |= PAD_DOWN;
 		if (state->buttons & CONT_DPAD_LEFT || state->joyx < -64) 
            pad |= PAD_LEFT;
-		if (state->buttons & CONT_DPAD_RIGHT || state->joyx > 64) 
+		else if (state->buttons & CONT_DPAD_RIGHT || state->joyx > 64) 
            pad |= PAD_RIGHT;
 	}
 	
 	if (kbd)
 	{
-		while((k = kbd_get_key()) != -1)
-		{
-			switch(k)
-			{
-				// Key up
-				case 20992:
-					pad |= PAD_UP;
-				break;
-				//Key Down
-				case 20736:
-					pad |= PAD_DOWN;
-				break;
-				//Key LEFT
-				case 20480:
-					pad |= PAD_LEFT;
-				break;
-				//Key RIGHT
-				case 20224:
-					pad |= PAD_RIGHT;
-				break;
-				//Key SPACE
-				case 32:
-				case 120:
-					pad |= PAD_BUTTON1;
-				break;
-				case 99:
-					pad |= PAD_BUTTON2;
-				break;
-			}
-		}
+		first_kbd_state = (kbd_state_t *) maple_dev_status(kbd);
+	
+		if (first_kbd_state->matrix[KBD_KEY_UP]) pad |= PAD_UP;
+		else if (first_kbd_state->matrix[KBD_KEY_DOWN]) pad |= PAD_DOWN;
+		
+		if (first_kbd_state->matrix[KBD_KEY_LEFT]) pad |= PAD_LEFT;
+		else if (first_kbd_state->matrix[KBD_KEY_RIGHT]) pad |= PAD_RIGHT;
+		
+		if (first_kbd_state->matrix[KBD_KEY_SPACE] || first_kbd_state->matrix[KBD_KEY_X]) pad |= PAD_BUTTON1;
+		if (first_kbd_state->matrix[KBD_KEY_Z] || first_kbd_state->matrix[KBD_KEY_C]) pad |= PAD_BUTTON2;
+		
+		if (first_kbd_state->matrix[KBD_KEY_V] || first_kbd_state->matrix[KBD_KEY_ESCAPE]) pad |= PAD_BUTTON3;
 	}
 	
 	/*if(mouse)
@@ -1247,8 +1231,9 @@ void FPSWait( void )
 
 	//ÉTÉEÉìÉhÇÃêßå‰
 	soundPlayCtrl( );
-
+#ifndef DREAMCAST
 	SDL_PollEvent(&event);
+#endif
 /*
 	nowTick = SDL_GetTicks();
 	frame = (nowTick - prvTickCount) / INTERVAL_BASE;

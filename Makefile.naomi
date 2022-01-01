@@ -1,9 +1,9 @@
 CC = kos-cc
 SH_DIRECTORY=/opt/toolchains/dc/sh-elf/bin/
 
-CFLAGS  = -Ofast -flto -Wall -Wextra -DDREAMCAST
+CFLAGS  = -Ofast -flto -Wall -Wextra -DDREAMCAST -DNAOMI
 CXXFLAGS = $(CFLAGS)
-LDFLAGS = -lc -lm -lSDL -lz -s -flto
+LDFLAGS = -lc -lm -lSDL_naomi -lz -s -flto
 
 #CFLAGS  += -DOPUS_MUSIC
 #LDFLAGS += -lopusplay -lopusfile -logg -lopus
@@ -22,14 +22,14 @@ SOURCES = $(patsubst %.o, %.c, $(OBJS))
 all: gnp
 
 romdisk.img:
-	$(KOS_GENROMFS) -f romdisk.img -d ./cd -v
+	$(KOS_GENROMFS) -f romdisk.img -d ./rd -v
 
 romdisk.o: romdisk.img
 	$(KOS_BASE)/utils/bin2o/bin2o romdisk.img romdisk romdisk.o
 
 gnp: $(OBJS)
-	$(CC) -o $@ $(OBJS) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 	naomibintool build GNP_NAOMI.BIN -d "Gameblabla" -e $@
 
 clean:
-	rm $(OBJS)
+	rm $(OBJS) *.img

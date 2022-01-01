@@ -322,6 +322,11 @@ void act_main( void )
 	act_relese( );		// èIóπ
 }
 
+#ifdef DREAMCAST
+/* Yes; this mess is really required to avoid issues with music playback */
+static int32_t old = 0;
+#endif
+
 void act_init( void )
 {
 	Sint32 i;
@@ -337,6 +342,11 @@ void act_init( void )
 	sprintf(path_work, "save/work.sav");
 	sprintf(path_item, "save/item_wk.sav");
 #elif defined(DREAMCAST)
+	// If level is the same, then just pause
+	if (old == save_data[3])
+	{
+		Pause_Music();
+	}
 	sprintf(path_work, "/ram/work.sav");
 	sprintf(path_item, "/ram/item_wk.sav");
 #elif defined(RELATIVE_PATH)
@@ -398,12 +408,12 @@ void act_init( void )
 	ResetGameFlag2( );
 
 #ifdef DREAMCAST
-	Pause_Music();
 	DC_LoadVMU("gan_work.sav", path_work);
 	DC_LoadVMU("gan_item.sav", path_item);
 #endif
 
 	LoadGameFlag2(path_work);
+	
 	for ( i = 0; i < 400; i++ )
 	{
 		save_data[i] = gameflag2[i];
@@ -417,7 +427,6 @@ void act_init( void )
 	player[20] = 0;
 	player[21] = 32;
 	player[22] = 1;
-
 
 	ResetGameFlag2( );
 	sprintf(string,MAP_DATA_PATH "%d_%d.map", ( int )stage , ( int )1, ( int )d_num );
@@ -440,6 +449,92 @@ void act_init( void )
 		}
 		sn = 10;
 	}
+/* Yes, this ugly mess is to stop the Dreamcast (or rather the ADX driver) from crashing */
+#ifdef DREAMCAST
+	if ( gameflag[70] == 1 )
+	{
+		if (
+		     ( ( save_data[3] >  0 ) && ( save_data[3] <=  5 ) ) 
+		  || ( ( save_data[3] > 20 ) && ( save_data[3] <= 25 ) )
+		  || ( ( save_data[3] > 40 ) && ( save_data[3] <= 45 ) )
+		   )
+		{
+			Stop_Music();
+		}
+		else if (
+		     ( ( save_data[3] > 45 ) && ( save_data[3] <= 50 ) )
+		   )
+		{
+			Stop_Music();
+		}
+		if (
+		     ( ( save_data[3] >  5 ) && ( save_data[3] <= 10 ) ) 
+		  || ( ( save_data[3] > 25 ) && ( save_data[3] <= 30 ) )
+		  || ( ( save_data[3] > 35 ) && ( save_data[3] <= 40 ) )
+		   )
+		{
+			Stop_Music();
+		}
+		else if (
+		     ( ( save_data[3] > 10 ) && ( save_data[3] <= 15 ) ) 
+		  || ( ( save_data[3] > 30 ) && ( save_data[3] <= 35 ) )
+		   )
+		{
+			Stop_Music();
+		}
+		else if (
+		     ( ( save_data[3] > 15 ) && ( save_data[3] <= 20 ) ) 
+		  || ( ( save_data[3] > 35 ) && ( save_data[3] <= 40 ) )
+		   )
+		{
+			Stop_Music();
+		}
+		else
+		{
+			Pause_Music();
+		}
+	}
+	else 
+	{
+		if ( gameflag[71] == 0 )
+		{
+			if ( (save_data[3] ==  1) || (save_data[3] == 21) || (save_data[3] == 41 ))
+			{
+				Stop_Music();
+			}
+			else if (save_data[3] == 46)
+			{
+				Stop_Music();
+			}
+			else if (
+			     ( ( save_data[3] ==  6 ) ) 
+			  || ( ( save_data[3] == 26 ) )
+			   )
+			{
+				Stop_Music();
+			}
+			else if (
+			     ( ( save_data[3] == 11 ) ) 
+			  || ( ( save_data[3] == 31 ) )
+			   )
+			{
+				Stop_Music();
+			}
+			else if (
+			     ( ( save_data[3] == 16 ) ) 
+			  || ( ( save_data[3] == 36 ) )
+			   )
+			{
+				Stop_Music();
+			}
+			else
+			{
+				Pause_Music();
+			}
+		}
+	}
+	old = save_data[3];
+#endif
 	
 	for ( i = 0 ; i < 20 ; i++ )
 	{
@@ -506,6 +601,7 @@ void act_init( void )
 		}
 	}
 	
+
 	player[14] = 10;
 	player[15] = player[0];
 	player[16] = player[1];
@@ -630,7 +726,7 @@ void act_init( void )
 		{
 			soundPlayBgm( EN_BGM_GAME02 );
 		}
-		if (
+		else if (
 		     ( ( save_data[3] > 45 ) && ( save_data[3] <= 50 ) )
 		   )
 		{
@@ -651,14 +747,14 @@ void act_init( void )
 		{
 			soundPlayBgm( EN_BGM_GAME03 );
 		}
-		if (
+		else if (
 		     ( ( save_data[3] > 10 ) && ( save_data[3] <= 15 ) ) 
 		  || ( ( save_data[3] > 30 ) && ( save_data[3] <= 35 ) )
 		   )
 		{
 			soundPlayBgm( EN_BGM_GAME04 );
 		}
-		if (
+		else if (
 		     ( ( save_data[3] > 15 ) && ( save_data[3] <= 20 ) ) 
 		  || ( ( save_data[3] > 35 ) && ( save_data[3] <= 40 ) )
 		   )
@@ -674,7 +770,7 @@ void act_init( void )
 			{
 				soundPlayBgm( EN_BGM_GAME02 );
 			}
-			if (save_data[3] == 46)
+			else if (save_data[3] == 46)
 			{
 				if ( stage == 2 )
 				{
@@ -685,21 +781,21 @@ void act_init( void )
 					soundPlayBgm( EN_BGM_GAME06 );
 				}
 			}
-			if (
+			else if (
 			     ( ( save_data[3] ==  6 ) ) 
 			  || ( ( save_data[3] == 26 ) )
 			   )
 			{
 				soundPlayBgm( EN_BGM_GAME03 );
 			}
-			if (
+			else if (
 			     ( ( save_data[3] == 11 ) ) 
 			  || ( ( save_data[3] == 31 ) )
 			   )
 			{
 				soundPlayBgm( EN_BGM_GAME04 );
 			}
-			if (
+			else if (
 			     ( ( save_data[3] == 16 ) ) 
 			  || ( ( save_data[3] == 36 ) )
 			   )
@@ -708,10 +804,8 @@ void act_init( void )
 			}
 		}
 	}
-
 	gameflag[71] = 0;
 	gameflag[70] = 0;
-	
 #ifdef DREAMCAST
 	Resume_Music();
 #endif

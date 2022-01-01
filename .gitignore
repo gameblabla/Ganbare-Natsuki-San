@@ -43,3 +43,4 @@ cd/*.BIN
 *.data
 IP.BIN
 *.iso
+*.7z
