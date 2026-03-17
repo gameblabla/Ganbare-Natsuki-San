@@ -2,10 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SDL.h>
 #include "define.h"
 #include "function.h"
-#include "util_snd.h"
+#include "audio/audio.h"
 #include "extern.h"
 #include "logo.h" 
 
@@ -33,7 +32,7 @@ void logo_main( void )
 		logo_keys( );	
 		logo_drow( );		
 		
-		RefreshScreen( g_screen );
+		RefreshScreen(NULL);
 		FPSWait( );	
 
 		exit_code = system_keys( ); 

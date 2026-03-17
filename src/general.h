@@ -1,7 +1,13 @@
 #ifndef	_GENERAL_
 #define _GENERAL_
 
+#include "define.h"
+
+#ifdef SDL_AVAILABLE
 #include <SDL.h>
+#else
+#include <stdint.h>
+#endif
 
 enum
 {
@@ -53,10 +59,10 @@ enum
 
 typedef union REG32{
 	struct{
-		Uint16 low;
-		Uint16 high;
+		uint16_t low;
+		uint16_t high;
 	}half;
-	Uint32 full;
+	uint32_t full;
 }REG32;
 
 #include <stdio.h>

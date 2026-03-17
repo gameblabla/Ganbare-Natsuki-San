@@ -3,73 +3,24 @@
 #include <unistd.h>
 #include <time.h>
 
-#include <SDL.h>
-#ifndef NOSOUND
-#include <SDL_mixer.h>
-#endif
 #include "define.h"
 #include "function.h"
 #include "extern.h"
-#include "util_snd.h"
-#include "general.h"
+#include "audio/audio.h"
 #include "dconv.h"
-
-#if defined(DREAMCAST)
-	#include <kos.h>
-#endif
-
-enum Joystick_SDL SDLJoyBtn;
+#include "filesystem/filesystem.h"
+#include "renderer/renderer.h"
+#include "input/input.h"
 
 void FunctionInit( void );
 void ResetGameFlag( void );
 void ResetGameFlag2( void );
-int LoadGameFlag( char *fn );
-int SaveGameFlag( char *fn );
-int LoadGameFlag2( char *fn );
-int SaveGameFlag2( char *fn );
-int SaveFile( char *fn, Sint32 *buff, Sint32 size );
-int LoadFile( char *fn, Sint32 *buff, Sint32 size );
 
 /* Unused - Gameblabla */
 /*
 Sint32 GetConfig( char* fn, char* cParam );
 Sint32 LogFileWrite( char* fn, char* cParam );
 */
-
-Sint32 LoadBitmap( char *fname , int bmpindex, int flag );
-void ReleaseBitmap( int bmpindex );
-void BltRect(int bmpindex, int srcX, int srcY, int dstX, int dstY, int width, int height);
-void Blt( int bmpindex, int dstX, int dstY );
-void ClearSecondary( void );
-void BltNumericImage( Sint32 value, Sint32 length, Sint32 x, Sint32 y, Sint32 plane, Sint32 num_stpos_x, Sint32 num_stpos_y, Sint32 num_width, Sint32 num_height );
-void BltNumericImage2( Sint32 value, Sint32 length, Sint32 x, Sint32 y, Sint32 plane, Sint32 num_stpos_x, Sint32 num_stpos_y, Sint32 num_width, Sint32 num_height );
-Sint32 get2keta( Sint32 val, Sint32 st );
-void SetGscreenPalette( SDL_Surface *surface );
-
-/* Unused, SetGscreenPalette gets used instead. Oh and the name of the function itself can conflict with some libraries- gameblabla */
-//void SetPalette(int getbmpindex, int setbmpindex);
-
-
-// Also unused.
-/*
-void CreateSurface( int bmpindex, int size_x, int size_y  );
-void SwapToSecondary( int bmpindex );
-void SaveBmp( int bmpindex, char *fn );
-*/
-
-void drawGRPline(Sint32 x1, Sint32 y1, Sint32 x2, Sint32 y2, Uint32 color);
-void pointSDLsurface( Sint32 px, Sint32 py, Uint32 color);
-void putSDLpixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
-
-int IsPushKey( int keycode );
-int IsPressKey( int keycode );
-void KeyInit( void );
-void KeyInput( void );
-int initPAD(void);
-void closePAD(void);
-int getPAD(void);
-int IsPushOKKey( void );
-int IsPushCancelKey( void );
 
 void FPSWait( void );
 int system_keys( void );
@@ -83,38 +34,13 @@ Sint32 funcSin( Sint32 rdo );
 Sint32 funcCos( Sint32 rdo );
 Sint32 funcTan2( Sint32 posX, Sint32 posY );
 
-// ƒL[æ“¾—p
-static int key_eventPress[GP2X_BUTTON_MAX];
-static int key_eventPress_old[GP2X_BUTTON_MAX];
-static int key_eventPush[GP2X_BUTTON_MAX];
-static int	pad_type;
-#ifdef SDL_JOYSTICK
-static int	pads;
-static int	trgs;
-static int	reps;
-static SDL_Joystick *joys;
-#endif
-static Uint8 *keys;
-
-//static int pads_old;
-// ‰æ‘œ•\¦—p
-static SDL_Surface* bitmap[BMPBUFF_MAX];
-//static SDL_Surface* g_surface_bakup;
-// ’èˆ——p
+// å¾…ã¡æ™‚é–“ç”¨
 static Uint32 prvTickCount;
 static Uint32 nowTick;
 //static int frame;
 
-#ifdef GP2X
 #define INTERVAL_BASE 16
-#else
-#define INTERVAL_BASE 16
-#endif
 
-static SDL_Event event;
-
-// ‰¹ŠyÄ¶
-static Sint32 sound_vol;
 
 void FunctionInit( void )
 {
@@ -122,11 +48,7 @@ void FunctionInit( void )
 	
 	prvTickCount = 0;
 	
-	for ( i = 0; i < BMPBUFF_MAX; i++ )
-	{
-		bitmap[i] = NULL;
-	}
-	KeyInit( );
+	initPAD( );
 	soundInitBuffer();
 
 }
@@ -135,316 +57,10 @@ void ResetGameFlag( void )
 {
 	memset( &gameflag[0], 0, sizeof( gameflag ) );
 }
-int LoadGameFlag( char *fn )
-{
-	int rc = 0;
-#ifdef SDLFILE
-	SDL_RWops *rw = SDL_RWFromFile(fn, "rb");
-	if (!rw)
-	{
-		rc = -1;
-	}
-	else 
-	{
-		SDL_RWread(rw, &gameflag[0], sizeof( gameflag ), 1);
-		SDL_RWclose(rw);
-	}
-#else
-	FILE *fp;
-#ifdef _TINSPIRE
-	char buf[192];
-	snprintf(buf, sizeof(buf), "%s.tns", fn);
-	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
-#else	
-	if ( ( fp = fopen( fn, "rb" ) ) == NULL )
-#endif
-	{
-		printf("file open error!! %s\n", fn);
-		rc = -1;	
-	}
-	else 
-	{
-		fread( &gameflag[0], 1, sizeof( gameflag ), fp );
-		fclose( fp );
-#ifdef GP2X
-		sync( );
-#endif
-	}
-#endif
-	
-	return ( rc );
-}
-int SaveGameFlag( char *fn )
-{
-	int rc = 0;
-#ifdef SDLFILE
-	SDL_RWops *rw = SDL_RWFromFile(fn, "wb");
-	if (!rw)
-	{
-		rc = -1;
-	}
-	else 
-	{
-		SDL_RWwrite(rw, &gameflag[0], 1, sizeof( gameflag ));
-		SDL_RWclose(rw);
-	}
-#else
-	FILE *fp;
-#ifdef _TINSPIRE
-	char buf[255];
-	snprintf(buf, sizeof(buf), "%s.tns", fn);
-	
-	if (strcmp(fn,"save/config")==0)
-	{
-		if ( ( fp = fopen( "save/config.tns", "wb" ) ) == NULL )
-		{
-			printf("file open error!! %s\n", fn);
-			rc = -1;
-		}
-		else 
-		{
-			fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
-			fclose( fp );
-		}
-	}
-	else
-	{
-		if ( ( fp = fopen( buf, "wb" ) ) == NULL )
-		{
-			printf("file open error!! %s\n", fn);
-			rc = -1;
-		}
-		else 
-		{
-			fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
-			fclose( fp );
-		}
-	}
-	
-#else
-	if ( ( fp = fopen( fn, "wb" ) ) == NULL )
-	{
-		printf("file open error!! %s\n", fn);
-		rc = -1;
-	}
-	else 
-	{
-		fwrite( &gameflag[0], 1, sizeof( gameflag ), fp );
-		fclose( fp );
-#ifdef GP2X
-		sync( );
-#endif
-	}
-	
-#endif
-
-#endif
-	
-	return ( rc );
-}
 
 void ResetGameFlag2( void )
 {
 	memset( &gameflag2[0], 0, sizeof( gameflag ) );
-}
-
-int LoadGameFlag2( char *fn )
-{
-	int rc = 0;
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN || defined(MSB_FIRST)
-	int32_t tmp, i;
-#endif
-
-#ifdef SDLFILE
-	SDL_RWops *rw = SDL_RWFromFile(fn, "rb");
-	if (!rw)
-	{
-		rc = -1;
-	}
-	else 
-	{
-		SDL_RWread(rw, &gameflag2[0], sizeof( gameflag ), 1);
-		SDL_RWclose(rw);
-	}
-#else
-	FILE *fp;
-
-#ifdef _TINSPIRE
-	char buf[127];
-	snprintf(buf, sizeof(buf), "%s.tns", fn);
-	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
-#else
-	if ( ( fp = fopen( fn, "rb" ) ) == NULL )
-#endif
-	{
-		printf("file open error!! %s\n", fn);
-		rc = -1;	
-	}
-	else 
-	{
-		printf("Fopen %s was a sucess\n", fn);
-		fread( &gameflag2[0], 1, sizeof( gameflag ), fp ); 
-		fclose( fp );	
-#ifdef GP2X
-		sync( );
-#endif
-	}
-#endif
-	
-	#if SDL_BYTEORDER == SDL_BIG_ENDIAN || defined(MSB_FIRST)
-	for(i=0;i<GAMEFLAG_SIZE;i++)
-	{
-		tmp = gameflag2[i];
-		gameflag2[i] = __builtin_bswap32(tmp);
-	}
-	#endif
-	
-	return ( rc );
-}
-
-int SaveGameFlag2( char *fn )
-{
-	int rc = 0;
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN || defined(MSB_FIRST)
-	Sint32 bgameflag2[GAMEFLAG_SIZE], i;
-#endif
-
-#ifdef SDLFILE
-	SDL_RWops *rw = SDL_RWFromFile(fn, "wb");
-	if (!rw)
-	{
-		printf("file open error!! %s\n", fn);
-		rc = -1;
-	}
-	else 
-	{
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN || defined(MSB_FIRST)
-		memcpy(bgameflag2, gameflag2, sizeof(bgameflag2));
-		for(i=0;i<GAMEFLAG_SIZE;i++)
-		{
-			bgameflag2[i] = __builtin_bswap32(gameflag2[i]);
-		}
-		SDL_RWwrite(rw, &bgameflag2[0], 1, sizeof(gameflag));
-#else
-		SDL_RWwrite(rw, &gameflag2[0], 1, sizeof(gameflag));
-#endif
-		SDL_RWclose(rw);
-	}
-#else
-	FILE *fp;
-#ifdef _TINSPIRE
-	char buf[127];
-	snprintf(buf, sizeof(buf), "%s.tns", fn);
-	if ( ( fp = fopen( buf, "wb" ) ) == NULL )
-#else
-	if ( ( fp = fopen( fn, "wb" ) ) == NULL )
-#endif
-	{
-		printf("file open error!! %s\n", fn);
-		rc = -1;
-	}
-	else 
-	{
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN || defined(MSB_FIRST)
-		memcpy(bgameflag2, gameflag2, sizeof(bgameflag2));
-		for(i=0;i<GAMEFLAG_SIZE;i++)
-		{
-			bgameflag2[i] = __builtin_bswap32(gameflag2[i]);
-		}
-		fwrite( &bgameflag2[0], 1, sizeof( gameflag ), fp ); 
-#else
-		fwrite( &gameflag2[0], 1, sizeof( gameflag ), fp ); 
-#endif
-		fclose( fp );
-#ifdef GP2X
-		sync( );
-#endif
-	}
-#endif
-	
-	return ( rc );
-}
-int SaveFile( char *fn, Sint32 *buff, Sint32 size )
-{
-	int rc = 0;
-#ifdef SDLFILE
-	SDL_RWops *rw = SDL_RWFromFile(fn, "wb");
-	if (!rw)
-	{
-		printf("file open error!! %s\n", fn);
-		rc = -1;
-	}
-	else 
-	{
-		SDL_RWwrite(rw, buff, 1,size);
-		SDL_RWclose(rw);
-	}
-#else
-	FILE *fp;	
-
-#ifdef _TINSPIRE
-	char buf[127];
-	snprintf(buf, sizeof(buf), "%s.tns", fn);
-	if ( ( fp = fopen( buf, "wb" ) ) == NULL )
-#else
-	if ( ( fp = fopen( fn, "wb" ) ) == NULL )
-#endif
-	{
-		printf("file open error!! %s\n", fn);
-		rc = -1;
-	}
-	else 
-	{
-		fwrite( buff, 1, size, fp ); 
-		fclose( fp );
-#ifdef GP2X
-		sync( );
-#endif
-	}
-#endif
-
-	return ( rc );
-}
-int LoadFile( char *fn, Sint32 *buff, Sint32 size )
-{
-	int rc = 0;
-#ifdef SDLFILE
-	SDL_RWops *rw = SDL_RWFromFile(fn, "rb");
-	if (!rw)
-	{
-		printf("file open error!! %s\n", fn);
-		rc = -1;
-	}
-	else 
-	{
-		SDL_RWread(rw, buff, size, 1);
-		SDL_RWclose(rw);
-	}
-#else
-	FILE *fp;	
-	
-#ifdef _TINSPIRE
-	char buf[127];
-	snprintf(buf, sizeof(buf), "%s.tns", fn);
-	if ( ( fp = fopen( buf, "rb" ) ) == NULL )
-#else
-	if ( ( fp = fopen( fn, "rb" ) ) == NULL )
-#endif
-	{
-		printf("file open error!! %s\n", fn);
-		rc = -1;
-	}
-	else 
-	{
-		fread( buff, 1, size, fp ); 
-		fclose( fp );
-#ifdef GP2X
-		sync( );
-#endif
-	}
-#endif
-	
-	return ( rc );
 }
 
 /* These two are unused */
@@ -533,735 +149,39 @@ int LoadFile( char *fn, Sint32 *buff, Sint32 size )
 }*/
 
 
-Sint32 LoadBitmap( char *fname , int bmpindex, int flag )
-{
-	Sint32 rc;
-	SDL_Surface* tmp;
-	char filename[128];
-
-	memset( &filename[0], '\0', sizeof( filename ) );
-	rc = 0;
-	
-	ReleaseBitmap( bmpindex );
-
-#ifdef _TINSPIRE
-	char buf[128];
-	snprintf(buf, sizeof(buf), "%s.tns", fname);
-	tmp = SDL_LoadBMP( buf );
-#else
-	tmp = SDL_LoadBMP( fname );
-#endif
-	
-	if (tmp)
-	{
-		if (flag != 0) SDL_SetColorKey(tmp, (SDL_SRCCOLORKEY|SDL_RLEACCEL), SDL_MapRGB(tmp->format,16,99,62) );
-		bitmap[bmpindex] = SDL_DisplayFormat(tmp);
-		SDL_FreeSurface(tmp);
-	}
-	else 
-	{
-		rc = -1;
-	}
-
-
-	return ( rc );
-}
-
-void ReleaseBitmap( int bmpindex )
-{
-	if ( bitmap[bmpindex] != NULL )
-	{
-		SDL_FreeSurface(bitmap[bmpindex]);
-		bitmap[bmpindex] = NULL;
-	}
-}
-
-void BltRect( int bmpindex, int dstX, int dstY, int srcX, int srcY, int width, int height)
-{
-	SDL_Rect srcRect;
-	SDL_Rect dstRect;
-	srcRect.x = srcX;
-	srcRect.y = srcY;
-	srcRect.w = width;
-	srcRect.h = height;
-	dstRect.x = dstX;
-	dstRect.y = dstY;
-	dstRect.w = width;
-	dstRect.h = height;
-
-	if(bitmap[bmpindex])
-	{
-		SDL_BlitSurface(bitmap[bmpindex], &srcRect, g_screen, &dstRect);
-	}
-}
-
-void Blt( int bmpindex, int dstX, int dstY )
-{
-	SDL_Rect dstRect;
-	dstRect.x = dstX;
-	dstRect.y = dstY;
-	dstRect.w = 0;
-	dstRect.h = 0;
-
-	if(bitmap[bmpindex])
-	{
-		SDL_BlitSurface(bitmap[bmpindex], NULL, g_screen, &dstRect);
-	}
-}
-
-void SetGscreenPalette( SDL_Surface *surface )
-{
-    Uint8 bpp;
-    if(surface)
-    {
-	    bpp = surface->format->BytesPerPixel;
-		if(bpp <= 1)
-		{
-			#ifdef SCALING
-			extern SDL_Surface* real_screen;
-			SDL_SetPalette(real_screen, SDL_LOGPAL|SDL_PHYSPAL, surface->format->palette->colors, 0, 256);
-			SDL_SetPalette(g_screen, SDL_LOGPAL|SDL_PHYSPAL, surface->format->palette->colors, 0, 256);
-			#else
-			SDL_SetPalette(g_screen, SDL_LOGPAL|SDL_PHYSPAL, surface->format->palette->colors, 0, 256);
-			#endif
-		}
-	}
-}
-
-/* Unused, the previous function is used instead. - Gameblabla */
-/*
-void SetPalette(int getbmpindex, int setbmpindex)
-{
-	SDL_Surface *surface;
-    Uint8 bpp;
-	SDL_Palette *pal;
-
-	surface = bitmap[getbmpindex];
-    if(surface)
-    {
-	    bpp = surface->format->BytesPerPixel;
-		if(bpp <= 8)
-		{
-			pal = surface->format->palette;
-			if(pal)
-			{
-				SDL_SetPalette(bitmap[setbmpindex], SDL_LOGPAL|SDL_PHYSPAL, pal->colors, 0, 256);
-			}
-		}
-	}
-}
-*/
-
-/* These are apparently never used. */
-/*
-void SaveBmp( int bmpindex, char *fn )
-{
-	if ( bmpindex >= 0 )
-	{
-		SDL_SaveBMP(bitmap[bmpindex], fn);
-	}
-	else 
-	{
-		SDL_SaveBMP(g_screen, fn);
-	}
-}
-
-void CreateSurface( int bmpindex, int size_x, int size_y  )
-{
-	SDL_Surface* tmp;
-    Uint32 rmask, gmask, bmask, amask;
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    rmask = 0xff000000;
-    gmask = 0x00ff0000;
-    bmask = 0x0000ff00;
-    amask = 0x000000ff;
-#else
-    rmask = 0x000000ff;
-    gmask = 0x0000ff00;
-    bmask = 0x00ff0000;
-    amask = 0xff000000;
-#endif
-
-	ReleaseBitmap( bmpindex );
-	tmp = SDL_CreateRGBSurface( SDL_SWSURFACE, size_x, size_y, 0, rmask, gmask, bmask, amask );
-	if(tmp)
-	{
-		bitmap[bmpindex] = SDL_DisplayFormat(tmp);
-		SDL_FreeSurface(tmp);
-	}
-}
-
-void SwapToSecondary( int bmpindex )
-{
-	if ( g_surface_bakup != NULL )
-	{
-		g_screen = g_surface_bakup;
-		g_surface_bakup = NULL;
-	}
-	else 
-	{
-		g_surface_bakup = g_screen;
-		g_screen = bitmap[bmpindex];
-	}
-}
-*/
-
-void ClearSecondary( void )
-{
-	SDL_Rect rect;
-
-	rect.x = 0;
-	rect.y = 0;
-	rect.w = DISPLY_WIDTH;
-	rect.h = DISPLY_HEIGHT;
-	
-	
-	SDL_FillRect(g_screen, &rect, SDL_MapRGBA(g_screen->format,0,0,0,255));
-}
-
-void KeyInit( void )
-{
-	int i;
-	
-	sound_vol = 128;
-	 
-	for ( i = 0; i < GP2X_BUTTON_MAX; i++ )
-	{
-		key_eventPress[i] = 0;
-		key_eventPress_old[i] = 0;
-		key_eventPush[i] = 0;
-	}
-
-	initPAD( );
-}
-
-int initPAD(void)
-{
-#ifdef SDL_JOYSTICK
-	if(SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0){
-		return 0;
-    }
-
-	if(SDL_NumJoysticks() > 0)
-	{
-		joys = SDL_JoystickOpen(0);
-		SDL_JoystickEventState(SDL_ENABLE);
-	}
-	else
-	{
-		joys = NULL;
-	}
-
-	pad_type = 0;
-	trgs = 0;
-	reps = 0;
-#endif
-	return 1;
-}
-
-void closePAD(void)
-{
-#ifdef SDL_JOYSTICK
-	if(SDL_JoystickOpened(0))
-		SDL_JoystickClose(joys);
-#endif
-}
-
-#ifdef DREAMCAST
-/*mouse_state_t *mstate;*/	
-/*unsigned int mouse_x = 0, mouse_y = 0, mouse_x_count = 0, mouse_y_count = 0;*/
-maple_device_t *cont, *kbd/*,  *mouse*/;
-cont_state_t *state;
-kbd_state_t* first_kbd_state; 
-#endif
-
-void KeyInput( void )
-{
-	int i;
-	int pad = 0;
-#ifdef PSPUMODE
-	keys = SDL_GetKeyState(NULL);
-
-	if(joys){
-		int x = 0, y = 0;
-		x = SDL_JoystickGetAxis(joys, 0);
-		y = SDL_JoystickGetAxis(joys, 1);
-
-		if(SDL_JoystickGetButton(joys,  sdljbUp) || y < -JOYSTICK_AXIS) pad |= PAD_UP;
-		if(SDL_JoystickGetButton(joys,  sdljbLeft) || x < -JOYSTICK_AXIS) pad |= PAD_LEFT;
-		if(SDL_JoystickGetButton(joys,  sdljbDown) || y > JOYSTICK_AXIS) pad |= PAD_DOWN;
-		if(SDL_JoystickGetButton(joys,  sdljbRight) || x > JOYSTICK_AXIS) pad |= PAD_RIGHT;
-		if(SDL_JoystickGetButton(joys, sdljbCross)) pad |= PAD_BUTTON1;
-		if(SDL_JoystickGetButton(joys, sdljbCircle)) pad |= PAD_BUTTON2;
-		if(SDL_JoystickGetButton(joys, sdljbTriangle)) pad |= PAD_BUTTON3;
-		if(SDL_JoystickGetButton(joys, sdljbSquare)) pad |= PAD_BUTTON5;
-	}
-#elif defined(DREAMCAST)
-	/* No need to check again if pointer exists. */
-	if (!cont)
-	{
-		for(i=0;i<4;i++)
-		{
-			cont = maple_enum_type(i, MAPLE_FUNC_CONTROLLER);
-			if (cont) break;
-		}
-	}
-	if (!kbd)
-	{
-		for(i=0;i<4;i++)
-		{
-			kbd = maple_enum_type(i, MAPLE_FUNC_KEYBOARD);
-			if (kbd) break;
-		}
-	}
-	/*if (!mouse)
-	{
-		for(i=0;i<4;i++)
-		{
-			mouse = maple_enum_type(i, MAPLE_FUNC_MOUSE);
-			if (mouse) break;
-		}
-	}*/
-	
-	if(cont)
-	{
-		state = (cont_state_t *)maple_dev_status(cont);
-		if (state->buttons & CONT_START)
-            pad |= PAD_BUTTON3;
-		if (state->buttons & CONT_Y)
-			pad |= PAD_BUTTON1;
-		if (state->buttons & CONT_X)
-			pad |= PAD_BUTTON2;
-		if (state->buttons & CONT_A) 
-            pad |= PAD_BUTTON1;
-		if (state->buttons & CONT_B) 
-			pad |= PAD_BUTTON2;
-           
-		if (state->buttons & CONT_DPAD_UP || state->joyy < -64) 
-			pad |= PAD_UP;
-		else if (state->buttons & CONT_DPAD_DOWN || state->joyy > 64) 
-           pad |= PAD_DOWN;
-		if (state->buttons & CONT_DPAD_LEFT || state->joyx < -64) 
-           pad |= PAD_LEFT;
-		else if (state->buttons & CONT_DPAD_RIGHT || state->joyx > 64) 
-           pad |= PAD_RIGHT;
-	}
-	
-	if (kbd)
-	{
-		first_kbd_state = (kbd_state_t *) maple_dev_status(kbd);
-	
-		if (first_kbd_state->matrix[KBD_KEY_UP]) pad |= PAD_UP;
-		else if (first_kbd_state->matrix[KBD_KEY_DOWN]) pad |= PAD_DOWN;
-		
-		if (first_kbd_state->matrix[KBD_KEY_LEFT]) pad |= PAD_LEFT;
-		else if (first_kbd_state->matrix[KBD_KEY_RIGHT]) pad |= PAD_RIGHT;
-		
-		if (first_kbd_state->matrix[KBD_KEY_SPACE] || first_kbd_state->matrix[KBD_KEY_X]) pad |= PAD_BUTTON1;
-		if (first_kbd_state->matrix[KBD_KEY_Z] || first_kbd_state->matrix[KBD_KEY_C]) pad |= PAD_BUTTON2;
-		
-		if (first_kbd_state->matrix[KBD_KEY_V] || first_kbd_state->matrix[KBD_KEY_ESCAPE]) pad |= PAD_BUTTON3;
-	}
-	
-	/*if(mouse)
-	{
-        mstate = (mouse_state_t *)maple_dev_status(mouse);
-        if (mstate)
-        {
-			if (mstate->dx < -1) mouse_x = 1; 
-			else if (mstate->dx > 1) mouse_x = 2; 
-			if (mstate->dy < -1) mouse_y = 1; 
-			else if (mstate->dy > 1) mouse_y = 2; 
-			
-			if (mouse_x > 0)
-			{
-				if (mouse_x == 1) pad |= PAD_LEFT;
-				else if (mouse_x == 2) pad |= PAD_RIGHT;
-				mouse_x_count++;
-				if (mouse_x_count > 5)
-				{
-					mouse_x_count = 0;
-					mouse_x = 0;
-				}
-			}
-			
-			if (mouse_y > 0)
-			{
-				if (mouse_y == 1) pad |= PAD_UP;
-				else if (mouse_y == 2) pad |= PAD_DOWN;
-				mouse_y_count++;
-				if (mouse_y_count > 5)
-				{
-					mouse_y_count = 0;
-					mouse_y = 0;
-				}
-			}
-			if (mstate->buttons & MOUSE_LEFTBUTTON) pad |= PAD_BUTTON1;
-			if (mstate->buttons & MOUSE_RIGHTBUTTON) pad |= PAD_BUTTON2;
-		}
-	}*/
-	
-#else
-	#ifdef SDL_JOYSTICK
-	int	btn1 = 0, btn2 = 0, btn3 = 0, btn4 = 0, btn5 = 0, btn6 = 0, btn7 = 0, btn8 = 0, btn9 = 0, btnA = 0;
-	#endif
-
-#ifdef SDL_JOYSTICK
-	int x, y;
-	if(joys){
-		x = SDL_JoystickGetAxis(joys, 0);
-		y = SDL_JoystickGetAxis(joys, 1);
-	}
-#endif
-
-	keys = SDL_GetKeyState(NULL);
-
-	if(pad_type == 0)
-	{
-		if(keys[SDLK_RIGHT] == SDL_PRESSED || keys[SDLK_KP6] == SDL_PRESSED
-		#ifdef SDL_JOYSTICK
-		 || x > JOYSTICK_AXIS
-		#endif
-		){
-			pad |= PAD_RIGHT;
-		}
-		if(keys[SDLK_LEFT] == SDL_PRESSED || keys[SDLK_KP4] == SDL_PRESSED
-		#ifdef SDL_JOYSTICK
-		|| x < -JOYSTICK_AXIS
-		#endif
-		){
-			pad |= PAD_LEFT;
-		}
-		if(keys[SDLK_DOWN] == SDL_PRESSED || keys[SDLK_KP2] == SDL_PRESSED
-		#ifdef SDL_JOYSTICK
-		|| y > JOYSTICK_AXIS
-		#endif
-		){
-			pad |= PAD_DOWN;
-		}
-		if(keys[SDLK_UP] == SDL_PRESSED || keys[SDLK_KP8] == SDL_PRESSED
-		#ifdef SDL_JOYSTICK
-		|| y < -JOYSTICK_AXIS
-		#endif
-		){
-			pad |= PAD_UP;
-		}
-	}
-	else if(pad_type == 1)
-	{
-		if(keys[SDLK_d] == SDL_PRESSED || keys[SDLK_KP6] == SDL_PRESSED
-		#ifdef SDL_JOYSTICK
-		|| x > JOYSTICK_AXIS
-		#endif
-		){
-			pad |= PAD_RIGHT;
-		}
-		if(keys[SDLK_a] == SDL_PRESSED || keys[SDLK_KP4] == SDL_PRESSED
-		#ifdef SDL_JOYSTICK
-		|| x < -JOYSTICK_AXIS
-		#endif
-		){
-			pad |= PAD_LEFT;
-		}
-		if(keys[SDLK_s] == SDL_PRESSED || keys[SDLK_KP2] == SDL_PRESSED
-		#ifdef SDL_JOYSTICK
-		|| y > JOYSTICK_AXIS
-		#endif
-		){
-			pad |= PAD_DOWN;
-		}
-		if(keys[SDLK_w] == SDL_PRESSED || keys[SDLK_KP8] == SDL_PRESSED
-		#ifdef SDL_JOYSTICK
-		|| y < -JOYSTICK_AXIS
-		#endif
-		){
-			pad |= PAD_UP;
-		}
-	}
-
-#ifdef SDL_JOYSTICK
-	if(joys){
-		btn1 = SDL_JoystickGetButton(joys, 0);
-		btn2 = SDL_JoystickGetButton(joys, 1);
-		btn3 = SDL_JoystickGetButton(joys, 2);
-		btn4 = SDL_JoystickGetButton(joys, 3);
-		btn5 = SDL_JoystickGetButton(joys, 4);
-		btn6 = SDL_JoystickGetButton(joys, 5);
-		btn7 = SDL_JoystickGetButton(joys, 6);
-		btn8 = SDL_JoystickGetButton(joys, 7);
-		btn9 = SDL_JoystickGetButton(joys, 8);
-		btnA = SDL_JoystickGetButton(joys, 9);
-	}
-#endif	
-	if(pad_type == 0)
-	{
-		if(keys[SDLK_LCTRL] == SDL_PRESSED
-		|| keys[SDLK_x] == SDL_PRESSED
-#ifdef SDL_JOYSTICK
-		 || btn1
-#endif
-		 ){
-			pad |= PAD_BUTTON1;
-		}
-#ifdef _TINSPIRE
-		if(keys[SDLK_LSHIFT] == SDL_PRESSED){
-#else
-		if(keys[SDLK_LALT] == SDL_PRESSED
-		|| keys[SDLK_SPACE] == SDL_PRESSED
-		|| keys[SDLK_c] == SDL_PRESSED
-#ifdef SDL_JOYSTICK
-		 || btn2
-#endif
-		){
-#endif
-			pad |= PAD_BUTTON2;
-		}
-		if(keys[SDLK_RETURN] == SDL_PRESSED
-		#ifdef SDL_JOYSTICK
-		|| btn3
-		#endif
-		){
-			pad |= PAD_BUTTON3;
-		}
-	}
-	else if(pad_type == 1)
-	{
-		if(keys[SDLK_BACKSLASH] == SDL_PRESSED
-#ifdef SDL_JOYSTICK
-		 || btn1
-#endif
-		){
-			pad |= PAD_BUTTON1;
-		}
-		if(keys[SDLK_RSHIFT] == SDL_PRESSED
-#ifdef SDL_JOYSTICK
-		 || btn2
-#endif
-		){
-			pad |= PAD_BUTTON2;
-		}
-		if(keys[SDLK_p] == SDL_PRESSED
-		#ifdef SDL_JOYSTICK
-		|| btn3
-		#endif
-		){
-			pad |= PAD_BUTTON3;
-		}
-	}
-
-	if(keys[SDLK_F1] == SDL_PRESSED
-		#ifdef SDL_JOYSTICK
-		|| btn7
-		#endif
-	){
-		pad |= PAD_BUTTON7;
-	}
-	if(keys[SDLK_F2] == SDL_PRESSED
-#ifdef SDL_JOYSTICK
-		 || btn8
-#endif
-	){
-		pad |= PAD_BUTTON8;
-	}
-	
-#ifdef SDL_JOYSTICK
-	if(btn4){
-		pad |= PAD_BUTTON4;
-	}
-	if(btn5){
-		pad |= PAD_BUTTON5;
-	}
-	if(btn6){
-		pad |= PAD_BUTTON6;
-	}
-	if(btn9){
-		pad |= PAD_BUTTON9;
-	}
-	if(btnA){
-		pad |= PAD_BUTTONA;
-	}
-#endif
-	
-#endif
-
-	for ( i = 0; i < GP2X_BUTTON_MAX; i++ )
-	{
-		key_eventPress[i] = 0;
-	}
-	
-	if ( pad & PAD_UP )
-	{
-		key_eventPress[GP2X_BUTTON_UP] = 1;
-	}
-	if ( pad & PAD_DOWN )
-	{
-		key_eventPress[GP2X_BUTTON_DOWN] = 1;
-	}
-	if ( pad & PAD_LEFT )
-	{
-		key_eventPress[GP2X_BUTTON_LEFT] = 1;
-	}
-	if ( pad & PAD_RIGHT )
-	{
-		key_eventPress[GP2X_BUTTON_RIGHT] = 1;
-	}
-	if ( pad & PAD_BUTTON1 )
-	{
-		key_eventPress[GP2X_BUTTON_A] = 1;
-	}
-	if ( pad & PAD_BUTTON2 )
-	{
-		key_eventPress[GP2X_BUTTON_X] = 1;
-	}
-	if ( pad & PAD_BUTTON3 )
-	{
-		key_eventPress[GP2X_BUTTON_Y] = 1;
-	}
-	if ( pad & PAD_BUTTON4 )
-	{
-		key_eventPress[GP2X_BUTTON_B] = 1;
-	}
-	if ( pad & PAD_BUTTON5 )
-	{
-		key_eventPress[GP2X_BUTTON_R] = 1;
-	}
-	if ( pad & PAD_BUTTON6 )
-	{
-		key_eventPress[GP2X_BUTTON_L] = 1;
-	}
-	if ( pad & PAD_BUTTON7 )
-	{
-		key_eventPress[GP2X_BUTTON_VOLDOWN] = 1;
-	}
-	if ( pad & PAD_BUTTON8 )
-	{
-		key_eventPress[GP2X_BUTTON_VOLUP] = 1;
-	}
-	if ( pad & PAD_BUTTON9 )
-	{
-		key_eventPress[GP2X_BUTTON_SELECT] = 1;
-	}
-	if ( pad & PAD_BUTTONA )
-	{
-		key_eventPress[GP2X_BUTTON_START] = 1;
-	}
-	if ( pad & PAD_BUTTONB )
-	{
-		key_eventPress[GP2X_BUTTON_CLICK] = 1;
-	}
-	/* Remember to disable this for platforms that use their own input code otherwise this will be triggered all the time - Gameblabla */
-#if !defined(GP2X) && !defined(DREAMCAST)
-	if ( keys[SDLK_ESCAPE] )	// I—¹
-	{
-		key_eventPress[GP2X_BUTTON_EXIT] = 1;
-	}
-#endif
-	for ( i = 0; i < GP2X_BUTTON_MAX; i++ )
-	{
-		if ( ( key_eventPress_old[i] == 0 ) && ( key_eventPress[i] != 0 ) )
-		{
-			key_eventPush[i] = 1;
-		}
-		else 
-		{
-			key_eventPush[i] = 0;
-		}
-		key_eventPress_old[i] = key_eventPress[i];
-		
-	}
-}
-
-int IsPushKey( int keycode )
-{
-	int rc = 0;
-	
-	if ( key_eventPush[keycode] == 1 )
-	{
-		rc = 1;
-	}
-
-	return( rc );
-}
-
-int IsPressKey( int keycode )
-{
-	int rc = 0;
-	
-	if ( key_eventPress[keycode] == 1 )
-	{
-		rc = 1;
-	}
-
-	return( rc );
-}
-
-int IsPushOKKey( void )
-{
-	int rc = 0;
-#ifdef GP2X
-	if ( key_eventPush[GP2X_BUTTON_B] == 1 )
-#else
-	if ( key_eventPush[GP2X_BUTTON_A] == 1 )
-#endif
-	{
-		rc = 1;
-	}
-
-	return( rc );
-}
-int IsPushCancelKey( void )
-{
-	int rc = 0;
-	
-#ifdef GP2X
-	if ( key_eventPush[GP2X_BUTTON_X] == 1 )
-#else
-	if ( key_eventPush[GP2X_BUTTON_X] == 1 )
-#endif
-	{
-		rc = 1;
-	}
-
-	return( rc );
-}
 
 void FPSWait( void )
 {
 	Uint32 leftTick;
 
-	//ƒTƒEƒ“ƒh‚Ì§Œä
+	//ã‚µã‚¦ãƒ³ãƒ‰ã®å†ç”Ÿ
 	soundPlayCtrl( );
-#ifndef DREAMCAST
-	SDL_PollEvent(&event);
-#endif
+	Input_PollEvent();
+	Input_Update();
 /*
-	nowTick = SDL_GetTicks();
+	nowTick = Renderer_GetTicks();
 	frame = (nowTick - prvTickCount) / INTERVAL_BASE;
 	if(frame <= 0){
 #ifdef GP2X
 		wait(prvTickCount + interval - nowTick);
 #else
-		SDL_Delay(prvTickCount + INTERVAL_BASE - nowTick);
+		Renderer_Delay(prvTickCount + INTERVAL_BASE - nowTick);
 #endif
 	}
-	prvTickCount = SDL_GetTicks();
+	prvTickCount = Renderer_GetTicks();
 */
 
-	if(prvTickCount == 0) prvTickCount = SDL_GetTicks();
+	if(prvTickCount == 0) prvTickCount = Renderer_GetTicks();
 	
 	while (true)
 	{
-	 	nowTick = SDL_GetTicks();
- 		leftTick = prvTickCount + INTERVAL_BASE - nowTick;
- 		if(leftTick < 1 || leftTick > 9999)
- 		{
-			break;
-		}
-#ifdef GP2X
- 	 	wait(1);
-#else
-		SDL_Delay(1);
-#endif
+	 	nowTick = Renderer_GetTicks();
+   		leftTick = prvTickCount + INTERVAL_BASE - nowTick;
+   		if(leftTick < 1 || leftTick > 9999)
+   		{
+ 			break;
+ 		}
+ 		Renderer_Delay(1);
 	}
 	prvTickCount = nowTick;
 
@@ -1290,42 +210,9 @@ void FPSWait( void )
 
 int system_keys( void )
 {
-	int rc;
-	
-	rc = 1;
-#ifdef GP2X
-	// I—¹
-//	if ( ( IsPressKey( GP2X_BUTTON_START ) ) && ( IsPressKey( GP2X_BUTTON_SELECT ) ) )
-	if ( ( IsPressKey( GP2X_BUTTON_START ) ) && ( IsPressKey( GP2X_BUTTON_L ) ) && ( IsPressKey( GP2X_BUTTON_R ) ) )
-#else
-	if ( ( event.type == SDL_QUIT ) || ( IsPressKey( GP2X_BUTTON_EXIT ) ) )
-#endif
-	{
-		rc = 0;
-		g_scene = EN_SN_EXIT;
-	}
-	// ‰¹—Ê’²®
-	if ( IsPushKey( GP2X_BUTTON_VOLUP ) )
-	{
-		gameflag[60] = gameflag[60] + 10;
-		if ( gameflag[60] > VOL_MAX )
-		{
-			gameflag[60] = VOL_MAX;
-		}
-		Set_Volume( gameflag[60] );
-	}
-	if ( IsPushKey( GP2X_BUTTON_VOLDOWN ) )
-	{
-		gameflag[60] = gameflag[60] - 10;
-		if ( gameflag[60] < 0 )
-		{
-			gameflag[60] = 0;
-		}
-		Set_Volume( gameflag[60] );
-	}
-	
-	return( rc );
+	return Input_SystemKeys();
 }
+
 int Set_Volume( int vol )
 {
 	int rc = 0;
@@ -1337,52 +224,52 @@ int Set_Volume( int vol )
 }
 
 /*[ BltNumericImage ]************************************************/
-/*	”’l‰æ‘œ•\¦ŠÖ”												*/
-/*-[ˆø”]-----------------------------------------------------------*/
-/*	value			(i )	‰æ‘œ•\¦‚·‚é”’l						*/
-/*	length			(i )	•\¦‚·‚éŒ…”iŒ…”ˆÈã‚Í•\¦‚³‚ê‚È‚¢j	*/
-/*	x				(i )	‰æ‘œ‚ğ•\¦‚·‚éˆÊ’u‚˜À•W				*/
-/*	y				(i )	‰æ‘œ‚ğ•\¦‚·‚éˆÊ’u‚™À•W				*/
-/*	plane			(i )	”’l‰æ‘œ‚ª“Ç‚İ‚Ü‚ê‚Ä‚¢‚éƒvƒŒ[ƒ“”Ô†	*/
-/*	num_stpos_x		(i )	ƒvƒŒ[ƒ““à‚Å‚Ì”’l‰æ‘œ‚ÌŠJnˆÊ’u‚˜À•W	*/
-/*	num_stpos_y		(i )	ƒvƒŒ[ƒ““à‚Å‚Ì”’l‰æ‘œ‚ÌŠJnˆÊ’u‚™À•W	*/
-/*	num_width		(i )	”’l‰æ‘œ‚P•¶š‚Ì•iƒhƒbƒg”j			*/
-/*	num_height		(i )	”’l‰æ‘œ‚P•¶š‚Ì‚‚³iƒhƒbƒg”j		*/
-/*-[–ß‚è’l]---------------------------------------------------------*/
-/*	–³‚µ															*/
+/*	ï¿½ï¿½ï¿½lï¿½æ‘œï¿½\ï¿½ï¿½ï¿½Öï¿½												*/
+/*-[ï¿½ï¿½ï¿½ï¿½]-----------------------------------------------------------*/
+/*	value			(i )	ï¿½æ‘œï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½é”ï¿½l						*/
+/*	length			(i )	ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½éŒ…ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½Èï¿½Í•\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½j	*/
+/*	x				(i )	ï¿½æ‘œï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê’uï¿½ï¿½ï¿½ï¿½ï¿½W				*/
+/*	y				(i )	ï¿½æ‘œï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê’uï¿½ï¿½ï¿½ï¿½ï¿½W				*/
+/*	plane			(i )	ï¿½ï¿½ï¿½lï¿½æ‘œï¿½ï¿½ï¿½Ç‚İï¿½ï¿½Ü‚ï¿½Ä‚ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ôï¿½	*/
+/*	num_stpos_x		(i )	ï¿½vï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Å‚Ìï¿½ï¿½lï¿½æ‘œï¿½ÌŠJï¿½nï¿½Ê’uï¿½ï¿½ï¿½ï¿½ï¿½W	*/
+/*	num_stpos_y		(i )	ï¿½vï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Å‚Ìï¿½ï¿½lï¿½æ‘œï¿½ÌŠJï¿½nï¿½Ê’uï¿½ï¿½ï¿½ï¿½ï¿½W	*/
+/*	num_width		(i )	ï¿½ï¿½ï¿½lï¿½æ‘œï¿½Pï¿½ï¿½ï¿½ï¿½ï¿½Ì•ï¿½ï¿½iï¿½hï¿½bï¿½gï¿½ï¿½ï¿½j			*/
+/*	num_height		(i )	ï¿½ï¿½ï¿½lï¿½æ‘œï¿½Pï¿½ï¿½ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½iï¿½hï¿½bï¿½gï¿½ï¿½ï¿½j		*/
+/*-[ï¿½ß‚ï¿½l]---------------------------------------------------------*/
+/*	ï¿½ï¿½ï¿½ï¿½															*/
 
 void BltNumericImage( Sint32 value, Sint32 length, Sint32 x, Sint32 y, Sint32 plane, Sint32 num_stpos_x, Sint32 num_stpos_y, Sint32 num_width, Sint32 num_height )
 {
-	Sint32 blt_num;	// ‚PŒ…‚Ì”’l‚ğŠi”[‚·‚é
-	Sint32 i;			// Œ…”•ª‚Ìforƒ‹[ƒv‚Åg—p
-	Sint32 dv;		// Š„‚èZ‚Åg—p‚·‚é’l
+	Sint32 blt_num;	// ï¿½Pï¿½ï¿½ï¿½Ìï¿½ï¿½lï¿½ï¿½ï¿½iï¿½[ï¿½ï¿½ï¿½ï¿½
+	Sint32 i;			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½forï¿½ï¿½ï¿½[ï¿½vï¿½Ågï¿½p
+	Sint32 dv;		// ï¿½ï¿½ï¿½ï¿½Zï¿½Ågï¿½pï¿½ï¿½ï¿½ï¿½l
 
-	// value ‚ª•‰‚Ì’l‚Ìê‡A³‚Ì’l‚É’u‚«Š·‚¦‚é
+	// value ï¿½ï¿½ï¿½ï¿½ï¿½Ì’lï¿½Ìê‡ï¿½Aï¿½ï¿½ï¿½Ì’lï¿½É’uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	if ( value < 0 )
 	{
 		value = value * -1;
 	}
 
-	// Å‰‚ÌŠ„‚èZ‚Åg—p‚·‚é’l‚ğ‹‚ß‚é
+	// ï¿½Åï¿½ï¿½ÌŠï¿½ï¿½ï¿½Zï¿½Ågï¿½pï¿½ï¿½ï¿½ï¿½lï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 	dv = 1;
 	for( i = 1; i < length; i++ )
 	{
 		dv = dv * 10;
 	}
 
-	// w’è‚³‚ê‚½Œ…”•ª‚Ì”š‰æ‘œ‚ğ“]‘—‚·‚é
+	// ï¿½wï¿½è‚³ï¿½ê‚½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½æ‘œï¿½ï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	for( i = 0; i < length; i++ )
 	{
-		// •\¦‚·‚é”š‚ğ‹‚ß‚é
+		// ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½é”ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 		blt_num = value / dv;
 		value = value - blt_num * dv;
 		if ( blt_num > 9 )
-		{	// •\¦‚µ‚½‚¢‚PŒ…‚Ì”’l‚É‚È‚ç‚È‚¯‚ê‚ÎA‚PŒ…‚É‚·‚éB
+		{	// ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Pï¿½ï¿½ï¿½Ìï¿½ï¿½lï¿½É‚È‚ï¿½È‚ï¿½ï¿½ï¿½ÎAï¿½Pï¿½ï¿½ï¿½É‚ï¿½ï¿½ï¿½B
 			blt_num = blt_num % 10;
 		}
-		// ”š‰æ‘œ“]‘—
+		// ï¿½ï¿½ï¿½ï¿½ï¿½æ‘œï¿½]ï¿½ï¿½
 		BltRect( plane, x + (num_width * i), y, num_stpos_x + (num_width * blt_num), num_stpos_y, num_width, num_height );
-		// Š„‚èZ‚Åg—p‚·‚é’l‚ğ10‚ÅŠ„‚é
+		// ï¿½ï¿½ï¿½ï¿½Zï¿½Ågï¿½pï¿½ï¿½ï¿½ï¿½lï¿½ï¿½10ï¿½ÅŠï¿½ï¿½ï¿½
 		dv = dv / 10;
 	}
 
@@ -1390,30 +277,30 @@ void BltNumericImage( Sint32 value, Sint32 length, Sint32 x, Sint32 y, Sint32 pl
 }
 
 /*[ BltNumericImage2 ]************************************************/
-/*	”’l‰æ‘œ•\¦ŠÖ”i‰E‹l‚ßj										*/
-/*-[ˆø”]-----------------------------------------------------------*/
-/*	value			(i )	‰æ‘œ•\¦‚·‚é”’l						*/
-/*	length			(i )	•\¦‚·‚éŒ…”iŒ…”ˆÈã‚Í•\¦‚³‚ê‚È‚¢j	*/
-/*	x				(i )	‰æ‘œ‚ğ•\¦‚·‚éˆÊ’u‚˜À•W				*/
-/*	y				(i )	‰æ‘œ‚ğ•\¦‚·‚éˆÊ’u‚™À•W				*/
-/*	plane			(i )	”’l‰æ‘œ‚ª“Ç‚İ‚Ü‚ê‚Ä‚¢‚éƒvƒŒ[ƒ“”Ô†	*/
-/*	num_stpos_x		(i )	ƒvƒŒ[ƒ““à‚Å‚Ì”’l‰æ‘œ‚ÌŠJnˆÊ’u‚˜À•W	*/
-/*	num_stpos_y		(i )	ƒvƒŒ[ƒ““à‚Å‚Ì”’l‰æ‘œ‚ÌŠJnˆÊ’u‚™À•W	*/
-/*	num_width		(i )	”’l‰æ‘œ‚P•¶š‚Ì•iƒhƒbƒg”j			*/
-/*	num_height		(i )	”’l‰æ‘œ‚P•¶š‚Ì‚‚³iƒhƒbƒg”j		*/
-/*-[–ß‚è’l]---------------------------------------------------------*/
-/*	–³‚µ															*/
+/*	ï¿½ï¿½ï¿½lï¿½æ‘œï¿½\ï¿½ï¿½ï¿½Öï¿½ï¿½iï¿½Eï¿½lï¿½ßj										*/
+/*-[ï¿½ï¿½ï¿½ï¿½]-----------------------------------------------------------*/
+/*	value			(i )	ï¿½æ‘œï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½é”ï¿½l						*/
+/*	length			(i )	ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½éŒ…ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½Èï¿½Í•\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½j	*/
+/*	x				(i )	ï¿½æ‘œï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê’uï¿½ï¿½ï¿½ï¿½ï¿½W				*/
+/*	y				(i )	ï¿½æ‘œï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê’uï¿½ï¿½ï¿½ï¿½ï¿½W				*/
+/*	plane			(i )	ï¿½ï¿½ï¿½lï¿½æ‘œï¿½ï¿½ï¿½Ç‚İï¿½ï¿½Ü‚ï¿½Ä‚ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ôï¿½	*/
+/*	num_stpos_x		(i )	ï¿½vï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Å‚Ìï¿½ï¿½lï¿½æ‘œï¿½ÌŠJï¿½nï¿½Ê’uï¿½ï¿½ï¿½ï¿½ï¿½W	*/
+/*	num_stpos_y		(i )	ï¿½vï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Å‚Ìï¿½ï¿½lï¿½æ‘œï¿½ÌŠJï¿½nï¿½Ê’uï¿½ï¿½ï¿½ï¿½ï¿½W	*/
+/*	num_width		(i )	ï¿½ï¿½ï¿½lï¿½æ‘œï¿½Pï¿½ï¿½ï¿½ï¿½ï¿½Ì•ï¿½ï¿½iï¿½hï¿½bï¿½gï¿½ï¿½ï¿½j			*/
+/*	num_height		(i )	ï¿½ï¿½ï¿½lï¿½æ‘œï¿½Pï¿½ï¿½ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½iï¿½hï¿½bï¿½gï¿½ï¿½ï¿½j		*/
+/*-[ï¿½ß‚ï¿½l]---------------------------------------------------------*/
+/*	ï¿½ï¿½ï¿½ï¿½															*/
 /********************************************************************/
 void BltNumericImage2( Sint32 value, Sint32 length, Sint32 x, Sint32 y, Sint32 plane, Sint32 num_stpos_x, Sint32 num_stpos_y, Sint32 num_width, Sint32 num_height )
 {
-	Sint32 blt_num;	// ‚PŒ…‚Ì”’l‚ğŠi”[‚·‚é
-	Sint32 i;			// Œ…”•ª‚Ìforƒ‹[ƒv‚Åg—p
-	Sint32 dv;		// Š„‚èZ‚Åg—p‚·‚é’l
-	Sint32 x_hosei;	//‰E‹l‚ß•â³’l
+	Sint32 blt_num;	// ï¿½Pï¿½ï¿½ï¿½Ìï¿½ï¿½lï¿½ï¿½ï¿½iï¿½[ï¿½ï¿½ï¿½ï¿½
+	Sint32 i;			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½forï¿½ï¿½ï¿½[ï¿½vï¿½Ågï¿½p
+	Sint32 dv;		// ï¿½ï¿½ï¿½ï¿½Zï¿½Ågï¿½pï¿½ï¿½ï¿½ï¿½l
+	Sint32 x_hosei;	//ï¿½Eï¿½lï¿½ß•â³ï¿½l
 	int buf;
 	int t = 1;
 	
-	// value ‚ª•‰‚Ì’l‚Ìê‡A³‚Ì’l‚É’u‚«Š·‚¦‚é
+	// value ï¿½ï¿½ï¿½ï¿½ï¿½Ì’lï¿½Ìê‡ï¿½Aï¿½ï¿½ï¿½Ì’lï¿½É’uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	if ( value < 0 )
 	{
 		value = value * -1;
@@ -1444,26 +331,26 @@ void BltNumericImage2( Sint32 value, Sint32 length, Sint32 x, Sint32 y, Sint32 p
 	x = x + x_hosei;
 	/* 2002.10.21 D.K end */
 	
-	// Å‰‚ÌŠ„‚èZ‚Åg—p‚·‚é’l‚ğ‹‚ß‚é
+	// ï¿½Åï¿½ï¿½ÌŠï¿½ï¿½ï¿½Zï¿½Ågï¿½pï¿½ï¿½ï¿½ï¿½lï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 	dv = 1;
 	for( i = 1; i < length; i++ )
 	{
 		dv = dv * 10;
 	}
 
-	// w’è‚³‚ê‚½Œ…”•ª‚Ì”š‰æ‘œ‚ğ“]‘—‚·‚é
+	// ï¿½wï¿½è‚³ï¿½ê‚½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½æ‘œï¿½ï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	for( i = 0; i < length; i++ )
 	{
-		// •\¦‚·‚é”š‚ğ‹‚ß‚é
+		// ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½é”ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 		blt_num = value / dv;
 		value = value - blt_num * dv;
 		if ( blt_num > 9 )
-		{	// •\¦‚µ‚½‚¢‚PŒ…‚Ì”’l‚É‚È‚ç‚È‚¯‚ê‚ÎA‚PŒ…‚É‚·‚éB
+		{	// ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Pï¿½ï¿½ï¿½Ìï¿½ï¿½lï¿½É‚È‚ï¿½È‚ï¿½ï¿½ï¿½ÎAï¿½Pï¿½ï¿½ï¿½É‚ï¿½ï¿½ï¿½B
 			blt_num = blt_num % 10;
 		}
-		// ”š‰æ‘œ“]‘—
+		// ï¿½ï¿½ï¿½ï¿½ï¿½æ‘œï¿½]ï¿½ï¿½
 		BltRect( plane, x + (num_width * i), y, num_stpos_x + (num_width * blt_num), num_stpos_y, num_width, num_height );
-		// Š„‚èZ‚Åg—p‚·‚é’l‚ğ10‚ÅŠ„‚é
+		// ï¿½ï¿½ï¿½ï¿½Zï¿½Ågï¿½pï¿½ï¿½ï¿½ï¿½lï¿½ï¿½10ï¿½ÅŠï¿½ï¿½ï¿½
 		dv = dv / 10;
 	}
 

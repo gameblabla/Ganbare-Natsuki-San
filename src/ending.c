@@ -2,10 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SDL.h>
 #include "define.h"
 #include "function.h"
-#include "util_snd.h"
+#include "audio/audio.h"
 #include "extern.h"
 #include "ending.h" 
 
@@ -32,7 +31,7 @@ void ending_main( void )
 		ending_keys( );	
 		ending_drow( );
 		
-		RefreshScreen( g_screen );
+		RefreshScreen(NULL);
 		FPSWait( );	
 
 		exit_code = system_keys( );
@@ -42,7 +41,7 @@ void ending_main( void )
 		}
 	}
 	
-	ending_relese( );		// I—¹
+	ending_relese( );		// ï¿½Iï¿½ï¿½
 }
 
 void ending_init( void )
@@ -83,7 +82,7 @@ void ending_keys( void )
 {
 	if ( ( IsPushKey(gameflag[4]) ) || ( IsPushKey(gameflag[5]) ) )
 	{
-		gameflag[40] = 0;					/* ƒ^ƒCƒgƒ‹ */
+		gameflag[40] = 0;					/* ï¿½^ï¿½Cï¿½gï¿½ï¿½ */
 		g_scene = EN_SN_TITLE;
 		scene_exit=0;
 		return;

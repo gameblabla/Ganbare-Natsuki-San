@@ -1,0 +1,20 @@
+CC := gcc
+CFLAGS  := -O2 -std=gnu99 -fomit-frame-pointer
+LDFLAGS := -lm -lrt
+OBJS  = src/ram.o src/refresh.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o
+OBJS += src/audio/headless/audio_headless.o
+OBJS += src/renderer/headless/renderer_headless.o
+OBJS += src/input/headless/input_headless.o
+OBJS += src/filesystem/generic/filesystem_generic.o
+OBJS += src/platform/generic/platform_generic.o
+SOURCES = $(patsubst %.o, %.c, $(OBJS))
+
+OUTPUT= gnp_headless
+
+all: $(OUTPUT)
+
+$(OUTPUT): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
+
+clean:
+	rm $(OBJS)

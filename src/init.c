@@ -2,195 +2,48 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#define SDL_MAIN_HANDLED
-#include <SDL.h>
 #include <unistd.h>
 
 #include "define.h"
 #include "extern.h"
 #include "function.h"
-#include "util_snd.h"
+#include "audio/audio.h"
+#include "platform.h"
+#include "renderer/renderer.h"
+#include "filesystem/filesystem.h"
 
 #include "scene.h"
-
-#ifdef OPENGL_SCALING
-#include <GL/gl.h>
-#endif
-
-#if defined(SCALING) || defined(OPENGL_SCALING)
-SDL_Surface* real_screen;
-#endif
-
-#ifdef GP2X
-#include <unistd.h>
-#endif
-
-#ifdef PSPUMODE
-#include <pspkernel.h>
-#endif 
-
-#ifdef DREAMCAST
-#include <kos.h>
-#include <SDL/SDL_dreamcast.h>
-#include "vmuicon.h"
-extern uint8_t romdisk[];
-KOS_INIT_FLAGS(INIT_DEFAULT | INIT_MALLOCSTATS);
-KOS_INIT_ROMDISK(romdisk);
-#endif
-
-#ifndef SDL_TRIPLEBUF
-#define SDL_TRIPLEBUF SDL_DOUBLEBUF
-#endif
 
 void main_init( void );
 void main_init_config( void );
 void ExitProgram(void);
 
-///----------------------------------------------------------------------------
-/// PSP Related Stuff
-///----------------------------------------------------------------------------
-#ifdef PSPUMODE
-PSP_MODULE_INFO("Gannatsu Portable", 0, 1, 1);
-PSP_HEAP_SIZE_KB(21*1024);
-int iDoRun;
-#endif
-
 int main(int argc, char *argv[])
 {
-	Uint32 flags;
-	SDL_Surface* tmp;
+	void* tmp;
 	
-	#ifdef MacOS
-	char AppPath[1024];
-	char AppPathw[1024];
-	#endif
-	
-#ifdef PSPUMODE
-	// PSP things
-	//psp_setup_callbacks();
-	scePowerSetClockFrequency(333, 333, 166);
-#endif 
-
-	/* 初期化 */
-	#ifdef MacOS
-	memset( &AppPath[0], '\0', sizeof( AppPath ) );
-	memset( &AppPathw[0], '\0', sizeof( AppPath ) );
-	#endif
-	
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
-		return 1;
-
-#ifdef GP2X
-#else
-	#ifdef MacOS
-		if ( argc > 0 )
-		{
-			strcpy( &AppPath[0], argv[0] );
-			char_work = strrchr( &AppPath[0], '/' );
-			strlen = char_work - &AppPath[0];
-			strncpy( &AppPathw[0], &AppPath[0], strlen );
-			chdir( &AppPathw[0] );
-		}
-	#else
-	#endif
-#endif	
-	
-#ifdef GP2X
-	flags = SDL_HWSURFACE | SDL_FULLSCREEN | SDL_DOUBLEBUF | SDL_HWPALETTE;
-#elif defined(PSPUMODE)
-	flags = SDL_HWSURFACE | SDL_FULLSCREEN | SDL_DOUBLEBUF | SDL_HWPALETTE;
-#elif defined(GCW0)
-	flags = SDL_HWSURFACE | SDL_TRIPLEBUF;
-#elif defined(RS90)
-	flags = SDL_HWSURFACE | SDL_TRIPLEBUF | SDL_YUV444;
-#elif defined(DREAMCAST)
-	SDL_DC_SetVideoDriver(SDL_DC_DMA_VIDEO);
-	flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
-#elif defined(CLASSICMAC)
-	flags = SDL_HWSURFACE | SDL_FULLSCREEN | SDL_DOUBLEBUF | SDL_HWPALETTE;
-#elif defined(MINGW)
-	flags = SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_HWPALETTE | SDL_FULLSCREEN;
-#else
-	flags = SDL_SWSURFACE;
-#endif
-
-#ifdef OPENGL_SCALING
-	flags |= SDL_OPENGL;
-#endif
-
-#ifndef DREAMCAST
-	SDL_ShowCursor(SDL_DISABLE);
-#endif
-
-#if defined(SCALING) || defined(OPENGL_SCALING)
-	real_screen = SDL_SetVideoMode(FINAL_RESOLUTION_WIDTH, FINAL_RESOLUTION_HEIGHT,
-	#ifdef OPENGL_SCALING
-	0,
-	#else
-	DEPTH,
-	#endif
-	flags | SDL_NOFRAME);
-	g_screen = SDL_CreateRGBSurface(SDL_SWSURFACE, DISPLY_WIDTH, DISPLY_HEIGHT,
-	#ifdef OPENGL_SCALING
-	16,
-	#else
-	DEPTH,
-	#endif
-	0,0,0,0);
-#else
-	g_screen = SDL_SetVideoMode(DISPLY_WIDTH, DISPLY_HEIGHT, DEPTH, flags);
-#endif
-
-#ifdef OPENGL_SCALING
-	glPushAttrib(GL_ENABLE_BIT);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-	glEnable(GL_TEXTURE_2D);
-
-	/* This allows alpha blending of 2D textures with the scene */
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glViewport(0, 0, real_screen->w, real_screen->h);
-
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-
-	glOrtho(0.0, (GLdouble)real_screen->w, (GLdouble)real_screen->h, 0.0, 0.0, 1.0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-
-	/* http://risky-safety.org/~zinnia/sdl/sourcetour/extra1/ */
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glColor4d(1.0f, 1.0f, 1.0f, 1.0f);
-#endif
-
-#ifdef DREAMCAST
-	vmu_set_icon(vmu_icon);
-#endif
+	Platform_InitEarly();
+	Platform_InitMain(argc, argv);
+	Platform_Init(argc, argv);
+	Platform_InitVideoPost();
 
 #if DEPTH != 8
-	if (g_screen->format->BitsPerPixel == 8)
+	if (Renderer_GetScreen() != NULL)
 #endif
 	{
-		tmp = SDL_LoadBMP(IMAGE_PATH "color.bmp");	
-		SetGscreenPalette( tmp );
-		SDL_FreeSurface(tmp);
+		tmp = Renderer_LoadSurface(IMAGE_PATH "color.bmp");	
+		if (tmp)
+		{
+			SetGscreenPalette( tmp );
+			Renderer_FreeSurface(tmp);
+		}
 	}
 	
-	if (!g_screen)
+	if (!Renderer_GetScreen())
 	{
-		fprintf(stderr, "Couldn't set video mode: %s\n", SDL_GetError());
+		fprintf(stderr, "Couldn't set video mode\n");
 		return 1;
 	}
-	
-	SDL_WM_SetCaption("Ganbare-Natsuki-san", "image/ico.bmp");
-
 
 	FunctionInit( );
 	main_init( );
@@ -201,6 +54,26 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+void ExitProgram(void)
+{
+	char path_config[96];
+	char path_folder[96];
+
+	Filesystem_GetConfigPath(path_config, sizeof(path_config));
+	Filesystem_GetSaveFolderPath(path_folder, sizeof(path_folder));
+	
+	soundStopBgm(0);
+	soundStopSeAll();
+	soundRelease();
+
+	printf("SaveGameFlag(path_config); (ExitProgram)\n");
+	SaveGameFlag(path_config);
+	
+	closePAD();
+	Platform_Shutdown();
+
+	Platform_Exit(0);
+}
 
 void main_init( void )
 {
@@ -209,16 +82,6 @@ void main_init( void )
 	main_init_config( );	
 
 #ifndef NOSOUND
-
-#ifdef MIDI_MUSIC
-	soundLoadBuffer(EN_BGM_GAME01, (Uint8 *)BGM_SOUND_PATH "01.mid", -1);
-	soundLoadBuffer(EN_BGM_GAME02, (Uint8 *)BGM_SOUND_PATH "02.mid", -1);
-	soundLoadBuffer(EN_BGM_GAME03, (Uint8 *)BGM_SOUND_PATH "03.mid", -1);
-	soundLoadBuffer(EN_BGM_GAME04, (Uint8 *)BGM_SOUND_PATH "04.mid", -1);
-	soundLoadBuffer(EN_BGM_GAME05, (Uint8 *)BGM_SOUND_PATH "05.mid", -1);
-	soundLoadBuffer(EN_BGM_GAME06, (Uint8 *)BGM_SOUND_PATH "06.mid", -1);
-	soundLoadBuffer(EN_BGM_GAME07, (Uint8 *)BGM_SOUND_PATH "07.mid", -1);
-#else
 	soundLoadBuffer(EN_BGM_GAME01, (Uint8 *)BGM_SOUND_PATH "01.ogg", -1);
 	soundLoadBuffer(EN_BGM_GAME02, (Uint8 *)BGM_SOUND_PATH "02.ogg", -1);
 	soundLoadBuffer(EN_BGM_GAME03, (Uint8 *)BGM_SOUND_PATH "03.ogg", -1);
@@ -226,7 +89,6 @@ void main_init( void )
 	soundLoadBuffer(EN_BGM_GAME05, (Uint8 *)BGM_SOUND_PATH "05.ogg", -1);
 	soundLoadBuffer(EN_BGM_GAME06, (Uint8 *)BGM_SOUND_PATH "06.ogg", -1);
 	soundLoadBuffer(EN_BGM_GAME07, (Uint8 *)BGM_SOUND_PATH "07.ogg", -1);
-#endif
 	
 	soundLoadBufferSE(EN_SE_ATK1   , (Uint8 *)SE_SOUND_PATH "atk1.wav" );
 	soundLoadBufferSE(EN_SE_DAMEGE , (Uint8 *)SE_SOUND_PATH "damage.wav" );
@@ -240,151 +102,62 @@ void main_init( void )
 #endif
 
 	Set_Volume( gameflag[60] );
-
 }
-
-void ExitProgram(void)
-{
-	char path_config[96];
-#ifndef RELATIVE_PATH
-	char path_folder[96];
-#endif
-
-#ifdef MINGW
-	sprintf(path_config, "save/config");
-	sprintf(path_folder, "save");
-#elif defined(DREAMCAST)
-	sprintf(path_config, "/ram/config");
-	sprintf(path_folder, "/ram");
-#elif defined(_TINSPIRE)
-	sprintf(path_config, "./save/config.tns");
-	sprintf(path_folder, "./save");
-#elif defined(RELATIVE_PATH)
-	sprintf(path_config, "config.dat");
-#else		
-	sprintf(path_config, "%s/.ganbare/config", getenv("HOME"));
-	sprintf(path_folder, "%s/.ganbare", getenv("HOME"));
-#endif
-	
-	soundStopBgm(0);
-	soundStopSeAll();
-	soundRelease();
-
-	printf("SaveGameFlag(path_config); (ExitProgram)\n");
-	SaveGameFlag(path_config);
-	
-	closePAD();
-	SDL_Quit();
-
-#ifdef GP2X
-	chdir("/usr/gp2x");
-	execl("/usr/gp2x/gp2xmenu", "/usr/gp2x/gp2xmenu", NULL);
-#endif
-#ifdef PSPUMODE
-	sceDisplayWaitVblankStart();
-	sceKernelExitGame(); 
-#endif
-}
-
 
 void main_init_config( void )
 {
 	int i;
 	char path_config[96];
-#ifndef RELATIVE_PATH
 	char path_folder[96];
-#endif
 	
-#ifdef MINGW
-	sprintf(path_config, "save/config");
-	sprintf(path_folder, "save");
-#elif defined(_TINSPIRE)
-	sprintf(path_config, "./save/config.tns");
-	sprintf(path_folder, "./save");
-#elif defined(DREAMCAST)
-	sprintf(path_config, "/ram/config");
-	sprintf(path_folder, "/ram");
-#elif defined(RELATIVE_PATH)
-	sprintf(path_config, "config.dat");
-#else		
-	sprintf(path_config, "%s/.ganbare/config", getenv("HOME"));
-	sprintf(path_folder, "%s/.ganbare", getenv("HOME"));
-#endif
-
-#ifdef MINGW
-	mkdir(path_folder);
-#elif defined(_TINSPIRE)
-	mkdir(path_folder, 0755);
-#elif defined(RELATIVE_PATH) || defined(DREAMCAST)
-
-#else	
-	mkdir(path_folder, 0755);
-#endif
+	Filesystem_GetConfigPath(path_config, sizeof(path_config));
+	Filesystem_GetSaveFolderPath(path_folder, sizeof(path_folder));
+	Filesystem_CreateSaveFolder(path_folder);
 	
 	if ( ! ( LoadGameFlag(path_config) == 0 ) )
 	{
 		ResetGameFlag();
-#ifdef GP2X
-		gameflag[0]=GP2X_BUTTON_UP;		//上	Up
-		gameflag[1]=GP2X_BUTTON_DOWN;	//下	Down
-		gameflag[2]=GP2X_BUTTON_LEFT;	//左	Left
-		gameflag[3]=GP2X_BUTTON_RIGHT;	//右	Right
-		gameflag[4]=GP2X_BUTTON_X;	//Ａ	Z
-		gameflag[5]=GP2X_BUTTON_B;	//Ｂ	X
-		gameflag[6]=GP2X_BUTTON_Y;	//Ｃ	C
-		gameflag[7]=GP2X_BUTTON_A;	//Ｄ	S
-		gameflag[8]=GP2X_BUTTON_L;	//Ｄ	S
-		gameflag[9]=GP2X_BUTTON_R;	//Ｄ	S
-		gameflag[10]=GP2X_BUTTON_START;	//Ｄ	S
-		gameflag[11]=GP2X_BUTTON_SELECT;	//Ｄ	S
-#else 
-		gameflag[0]=GP2X_BUTTON_UP;		//上	Up
-		gameflag[1]=GP2X_BUTTON_DOWN;	//下	Down
-		gameflag[2]=GP2X_BUTTON_LEFT;	//左	Left
-		gameflag[3]=GP2X_BUTTON_RIGHT;	//右	Right
-		gameflag[4]=GP2X_BUTTON_A;	//Ａ	Z
-		gameflag[5]=GP2X_BUTTON_X;	//Ｂ	X
-		gameflag[6]=GP2X_BUTTON_Y;	//Ｃ	C
-		gameflag[7]=GP2X_BUTTON_B;	//Ｄ	S
-		gameflag[8]=GP2X_BUTTON_L;	//Ｄ	S
-		gameflag[9]=GP2X_BUTTON_R;	//Ｄ	S
-		gameflag[10]=GP2X_BUTTON_START;	//Ｄ	S
-		gameflag[11]=GP2X_BUTTON_SELECT;	//Ｄ	S
-#endif
+		gameflag[0]=GP2X_BUTTON_UP;		
+		gameflag[1]=GP2X_BUTTON_DOWN;	
+		gameflag[2]=GP2X_BUTTON_LEFT;	
+		gameflag[3]=GP2X_BUTTON_RIGHT;	
+		gameflag[4]=GP2X_BUTTON_A;	
+		gameflag[5]=GP2X_BUTTON_X;	
+		gameflag[6]=GP2X_BUTTON_Y;	
+		gameflag[7]=GP2X_BUTTON_B;	
+		gameflag[8]=GP2X_BUTTON_L;	
+		gameflag[9]=GP2X_BUTTON_R;	
+		gameflag[10]=GP2X_BUTTON_START;	
+		gameflag[11]=GP2X_BUTTON_SELECT;	
 		
-		gameflag[60] = 128;	//音量
-
-		gameflag[70] = 1;	//タイトル画面から来た
-		gameflag[71] = 1;	//リトライを選択した
-
-
-		gameflag[100] = 0;	//クリアフラグ
+		gameflag[60] = 128;	
+		gameflag[70] = 1;	
+		gameflag[71] = 1;	
+		gameflag[100] = 0;	
 		
-		gameflag[107] = 0;	//play time s
-		gameflag[108] = 0;	//play time s
-		gameflag[109] = 0;	//play time m
-		gameflag[110] = 0;	//play time h
-		gameflag[111] = 59;	//CLEAR time s
-		gameflag[112] = 59;	//CLEAR time m
-		gameflag[113] = 99;	//CLEAR time h
+		gameflag[107] = 0;	
+		gameflag[108] = 0;	
+		gameflag[109] = 0;	
+		gameflag[110] = 0;	
+		gameflag[111] = 59;	
+		gameflag[112] = 59;	
+		gameflag[113] = 99;	
+			
+		gameflag[120] = 1;	
+		gameflag[121] = 1;	
+		gameflag[122] = 0;	
+		gameflag[123] = -1;	
+		gameflag[124] = 0;	
+		gameflag[125] = 0;	
+		gameflag[126] = 0;	
+		gameflag[127] = 0;	
 		
-		
-		gameflag[120] = 1;	//ステージセレクト
-		gameflag[121] = 1;	//到達ステージ
-		gameflag[122] = 0;	//キャラセレクト
-		gameflag[123] = -1;	//リプレイ選択時のステージ
-		gameflag[124] = 0;	//リプレイＡＬＬ、ＯＮＥ
-		gameflag[125] = 0;	//リプレイjamp
-		gameflag[126] = 0;	//裏面
-		gameflag[127] = 0;	//トータルアタック
-		
-		gameflag[132] = 0;	//リプレイ
-		gameflag[133] = 0;	//アンカータイプ
-
-		gameflag[135] = 0;	//トータルアタック 時間					[130]>[135]
-		gameflag[136] = 0;	//トータルアタック ミス				[131]>[136]
-		gameflag[137] = 1595959;	//トータルアタック クリア時間	[132]>[137]
-		gameflag[138] = 999;	//トータルアタック クリアミス	[133]>[138]
+		gameflag[132] = 0;	
+		gameflag[133] = 0;	
+		gameflag[135] = 0;	
+		gameflag[136] = 0;	
+		gameflag[137] = 1595959;	
+		gameflag[138] = 999;	
 		
 		for ( i = 0; i <= 99; i++ )
 		{
@@ -395,10 +168,6 @@ void main_init_config( void )
 			gameflag[300 + i] = 100;
 		}
 	}
-	gameflag[121] = 50;	//到達ステージ
-	gameflag[100] = 1;	//到達ステージ
+	gameflag[121] = 50;	
+	gameflag[100] = 1;	
 }
-
-
-
-

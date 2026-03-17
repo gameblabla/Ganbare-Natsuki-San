@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include "define.h"
 
-extern SDL_Surface *g_screen;
 extern int g_scene;
 
 extern Sint32 gameflag[GAMEFLAG_SIZE];

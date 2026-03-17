@@ -14,8 +14,10 @@ RINCLUDES=$(PREFIX)/RIncludes
 REZFLAGS=-I$(RINCLUDES)
 	
 OBJS  = src/ram.o src/util_snd.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o src/refresh.o
-#SOURCES = $(patsubst %.o, %.c, $(OBJS))
-	
+OBJS += src/renderer/sdl12generic/renderer_sdl12.o
+OBJS += src/input/generic/input_generic.o
+OBJS += src/filesystem/macos/filesystem_macos.o
+
 CFLAGS += $(DEFS)
 
 HelloWorld.bin HelloWorld.APPL HelloWorld.dsk: HelloWorld.xcoff

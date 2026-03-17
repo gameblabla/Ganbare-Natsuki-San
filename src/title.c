@@ -2,15 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SDL.h>
-#ifdef DREAMCAST
-#include "vmu.h"
-#endif
 #include "define.h"
 #include "function.h"
-#include "util_snd.h"
+#include "audio/audio.h"
 #include "extern.h"
 #include "title.h" 
+#include "renderer/renderer.h"
+#include "filesystem/filesystem.h"
+#include "platform.h"
 
 #include "refresh.h"
 
@@ -60,7 +59,7 @@ void title_main( void )
 		title_keys( );		
 		title_drow( );
 		
-		RefreshScreen( g_screen );
+		RefreshScreen(NULL);
 		
 		
 		FPSWait( );	
@@ -76,9 +75,7 @@ void title_main( void )
 
 void title_init( void )
 {
-#ifdef DREAMCAST
 	Stop_Music();
-#endif
 	scene_exit = 1;
 
 	title_no = 0;
@@ -150,24 +147,9 @@ void title_keys( void )
 	char path_item[96];
 	char path_work[96];
 
-#ifdef MINGW
-	sprintf(path_work, "save/work.sav");
-	sprintf(path_item, "save/item_wk.sav");
-#elif defined(DREAMCAST)
-	sprintf(path_work, "/ram/work.sav");
-	sprintf(path_item, "/ram/item_wk.sav");
-#elif defined(_TINSPIRE)
-	sprintf(path_work, "./save/work.sav.tns");
-	sprintf(path_item, "./save/item_wk.sav.tns");
-#elif defined(RELATIVE_PATH)
-	sprintf(path_work, "work.sav");
-	sprintf(path_item, "item_wk.sav");
-#else
-	sprintf(path_work, "%s/.ganbare/work.sav", getenv("HOME"));
-	sprintf(path_item, "%s/.ganbare/item_wk.sav", getenv("HOME"));
-#endif
+	Filesystem_GetWorkSavePath(path_work, sizeof(path_work));
+	Filesystem_GetItemSavePath(path_item, sizeof(path_item));
 
-	
 	if ( IsPushKey( gameflag[0] ) )
 	{
 		soundPlaySe( EN_SE_SELECT );
@@ -310,10 +292,8 @@ void title_keys( void )
 			gameflag[40] = 10;
 			g_scene = EN_SN_EXIT;
 			scene_exit=0;
-			#ifdef DREAMCAST
-			DC_SaveVMU(path_work, "gan_work.sav", "WORK");
-			DC_SaveVMU(path_item, "gan_item.sav", "ITEM");
-			#endif
+			Platform_SaveCustom(path_work, "gan_work.sav", "WORK");
+			Platform_SaveCustom(path_item, "gan_item.sav", "ITEM");
 		}
 		else if ( mode == 3 )	/* option */
 		{
@@ -337,10 +317,6 @@ void title_keys( void )
 			SaveGameFlag2(path_work);
 			ResetGameFlag2( );
 			SaveGameFlag2(path_item);
-			#ifdef DREAMCAST
-			DC_SaveVMU(path_work, "gan_work.sav", "WORK");
-			DC_SaveVMU(path_item, "gan_item.sav", "ITEM");
-			#endif
 
 			gameflag[40] = 4;
 			g_scene = EN_SN_ACT;
@@ -362,10 +338,6 @@ void title_keys( void )
 				SaveGameFlag2(path_work);
 				ResetGameFlag2( );
 				SaveGameFlag2(path_item);
-				#ifdef DREAMCAST
-				DC_SaveVMU(path_work, "gan_work.sav", "WORK");
-				DC_SaveVMU(path_item, "gan_item.sav", "ITEM");
-				#endif
 
 				gameflag[40] = 4;
 				g_scene = EN_SN_ACT;
@@ -390,10 +362,6 @@ void title_keys( void )
 			SaveGameFlag2(path_work);
 			ResetGameFlag2( );
 			SaveGameFlag2(path_item);
-			#ifdef DREAMCAST
-			DC_SaveVMU(path_work, "gan_work.sav", "WORK");
-			DC_SaveVMU(path_item, "gan_item.sav", "ITEM");
-			#endif
 
 			gameflag[40] = 4;
 			g_scene = EN_SN_ACT;
@@ -418,10 +386,6 @@ void title_keys( void )
 			SaveGameFlag2(path_work);
 			ResetGameFlag2( );
 			SaveGameFlag2(path_item);
-			#ifdef DREAMCAST
-			DC_SaveVMU(path_work, "gan_work.sav", "WORK");
-			DC_SaveVMU(path_item, "gan_item.sav", "ITEM");
-			#endif
 
 			gameflag[40] = 4;
 			g_scene = EN_SN_ACT;
@@ -468,10 +432,6 @@ void title_keys( void )
 				SaveGameFlag2(path_work);
 				ResetGameFlag2( );
 				SaveGameFlag2(path_item);
-				#ifdef DREAMCAST
-				DC_SaveVMU(path_work, "gan_work.sav", "WORK");
-				DC_SaveVMU(path_item, "gan_item.sav", "ITEM");
-				#endif
 
 				gameflag[40] = 4;
 				g_scene = EN_SN_ACT;
@@ -578,40 +538,40 @@ void title_init_save_data( void )
 		gameflag2[2]	= 1;
 	}
 	gameflag2[3]	= gameflag[120];
-	gameflag2[4]	= 0;	/* Œü‚« */
-	gameflag2[5]	= 3;	/* Œ»İ‚g‚o */
-	gameflag2[6]	= 3;	/* Å‘å‚g‚o */
-	gameflag2[7]	= 0;	/* ƒn[ƒg‚Ì‚©‚¯‚çŠŒÂ” */
-	gameflag2[8]	= 0;	/* Œ»İİ’èƒXƒLƒ‹ */
-	gameflag2[9]	= 0;	/* ƒeƒŒƒ|[ƒ^g—p•s‰ÂAƒXƒNƒ[ƒ‹•s‰Âƒtƒ‰ƒO */
-	gameflag2[10]	= 0;	/* ƒeƒŒƒ|[ƒ^g—p•s‰Âƒtƒ‰ƒO */
+	gameflag2[4]	= 0;	/* ï¿½ï¿½ï¿½ï¿½ */
+	gameflag2[5]	= 3;	/* ï¿½ï¿½ï¿½İ‚gï¿½o */
+	gameflag2[6]	= 3;	/* ï¿½Å‘ï¿½gï¿½o */
+	gameflag2[7]	= 0;	/* ï¿½nï¿½[ï¿½gï¿½Ì‚ï¿½ï¿½ï¿½ï¿½çŠï¿½ï¿½ï¿½Âï¿½ */
+	gameflag2[8]	= 0;	/* ï¿½ï¿½ï¿½İİ’ï¿½Xï¿½Lï¿½ï¿½ */
+	gameflag2[9]	= 0;	/* ï¿½eï¿½ï¿½ï¿½|ï¿½[ï¿½^ï¿½gï¿½pï¿½sï¿½ÂAï¿½Xï¿½Nï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½sï¿½Âƒtï¿½ï¿½ï¿½O */
+	gameflag2[10]	= 0;	/* ï¿½eï¿½ï¿½ï¿½|ï¿½[ï¿½^ï¿½gï¿½pï¿½sï¿½Âƒtï¿½ï¿½ï¿½O */
 
-	gameflag2[20]	= 0; 	/*  */
-	gameflag2[21]	= 0; 	/* •ª */
-	gameflag2[22]	= 0; 	/* •b */
+	gameflag2[20]	= 0; 	/* ï¿½ï¿½ */
+	gameflag2[21]	= 0; 	/* ï¿½ï¿½ */
+	gameflag2[22]	= 0; 	/* ï¿½b */
 	
-	gameflag2[30]	= 0;	/* ƒeƒŒƒ|[ƒ^[g—p */
-	gameflag2[31]	= 0;	/* ƒeƒŒƒ|[ƒ^[ƒXƒe[ƒW */
-	gameflag2[32]	= 0;	/* ƒeƒŒƒ|[ƒ^[‰æ–Ê‚m‚ */
-	gameflag2[33]	= 0;	/* ƒeƒŒƒ|[ƒ^[‚w */
-	gameflag2[34]	= 0;	/* ƒeƒŒƒ|[ƒ^[‚x */
+	gameflag2[30]	= 0;	/* ï¿½eï¿½ï¿½ï¿½|ï¿½[ï¿½^ï¿½[ï¿½gï¿½p */
+	gameflag2[31]	= 0;	/* ï¿½eï¿½ï¿½ï¿½|ï¿½[ï¿½^ï¿½[ï¿½Xï¿½eï¿½[ï¿½W */
+	gameflag2[32]	= 0;	/* ï¿½eï¿½ï¿½ï¿½|ï¿½[ï¿½^ï¿½[ï¿½ï¿½Ê‚mï¿½ï¿½ */
+	gameflag2[33]	= 0;	/* ï¿½eï¿½ï¿½ï¿½|ï¿½[ï¿½^ï¿½[ï¿½w */
+	gameflag2[34]	= 0;	/* ï¿½eï¿½ï¿½ï¿½|ï¿½[ï¿½^ï¿½[ï¿½x */
 
-	gameflag2[40]	= 0;	/* æ“¾ƒXƒLƒ‹‚P */
-	gameflag2[41]	= 0;	/* æ“¾ƒXƒLƒ‹‚Q */
-	gameflag2[42]	= 0;	/* æ“¾ƒXƒLƒ‹‚R */
-	gameflag2[43]	= 0;	/* æ“¾ƒXƒLƒ‹‚S */
+	gameflag2[40]	= 0;	/* ï¿½æ“¾ï¿½Xï¿½Lï¿½ï¿½ï¿½P */
+	gameflag2[41]	= 0;	/* ï¿½æ“¾ï¿½Xï¿½Lï¿½ï¿½ï¿½Q */
+	gameflag2[42]	= 0;	/* ï¿½æ“¾ï¿½Xï¿½Lï¿½ï¿½ï¿½R */
+	gameflag2[43]	= 0;	/* ï¿½æ“¾ï¿½Xï¿½Lï¿½ï¿½ï¿½S */
 }
 
 /***************************************************************************/
 // NAME      = kane_set
-// FUNCTION  = ƒ^ƒCƒgƒ‹•¶š‚Ì¶¬
+// FUNCTION  = ï¿½^ï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½
 // NOTES     = 
 // DATE      = 
 // AUTHER    = koizumi
 // HISTORY   =
-// PARAMETER = xF‰ŠúˆÊ’u
-//             yF‰ŠúˆÊ’u
-// RETURN    = ‚È‚µ
+// PARAMETER = xï¿½Fï¿½ï¿½ï¿½ï¿½ï¿½Ê’u
+//             yï¿½Fï¿½ï¿½ï¿½ï¿½ï¿½Ê’u
+// RETURN    = ï¿½È‚ï¿½
 /***************************************************************************/
 void title_kane_set( int x, int y )
 {
@@ -639,13 +599,13 @@ void title_kane_set( int x, int y )
 
 /***************************************************************************/
 // NAME      = kane_disp
-// FUNCTION  = ƒ^ƒCƒgƒ‹•¶š‚Ì•\¦
+// FUNCTION  = ï¿½^ï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì•\ï¿½ï¿½
 // NOTES     = 
 // DATE      = 
 // AUTHER    = koizumi
 // HISTORY   =
-// PARAMETER = ‚È‚µ
-// RETURN    = ‚È‚µ
+// PARAMETER = ï¿½È‚ï¿½
+// RETURN    = ï¿½È‚ï¿½
 /***************************************************************************/
 void title_kane_disp( void )
 {
@@ -655,7 +615,7 @@ void title_kane_disp( void )
 	{
 		if ( kane[0 + ( i * 10 )] == 1 )
 		{
-			BltRect( 7, kane[1 + ( i * 10 )], ( 0 - kane[2 + ( i * 10 )] ) + 240 - 96, 0, 64, 192, 96 );
+			BltRect( 7, kane[1 + ( i * 10 )], ( 0 - kane[2 + ( i * 10 )] ) + DISPLY_HEIGHT - 96, 0, 64, 192, 96 );
 
 			title_k_jmp( i );
 		}
@@ -665,13 +625,13 @@ void title_kane_disp( void )
 
 /***************************************************************************/
 // NAME      = k_jmp
-// FUNCTION  = ƒ^ƒCƒgƒ‹•¶š‚ÌY•\¦ˆÊ’uŒvZ
+// FUNCTION  = ï¿½^ï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Yï¿½\ï¿½ï¿½ï¿½Ê’uï¿½vï¿½Z
 // NOTES     = 
 // DATE      = 
 // AUTHER    = koizumi
 // HISTORY   =
-// PARAMETER = iFƒoƒbƒtƒ@”Ô†
-// RETURN    = ‚È‚µ
+// PARAMETER = iï¿½Fï¿½oï¿½bï¿½tï¿½@ï¿½Ôï¿½
+// RETURN    = ï¿½È‚ï¿½
 /***************************************************************************/
 void title_k_jmp( int i )
 {
@@ -706,10 +666,10 @@ void title_k_jmp( int i )
 		{
 			kane[6 + ( i * 10 )] = -8;
 		}
-		/* ’n–Ê”»’è */
+		/* ï¿½nï¿½Ê”ï¿½ï¿½ï¿½ */
 	}
 	
-	/* ¡‰ñ‚ÌˆÊ’u */
+	/* ï¿½ï¿½ï¿½ï¿½ÌˆÊ’u */
 	y1 = ( ( 0 - kane[6 + ( i * 10 )] ) * ( 0 - kane[6 + ( i * 10 )] ) * ( 0 - kane[6 + ( i * 10 )] ) );
 	kane[2 + ( i * 10 )] = kane[2 + ( i * 10 )] - ( y1 / 25 );
 
@@ -723,13 +683,13 @@ void title_k_jmp( int i )
 
 /***************************************************************************/
 // NAME      = replay_file_find
-// FUNCTION  = ƒŠƒvƒŒƒCƒtƒ@ƒCƒ‹‚ÌŒŸõ
+// FUNCTION  = ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Cï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ÌŒï¿½ï¿½ï¿½
 // NOTES     = 
 // DATE      = 
 // AUTHER    = koizumi
 // HISTORY   =
-// PARAMETER = ‚È‚µ
-// RETURN    = ƒtƒ@ƒCƒ‹‚Ì—L–³
+// PARAMETER = ï¿½È‚ï¿½
+// RETURN    = ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ì—Lï¿½ï¿½
 /***************************************************************************/
 int replay_file_find( void )
 {
@@ -740,7 +700,7 @@ int replay_file_find( void )
 	stage = 1;
 	if ( gameflag[126] == 1 )
 	{
-		stage = 2;	/* — ƒXƒe[ƒW */
+		stage = 2;	/* ï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½W */
 	}
 	else 
 	{
@@ -760,13 +720,13 @@ int replay_file_find( void )
 
 /***************************************************************************/
 // NAME      = replay_file_find2
-// FUNCTION  = Å’ZƒWƒƒƒ“ƒvƒŠƒvƒŒƒCƒtƒ@ƒCƒ‹‚ÌŒŸõ
+// FUNCTION  = ï¿½Å’Zï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Cï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ÌŒï¿½ï¿½ï¿½
 // NOTES     = 
 // DATE      = 
 // AUTHER    = koizumi
 // HISTORY   =
-// PARAMETER = ‚È‚µ
-// RETURN    = ƒtƒ@ƒCƒ‹‚Ì—L–³
+// PARAMETER = ï¿½È‚ï¿½
+// RETURN    = ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ì—Lï¿½ï¿½
 /***************************************************************************/
 int replay_file_find2( void )
 {
@@ -777,7 +737,7 @@ int replay_file_find2( void )
 	stage = 1;
 	if ( gameflag[126] == 1 )
 	{
-		stage = 2;	/* — ƒXƒe[ƒW */
+		stage = 2;	/* ï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½W */
 	}
 	else 
 	{

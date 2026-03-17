@@ -8,13 +8,16 @@ CC = $(CROSS_COMPILE)gcc
 CXX = $(CROSS_COMPILE)g++
 STRIP = $(CROSS_COMPILE)strip
 
-CFLAGS = `$(SDL_BASE)sdl-config --cflags` -O2 -Wall
+CFLAGS = `$(SDL_BASE)sdl-config --cflags` -O2 -Wall -DGP2X
 CXXFLAGS = `$(SDL_BASE)sdl-config --cflags` -O2 -Wall
-#LIBS = -L"C:/GP2X/devkitGP2X/lib" -lSDL -lSDL_gfx --start-group -lSDL_ttf -lfreetype -lSDL --end-group -lSDL_image -ljpeg -lpng12 -lz --start-group -lSDL_mixer -lvorbisidec -lmikmod -lsmpeg -lSDL --end-group -lgcc -lm -lc -lexpat -lpthread -ldl
 LIBS = `$(SDL_BASE)sdl-config --libs`
 
 SDLTEST_TARGET = gnp.gpe
 SDLTEST_OBJS = ram.o util_snd.o function.o dconv.o scene.o title.o init.o act.o option.o ending.o logo.o
+SDLTEST_OBJS += src/renderer/sdl12generic/renderer_sdl12.o
+SDLTEST_OBJS += src/input/generic/input_generic.o
+SDLTEST_OBJS += src/filesystem/gp2x/filesystem_gp2x.o
+SDLTEST_OBJS += src/platform/gp2x/platform_gp2x.o
 
 all : $(SDLTEST_TARGET)
 

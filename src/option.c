@@ -2,10 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SDL.h>
 #include "define.h"
 #include "function.h"
-#include "util_snd.h"
+#include "audio/audio.h"
 #include "extern.h"
 #include "option.h" 
 
@@ -47,7 +46,7 @@ void option_main( void )
 		option_keys( );		
 		option_drow( );		
 		
-		RefreshScreen( g_screen );	
+		RefreshScreen(NULL);	
 		FPSWait( );		
 
 		exit_code = system_keys( ); 
