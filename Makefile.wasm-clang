@@ -1,0 +1,73 @@
+# Upstream LLVM/clang WebAssembly + HTML Canvas build for Ganbare Natsuki-san.
+#
+# This target intentionally does not use SDL, Emscripten, Asyncify, or WASI.
+# It builds a browser-oriented wasm32-unknown-unknown module with clang/LLD,
+# then uses a small JavaScript host for Canvas presentation, input, assets, and
+# localStorage-backed saves.
+#
+# Build:
+#   make -f Makefile.wasm-clang
+# Serve:
+#   make -f Makefile.wasm-clang serve
+
+CLANG ?= clang
+PYTHON ?= python3
+DATASET ?= wide
+BUILD_DIR ?= build/wasm-clang
+WASM ?= $(BUILD_DIR)/ganbare_natsuki_san.wasm
+ASSET_BIN ?= $(BUILD_DIR)/assets.bin
+ASSET_JSON ?= $(BUILD_DIR)/assets.json
+CLANG_RESOURCE := $(shell $(CLANG) -print-resource-dir)
+
+COMMON_CFLAGS ?= -O2 -std=gnu99 -Wall -Wextra -fomit-frame-pointer
+COMMON_CFLAGS += --target=wasm32-unknown-unknown -ffreestanding -nostdinc -fno-builtin -fno-stack-protector
+COMMON_CFLAGS += -isystem $(CLANG_RESOURCE)/include -Isrc/wasm/freestanding/include -Isrc
+COMMON_CFLAGS += -DWIDESCREEN -DRELATIVE_PATH -DGNS_WASM_RAW -DGNS_FRAME_STEPPED
+
+WASM_LDFLAGS += --target=wasm32-unknown-unknown -nostdlib
+WASM_LDFLAGS += -Wl,--no-entry -Wl,--allow-undefined -Wl,--export-memory
+WASM_LDFLAGS += -Wl,--export=gns_start -Wl,--export=gns_frame -Wl,--export=gns_shutdown
+WASM_LDFLAGS += -Wl,--export=gns_input_button_event -Wl,--export=gns_input_clear -Wl,--export=gns_input_debug_press -Wl,--export=gns_input_debug_push
+WASM_LDFLAGS += -Wl,--initial-memory=67108864 -Wl,--max-memory=268435456 -Wl,-z,stack-size=1048576
+
+SRCS  = src/ram.c src/refresh.c src/function.c src/dconv.c src/scene.c src/title.c src/init.c src/act.c src/option.c src/ending.c src/logo.c
+SRCS += src/renderer/wasm_raw/renderer_wasm_raw.c
+SRCS += src/input/wasm_raw/input_wasm_raw.c
+SRCS += src/audio/wasm_raw/audio_wasm_raw.c
+SRCS += src/filesystem/wasm_raw/filesystem_wasm_raw.c
+SRCS += src/platform/wasm_raw/platform_wasm_raw.c
+SRCS += src/wasm/freestanding/wasm_runtime.c
+
+OBJS = $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRCS))
+
+ASSETS_STAMP = $(BUILD_DIR)/.assets-stamp
+
+all: $(BUILD_DIR)/index.html $(BUILD_DIR)/gns_wasm.js $(WASM) $(ASSETS_STAMP)
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
+	mkdir -p $(dir $@)
+	$(CLANG) $(COMMON_CFLAGS) -c $< -o $@
+
+$(WASM): $(OBJS)
+	$(CLANG) $(WASM_LDFLAGS) -o $@ $(OBJS)
+
+$(ASSETS_STAMP): tools/pack_wasm_assets.py | $(BUILD_DIR)
+	$(PYTHON) tools/pack_wasm_assets.py --image-root data/$(DATASET)/image --data-root data/data --sound-root data/sound --out-bin $(ASSET_BIN) --out-json $(ASSET_JSON)
+	touch $@
+
+$(BUILD_DIR)/index.html: web/wasm_clang/index.html | $(BUILD_DIR)
+	cp $< $@
+
+$(BUILD_DIR)/gns_wasm.js: web/wasm_clang/gns_wasm.js | $(BUILD_DIR)
+	cp $< $@
+
+serve: all
+	$(PYTHON) -m http.server 8000 -d $(BUILD_DIR)
+
+clean:
+	rm -rf $(BUILD_DIR)
+
+.PHONY: all serve clean

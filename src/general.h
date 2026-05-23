@@ -3,7 +3,9 @@
 
 #include "define.h"
 
-#ifdef SDL_AVAILABLE
+#if defined(SDL3_AVAILABLE)
+#include <SDL3/SDL.h>
+#elif defined(SDL_AVAILABLE)
 #include <SDL.h>
 #else
 #include <stdint.h>

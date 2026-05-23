@@ -18,6 +18,7 @@ void main_init( void );
 void main_init_config( void );
 void ExitProgram(void);
 
+#ifndef GNS_FRAME_STEPPED
 int main(int argc, char *argv[])
 {
 	void* tmp;
@@ -53,6 +54,82 @@ int main(int argc, char *argv[])
 	ExitProgram( );
 	return 0;
 }
+
+#else
+static int gns_started = 0;
+
+__attribute__((export_name("gns_start")))
+int gns_start(void)
+{
+	void* tmp;
+	int argc = 0;
+	char **argv = NULL;
+
+	if (gns_started) return 0;
+	gns_started = 1;
+
+	Platform_InitEarly();
+	Platform_InitMain(argc, argv);
+	Platform_Init(argc, argv);
+	Platform_InitVideoPost();
+
+#if DEPTH != 8
+	if (Renderer_GetScreen() != NULL)
+#endif
+	{
+		tmp = Renderer_LoadSurface(IMAGE_PATH "color.bmp");	
+		if (tmp)
+		{
+			SetGscreenPalette( tmp );
+			Renderer_FreeSurface(tmp);
+		}
+	}
+	
+	if (!Renderer_GetScreen())
+	{
+		fprintf(stderr, "Couldn't set video mode\n");
+		return 1;
+	}
+
+	FunctionInit( );
+	main_init( );
+	return 0;
+}
+
+__attribute__((export_name("gns_frame")))
+int gns_frame(void)
+{
+	if (!gns_started)
+	{
+		if (gns_start() != 0) return 0;
+	}
+
+	/* In frame-stepped/browser builds the host owns the event loop.
+	   Snapshot browser input before scene logic so menu/button pushes are
+	   visible in the same exported frame. */
+	Input_Update( );
+
+	if (!scenemanager_frame( ))
+	{
+		ExitProgram( );
+		return 0;
+	}
+	return 1;
+}
+
+__attribute__((export_name("gns_shutdown")))
+void gns_shutdown(void)
+{
+	if (!gns_started) return;
+	soundStopBgm(0);
+	soundStopSeAll();
+	soundRelease();
+	SaveGameFlag("config");
+	closePAD();
+	Platform_Shutdown();
+	gns_started = 0;
+}
+#endif
 
 void ExitProgram(void)
 {
@@ -168,6 +245,52 @@ void main_init_config( void )
 			gameflag[300 + i] = 100;
 		}
 	}
-	gameflag[121] = 50;	
+
+#ifdef GNS_WASM_RAW
+	/* The browser host exposes a fixed virtual GP2X-style pad.  Keep the
+	   logical game bindings canonical even when an older localStorage config
+	   was written by a previous experimental WASM build. */
+	gameflag[0]=GP2X_BUTTON_UP;
+	gameflag[1]=GP2X_BUTTON_DOWN;
+	gameflag[2]=GP2X_BUTTON_LEFT;
+	gameflag[3]=GP2X_BUTTON_RIGHT;
+	gameflag[4]=GP2X_BUTTON_A;
+	gameflag[5]=GP2X_BUTTON_X;
+	gameflag[6]=GP2X_BUTTON_Y;
+	gameflag[7]=GP2X_BUTTON_B;
+	gameflag[8]=GP2X_BUTTON_L;
+	gameflag[9]=GP2X_BUTTON_R;
+	gameflag[10]=GP2X_BUTTON_START;
+	gameflag[11]=GP2X_BUTTON_SELECT;
+
+	/* Do not let stale browser config imply that stage 50 is available when
+	   no valid work save is present.  The WASM filesystem returns a synthetic
+	   stage-1 save but returns -1 for the missing/corrupt case, so this detects
+	   a genuinely persisted work save without breaking the ACT fallback. */
+	{
+		Sint32 saved_gameflag2[GAMEFLAG_SIZE];
+		char path_work_wasm[96];
+		int valid_work_wasm;
+
+		memcpy(saved_gameflag2, gameflag2, sizeof(gameflag2));
+		Filesystem_GetWorkSavePath(path_work_wasm, sizeof(path_work_wasm));
+		valid_work_wasm = (LoadGameFlag2(path_work_wasm) == 0);
+		memcpy(gameflag2, saved_gameflag2, sizeof(gameflag2));
+
+		if (!valid_work_wasm)
+		{
+			gameflag[120] = 1;
+			gameflag[121] = 1;
+			gameflag[123] = -1;
+		}
+		else
+		{
+			if (gameflag[120] < 1 || gameflag[120] > 50) gameflag[120] = 1;
+			if (gameflag[121] < 1 || gameflag[121] > 50) gameflag[121] = gameflag[120];
+		}
+	}
+#else
+	gameflag[121] = 50;
+#endif
 	gameflag[100] = 1;	
 }

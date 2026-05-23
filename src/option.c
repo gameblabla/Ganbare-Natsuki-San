@@ -35,6 +35,7 @@ static int tolal_time3[5];
 /* Size was 1024, reduce it to 20 as that's the minimum here. - Gameblabla */
 static char string[20];
 
+#ifndef GNS_FRAME_STEPPED
 void option_main( void )
 {
 	int exit_code;
@@ -58,6 +59,43 @@ void option_main( void )
 	
 	option_relese( );		
 }
+
+#else
+int option_step( void )
+{
+	static int active = 0;
+	int exit_code;
+
+	if ( ! active )
+	{
+		option_init( );
+		active = 1;
+	}
+
+	if ( scene_exit )
+	{
+		option_keys( );
+		option_drow( );
+		RefreshScreen(NULL);
+		FPSWait( );
+
+		exit_code = system_keys( );
+		if ( exit_code == 0 )
+		{
+			scene_exit = 0;
+		}
+	}
+
+	if ( ! scene_exit )
+	{
+		option_relese( );
+		active = 0;
+		return 0;
+	}
+
+	return 1;
+}
+#endif
 
 void option_init( void )
 {

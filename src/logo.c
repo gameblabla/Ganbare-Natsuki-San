@@ -21,6 +21,7 @@ static int scene_exit;
 static int demo;
 
 
+#ifndef GNS_FRAME_STEPPED
 void logo_main( void )
 {
 	int exit_code;
@@ -44,6 +45,43 @@ void logo_main( void )
 	
 	logo_relese( );	
 }
+
+#else
+int logo_step( void )
+{
+	static int active = 0;
+	int exit_code;
+
+	if ( ! active )
+	{
+		logo_init( );
+		active = 1;
+	}
+
+	if ( scene_exit )
+	{
+		logo_keys( );
+		logo_drow( );
+		RefreshScreen(NULL);
+		FPSWait( );
+
+		exit_code = system_keys( );
+		if ( exit_code == 0 )
+		{
+			scene_exit = 0;
+		}
+	}
+
+	if ( ! scene_exit )
+	{
+		logo_relese( );
+		active = 0;
+		return 0;
+	}
+
+	return 1;
+}
+#endif
 
 void logo_init( void )
 {
@@ -84,7 +122,15 @@ void logo_drow( void )
 	ClearSecondary();
 	demo++;
 	
+#ifdef WIDESCREEN
+	/* The logo/intro artwork is still the original 320x240 image.  Center it
+	 * inside the 400x240 widescreen framebuffer instead of pinning it to the
+	 * left edge.  This is intentionally local to the intro/logo screen so the
+	 * rest of the widescreen layout remains unchanged. */
+	Blt( 2, ( DISPLY_WIDTH - 320 ) / 2, 0 );
+#else
 	Blt( 2, 0, 0 );		/* 320 * 240 */
+#endif
 	KeyInput();				
 }
 

@@ -18,7 +18,11 @@ extern int LoadFile( char *fn, Sint32 *buff, Sint32 size );
 
 #define IsPushKey Input_IsPush
 #define IsPressKey Input_IsPress
+#ifdef GNS_FRAME_STEPPED
+#define KeyInput() ((void)0)
+#else
 #define KeyInput Input_Update
+#endif
 #define initPAD Input_Init
 #define closePAD Input_Shutdown
 #define IsPushOKKey Input_IsPushOK

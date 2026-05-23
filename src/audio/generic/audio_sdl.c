@@ -321,7 +321,7 @@ void soundPlaySe(Sint32 num)
 	for(i = 0; i < SOUND_MIXBANK; i++){
 		if(chunkChannel[i] == -1){
 		    Mix_PlayChannel(i, chunk[num], 0);
-			Mix_VolumeChunk(chunk[i], vol);
+			Mix_VolumeChunk(chunk[num], vol);
 			chunkChannel[i] = num;
 			return;
 		}

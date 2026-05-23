@@ -1,0 +1,60 @@
+# WebAssembly + HTML Canvas build for Ganbare Natsuki-san.
+#
+# This is intentionally not an SDL build.  The game still draws through the
+# renderer/input/filesystem/audio interfaces, but the selected backends are:
+#   - renderer:   src/renderer/wasm_canvas/renderer_wasm_canvas.c
+#   - input:      src/input/wasm_canvas/input_wasm_canvas.c
+#   - filesystem: src/filesystem/wasm_canvas/filesystem_wasm_canvas.c
+#   - audio:      src/audio/headless/audio_headless.c
+#
+# Build:
+#   make -f Makefile.wasm
+# Serve:
+#   make -f Makefile.wasm serve
+#
+# The compiler is Emscripten's LLVM/clang frontend.  It is used here for its
+# browser runtime, virtual filesystem preloading, and Asyncify support.  SDL is
+# not linked or used by this target.
+
+EMCC ?= emcc
+DATASET ?= wide
+BUILD_DIR ?= build/wasm
+OUTPUT ?= $(BUILD_DIR)/index.html
+
+COMMON_CFLAGS ?= -O2 -std=gnu99 -Wall -Wextra -fomit-frame-pointer
+COMMON_CFLAGS += -DWIDESCREEN -DNOSOUND -DRELATIVE_PATH -DGNS_WASM_CANVAS
+
+LDFLAGS += -lm
+WASM_LDFLAGS += -sENVIRONMENT=web -sALLOW_MEMORY_GROWTH=1 -sASYNCIFY=1
+WASM_LDFLAGS += -sEXIT_RUNTIME=1
+WASM_LDFLAGS += --shell-file web/wasm_canvas_shell.html
+
+PRELOADS  = --preload-file data/$(DATASET)/image@image
+PRELOADS += --preload-file data/data@data
+
+OBJS  = src/ram.o src/refresh.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o
+OBJS += src/renderer/wasm_canvas/renderer_wasm_canvas.o
+OBJS += src/input/wasm_canvas/input_wasm_canvas.o
+OBJS += src/audio/headless/audio_headless.o
+OBJS += src/filesystem/wasm_canvas/filesystem_wasm_canvas.o
+OBJS += src/platform/wasm_canvas/platform_wasm_canvas.o
+
+all: $(OUTPUT)
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+$(OUTPUT): $(OBJS) web/wasm_canvas_shell.html | $(BUILD_DIR)
+	$(EMCC) $(COMMON_CFLAGS) -o $@ $(OBJS) $(LDFLAGS) $(WASM_LDFLAGS) $(PRELOADS)
+
+%.o: %.c
+	$(EMCC) $(COMMON_CFLAGS) -c $< -o $@
+
+serve: $(OUTPUT)
+	python3 -m http.server 8000 -d $(BUILD_DIR)
+
+clean:
+	rm -f $(OBJS)
+	rm -rf $(BUILD_DIR)
+
+.PHONY: all serve clean

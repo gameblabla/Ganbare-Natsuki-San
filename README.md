@@ -17,6 +17,20 @@ Here are some of the changes :
   * Fixed support for 64-bits platforms
   * Loads 32-bitsz backgrounds instead of the 8-bits ones. (An error in the source code)
 
+
+SDL3 desktop build
+==================
+
+This branch includes a separate SDL3 code path alongside the existing SDL 1.2 and Dreamcast paths. Build it with:
+
+    make -f Makefile.SDL3
+
+Run it from the source tree with the widescreen assets:
+
+    make -f Makefile.SDL3 run
+
+The SDL3 backend renders the existing software framebuffer through a streaming texture, keeps the 400x240 widescreen coordinate system when WIDESCREEN is enabled, and letterboxes/pillarboxes on resize instead of stretching the image. See SDL3_PORTING.md for details.
+
 LICENSE
 ========
 

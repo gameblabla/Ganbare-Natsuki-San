@@ -152,12 +152,16 @@ void ResetGameFlag2( void )
 
 void FPSWait( void )
 {
+#ifndef GNS_FRAME_STEPPED
 	Uint32 leftTick;
+#endif
 
 	//サウンドの再生
 	soundPlayCtrl( );
+#ifndef GNS_FRAME_STEPPED
 	Input_PollEvent();
 	Input_Update();
+#endif
 /*
 	nowTick = Renderer_GetTicks();
 	frame = (nowTick - prvTickCount) / INTERVAL_BASE;
@@ -171,6 +175,10 @@ void FPSWait( void )
 	prvTickCount = Renderer_GetTicks();
 */
 
+#ifdef GNS_FRAME_STEPPED
+	nowTick = Renderer_GetTicks();
+	prvTickCount = nowTick;
+#else
 	if(prvTickCount == 0) prvTickCount = Renderer_GetTicks();
 	
 	while (true)
@@ -184,6 +192,7 @@ void FPSWait( void )
  		Renderer_Delay(1);
 	}
 	prvTickCount = nowTick;
+#endif
 
 	gameflag[107] = gameflag[107] + 1;
 	if ( gameflag[107] >= 60 )

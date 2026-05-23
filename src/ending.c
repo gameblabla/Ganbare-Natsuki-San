@@ -20,6 +20,7 @@ void ending_init_save_data( void );
 
 static int scene_exit;
 
+#ifndef GNS_FRAME_STEPPED
 void ending_main( void )
 {
 	int exit_code;
@@ -43,6 +44,43 @@ void ending_main( void )
 	
 	ending_relese( );		// �I��
 }
+
+#else
+int ending_step( void )
+{
+	static int active = 0;
+	int exit_code;
+
+	if ( ! active )
+	{
+		ending_init( );
+		active = 1;
+	}
+
+	if ( scene_exit )
+	{
+		ending_keys( );
+		ending_drow( );
+		RefreshScreen(NULL);
+		FPSWait( );
+
+		exit_code = system_keys( );
+		if ( exit_code == 0 )
+		{
+			scene_exit = 0;
+		}
+	}
+
+	if ( ! scene_exit )
+	{
+		ending_relese( );
+		active = 0;
+		return 0;
+	}
+
+	return 1;
+}
+#endif
 
 void ending_init( void )
 {

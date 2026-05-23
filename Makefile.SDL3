@@ -1,0 +1,69 @@
+# SDL3 desktop build. This keeps the old SDL 1.2 Makefile and Dreamcast
+# Makefile untouched, while adding a modern SDL3 renderer/input/audio path.
+#
+# Build:
+#   make -f Makefile.SDL3
+# Run from the source tree with the widescreen assets:
+#   make -f Makefile.SDL3 run
+#
+# Override packages if your distribution uses different pkg-config names:
+#   make -f Makefile.SDL3 SDL3_PKG=SDL3 SDL3_MIXER_PKG=sdl3-mixer
+#
+# Build without SDL3_mixer audio, using the no-op audio backend:
+#   make -f Makefile.SDL3 AUDIO_BACKEND=headless
+
+CC ?= gcc
+PKG_CONFIG ?= pkg-config
+SDL3_PKG ?= sdl3
+SDL3_MIXER_PKG ?= SDL3_mixer
+AUDIO_BACKEND ?= sdl3
+OUTPUT ?= gnp_sdl3
+DATASET ?= wide
+PREFIX ?= /usr/local
+
+CFLAGS ?= -O2 -g -std=gnu99 -Wall -Wextra -fomit-frame-pointer
+CFLAGS += -DSDL3_AVAILABLE -DGNS_SDL3 -DWIDESCREEN
+CFLAGS += $(shell $(PKG_CONFIG) --cflags $(SDL3_PKG))
+LDFLAGS += $(shell $(PKG_CONFIG) --libs $(SDL3_PKG)) -lm
+
+OBJS  = src/ram.o src/refresh.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o
+OBJS += src/renderer/sdl3/renderer_sdl3.o
+OBJS += src/input/sdl3/input_sdl3.o
+OBJS += src/filesystem/generic/filesystem_generic.o
+OBJS += src/platform/generic/platform_generic.o
+
+ifeq ($(AUDIO_BACKEND),headless)
+CFLAGS += -DNOSOUND
+OBJS += src/audio/headless/audio_headless.o
+else
+CFLAGS += $(shell $(PKG_CONFIG) --cflags $(SDL3_MIXER_PKG))
+LDFLAGS += $(shell $(PKG_CONFIG) --libs $(SDL3_MIXER_PKG))
+OBJS += src/audio/sdl3/audio_sdl3.o
+endif
+
+SOURCES = $(patsubst %.o,%.c,$(OBJS))
+
+all: $(OUTPUT)
+
+$(OUTPUT): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
+
+run: $(OUTPUT)
+	cd data/$(DATASET) && ../../$(OUTPUT)
+
+package-dir: $(OUTPUT)
+	rm -rf build/sdl3-$(DATASET)
+	mkdir -p build/sdl3-$(DATASET)
+	cp $(OUTPUT) build/sdl3-$(DATASET)/
+	cp -r data/$(DATASET)/image build/sdl3-$(DATASET)/
+	cp -r data/data build/sdl3-$(DATASET)/
+	cp -r data/sound build/sdl3-$(DATASET)/
+
+install: package-dir
+	mkdir -p $(DESTDIR)$(PREFIX)/games/ganbare-natsuki-san
+	cp -r build/sdl3-$(DATASET)/* $(DESTDIR)$(PREFIX)/games/ganbare-natsuki-san/
+
+clean:
+	rm -f $(OBJS) $(OUTPUT)
+
+.PHONY: all run package-dir install clean

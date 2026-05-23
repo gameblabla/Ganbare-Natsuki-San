@@ -48,6 +48,7 @@ static int title_no = 0;
 /* Size was 1024, reduce it to 29 as that's the minimum here. - Gameblabla */
 static char string[29];
 
+#ifndef GNS_FRAME_STEPPED
 void title_main( void )
 {
 	int exit_code;
@@ -72,6 +73,43 @@ void title_main( void )
 	
 	title_relese( );
 }
+
+#else
+int title_step( void )
+{
+	static int active = 0;
+	int exit_code;
+
+	if ( ! active )
+	{
+		title_init( );
+		active = 1;
+	}
+
+	if ( scene_exit )
+	{
+		title_keys( );
+		title_drow( );
+		RefreshScreen(NULL);
+		FPSWait( );
+
+		exit_code = system_keys( );
+		if ( exit_code == 0 )
+		{
+			scene_exit = 0;
+		}
+	}
+
+	if ( ! scene_exit )
+	{
+		title_relese( );
+		active = 0;
+		return 0;
+	}
+
+	return 1;
+}
+#endif
 
 void title_init( void )
 {
