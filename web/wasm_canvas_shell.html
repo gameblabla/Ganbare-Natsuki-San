@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ganbare Natsuki-san</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      background: #050505;
+      --gns-aspect: 5 / 3;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #050505;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+    }
+
+    #gns-canvas {
+      display: block;
+      width: min(100vw, calc(100vh * var(--gns-aspect)));
+      height: auto;
+      max-width: 100vw;
+      max-height: 100vh;
+      aspect-ratio: var(--gns-aspect);
+      background: #000;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      outline: none;
+      touch-action: none;
+    }
+
+    #status {
+      position: fixed;
+      left: 0.75rem;
+      bottom: 0.5rem;
+      font: 12px/1.4 system-ui, sans-serif;
+      color: #aaa;
+      opacity: 0.75;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gns-canvas" width="400" height="240" tabindex="0" aria-label="Ganbare Natsuki-san game canvas"></canvas>
+  <div id="status">Loading…</div>
+  <script>
+    var Module = {
+      canvas: document.getElementById('gns-canvas'),
+      print: function(text) { console.log(text); },
+      printErr: function(text) { console.error(text); },
+      setStatus: function(text) {
+        var status = document.getElementById('status');
+        if (status) status.textContent = text || '';
+      },
+      onRuntimeInitialized: function() {
+        var status = document.getElementById('status');
+        if (status) status.textContent = '';
+        Module.canvas.focus();
+      }
+    };
+  </script>
+  {{{ SCRIPT }}}
+</body>
+</html>
