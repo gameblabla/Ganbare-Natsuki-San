@@ -2,6 +2,7 @@ CC = kos-cc
 SH_DIRECTORY=/opt/toolchains/dc/sh-elf/bin/
 
 CFLAGS  = -Ofast -flto -Wall -Wextra -DDREAMCAST -DNAOMI
+CFLAGS += -DSDL_AVAILABLE -Isrc
 CXXFLAGS = $(CFLAGS)
 LDFLAGS = -lc -lm -lSDL_naomi -lz -s -flto
 
@@ -16,7 +17,24 @@ CFLAGS +=  -ml -m4-single-only -Wl,-Ttext=0x8c020000 -Wl,--gc-sections -nodefaul
 SYSROOT = $(shell $(CC) --print-sysroot)
 CFLAGS += `$(SYSROOT)/bin/sdl-config --cflags`
 
-OBJS  = romdisk.o src/ram.o src/util_snd_dc.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o src/vmu.o
+OBJS  = romdisk.o
+OBJS += src/ram.o
+OBJS += src/refresh.o
+OBJS += src/function.o
+OBJS += src/dconv.o
+OBJS += src/scene.o
+OBJS += src/title.o
+OBJS += src/init.o
+OBJS += src/act.o
+OBJS += src/option.o
+OBJS += src/ending.o
+OBJS += src/logo.o
+OBJS += src/audio/dreamcast/audio_dreamcast.o
+OBJS += src/renderer/dreamcast/renderer_dreamcast.o
+OBJS += src/input/dreamcast/input_dreamcast.o
+OBJS += src/filesystem/dreamcast/filesystem_dreamcast.o
+OBJS += src/filesystem/dreamcast/vmu.o
+OBJS += src/platform/dreamcast/platform_dreamcast.o
 SOURCES = $(patsubst %.o, %.c, $(OBJS))
 
 all: gnp

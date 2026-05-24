@@ -5,6 +5,7 @@ PROGRAM = gnp.elf
 CC = /opt/rs90-toolchain/bin/mipsel-linux-gcc
 LDFLAGS =  -nodefaultlibs -lc -lgcc -lSDL -lSDL_mixer -lmikmod -lvorbisidec -logg  -no-pie -Wl,--as-needed -Wl,--gc-sections -flto -s
 CFLAGS = -Ofast -fdata-sections -ffunction-sections -mno-fp-exceptions -mno-check-zero-division -mframe-header-opt -fsingle-precision-constant -fno-common -mips32 -mno-mips16 -mplt -mno-shared -flto
+CFLAGS += -DSDL_AVAILABLE
 CFLAGS	+= -DGCW0
 SYSROOT = $(shell $(CC) --print-sysroot)
 CFLAGS += `$(SYSROOT)/usr/bin/sdl-config --cflags`
@@ -13,7 +14,22 @@ CFLAGS += `$(SYSROOT)/usr/bin/sdl-config --cflags`
 INCLUDES := 
 
 CFLAGS +=  -Isrc
-CFILES =  src/ram.c src/util_snd.c src/function.c src/dconv.c src/scene.c src/title.c src/init.c src/act.c src/option.c src/ending.c src/logo.c src/refresh.c
+CFILES  = src/ram.c
+CFILES += src/refresh.c
+CFILES += src/function.c
+CFILES += src/dconv.c
+CFILES += src/scene.c
+CFILES += src/title.c
+CFILES += src/init.c
+CFILES += src/act.c
+CFILES += src/option.c
+CFILES += src/ending.c
+CFILES += src/logo.c
+CFILES += src/audio/generic/audio_sdl.c
+CFILES += src/renderer/sdl12generic/renderer_sdl12.c
+CFILES += src/input/generic/input_generic.c
+CFILES += src/filesystem/gcw0/filesystem_gcw0.c
+CFILES += src/platform/generic/platform_generic.c
 
 #
 #========================================(Compile)

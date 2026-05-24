@@ -1,17 +1,16 @@
-CC := emcc
-CFLAGS  := -O0 -g3 -DRELATIVE_PATH -DNOSOUND -std=gnu99 -fomit-frame-pointer -s ENVIRONMENT=web -s ALLOW_MEMORY_GROWTH=1 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s STB_IMAGE=1 --closure 1
-LDFLAGS := -lSDL  -lm -ldl
-SYSROOT = 
+# Compatibility wrapper.  The old Emscripten Makefile referenced removed SDL 1.2-era files.
+# Use the maintained Canvas/Emscripten backend instead.
 
-OBJS  = src/ram.o src/util_snd.o src/refresh.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o
-SOURCES = $(patsubst %.o, %.c, $(OBJS))
+all:
+	$(MAKE) -f Makefile.wasm-emcc all
 
-OUTPUT= gnp.html
-
-all: $(OUTPUT)
-
-$(OUTPUT): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS) --preload-file game_data/ --use-preload-plugins
+serve:
+	$(MAKE) -f Makefile.wasm-emcc serve
 
 clean:
-	rm $(OBJS) *.wasm *.js *.html
+	$(MAKE) -f Makefile.wasm-emcc clean
+
+%:
+	$(MAKE) -f Makefile.wasm-emcc $@
+
+.PHONY: all serve clean

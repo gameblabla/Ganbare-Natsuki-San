@@ -1,10 +1,26 @@
 TARGET = GannatsuPortable
-OBJS = ram.o util_snd.o function.o dconv.o scene.o title.o init.o act.o option.o ending.o logo.o
+OBJS  = src/ram.o
+OBJS += src/refresh.o
+OBJS += src/function.o
+OBJS += src/dconv.o
+OBJS += src/scene.o
+OBJS += src/title.o
+OBJS += src/init.o
+OBJS += src/act.o
+OBJS += src/option.o
+OBJS += src/ending.o
+OBJS += src/logo.o
+OBJS += src/audio/generic/audio_sdl.o
+OBJS += src/renderer/sdl12generic/renderer_sdl12.o
+OBJS += src/input/generic/input_generic.o
+OBJS += src/filesystem/generic/filesystem_generic.o
+OBJS += src/platform/psp/platform_psp.o
 
 BUILD_PRX = 1
 PSP_FW_VERSION = 390
 
 CFLAGS = -O2 -G0 -Wall -w -g -Wextra -DPSPUMODE
+CFLAGS += -DSDL_AVAILABLE -Isrc
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fno-builtin-printf
 ASFLAGS = $(CFLAGS)
 

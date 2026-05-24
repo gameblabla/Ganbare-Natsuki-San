@@ -9,13 +9,25 @@ CXX = $(CROSS_COMPILE)g++
 STRIP = $(CROSS_COMPILE)strip
 
 CFLAGS = `$(SDL_BASE)sdl-config --cflags` -O2 -Wall -DGP2X
+CFLAGS += -DSDL_AVAILABLE -Isrc
 CXXFLAGS = `$(SDL_BASE)sdl-config --cflags` -O2 -Wall
 LIBS = `$(SDL_BASE)sdl-config --libs`
 
 SDLTEST_TARGET = gnp.gpe
-SDLTEST_OBJS = ram.o util_snd.o function.o dconv.o scene.o title.o init.o act.o option.o ending.o logo.o
+SDLTEST_OBJS  = src/ram.o
+SDLTEST_OBJS += src/refresh.o
+SDLTEST_OBJS += src/function.o
+SDLTEST_OBJS += src/dconv.o
+SDLTEST_OBJS += src/scene.o
+SDLTEST_OBJS += src/title.o
+SDLTEST_OBJS += src/init.o
+SDLTEST_OBJS += src/act.o
+SDLTEST_OBJS += src/option.o
+SDLTEST_OBJS += src/ending.o
+SDLTEST_OBJS += src/logo.o
+SDLTEST_OBJS += src/audio/generic/audio_sdl.o
 SDLTEST_OBJS += src/renderer/sdl12generic/renderer_sdl12.o
-SDLTEST_OBJS += src/input/generic/input_generic.o
+SDLTEST_OBJS += src/input/gp2x/input_gp2x.o
 SDLTEST_OBJS += src/filesystem/gp2x/filesystem_gp2x.o
 SDLTEST_OBJS += src/platform/gp2x/platform_gp2x.o
 
@@ -26,4 +38,4 @@ $(SDLTEST_TARGET) : $(SDLTEST_OBJS)
 	$(STRIP) $(SDLTEST_TARGET)
 
 clean:
-	rm -f $(ALL_TARGETS) *.o *~
+	rm -f $(SDLTEST_TARGET) $(SDLTEST_OBJS) *.o *~

@@ -7,16 +7,29 @@ REZ=$(RETRO68)/bin/Rez
 SDL_INCLUDE=$(PREFIX)/include/SDL
 
 CFLAGS = -D__MACOS__ -DCLASSICMAC -DMSB_FIRST -Wall -Wextra -Ofast -fdata-sections -ffunction-sections -I$(SDL_INCLUDE)
+CFLAGS += -DSDL_AVAILABLE -Isrc
 CXXFLAGS = $(CFLAGS)
 
 LDFLAGS=-lRetroConsole -lSDL_mixer -lm -lSDL -lDialogsLib -Wl,--as-needed -Wl,--gc-sections 
 RINCLUDES=$(PREFIX)/RIncludes
 REZFLAGS=-I$(RINCLUDES)
 	
-OBJS  = src/ram.o src/util_snd.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o src/refresh.o
+OBJS  = src/ram.o
+OBJS += src/refresh.o
+OBJS += src/function.o
+OBJS += src/dconv.o
+OBJS += src/scene.o
+OBJS += src/title.o
+OBJS += src/init.o
+OBJS += src/act.o
+OBJS += src/option.o
+OBJS += src/ending.o
+OBJS += src/logo.o
+OBJS += src/audio/generic/audio_sdl.o
 OBJS += src/renderer/sdl12generic/renderer_sdl12.o
 OBJS += src/input/generic/input_generic.o
 OBJS += src/filesystem/macos/filesystem_macos.o
+OBJS += src/platform/generic/platform_generic.o
 
 CFLAGS += $(DEFS)
 

@@ -1,14 +1,27 @@
 CC = nspire-gcc
 CXX =  nspire-g++
 CFLAGS  = -O2 -D_TINSPIRE -DNOSOUND -I/home/hatsune/Ndless/ndless-sdk/include -I/home/hatsune/Ndless/ndless-sdk/include/SDL
+CFLAGS += -DSDL_AVAILABLE -Isrc
 LDFLAGS = -lSDL -lm
 SYSROOT = $(shell $(CC) --print-sysroot)
 CFLAGS += `$(SYSROOT)/usr/bin/sdl-config --cflags`
 
-OBJS  = src/ram.o src/util_snd.o src/function.o src/dconv.o src/scene.o src/title.o src/init.o src/act.o src/option.o src/ending.o src/logo.o
+OBJS  = src/ram.o
+OBJS += src/refresh.o
+OBJS += src/function.o
+OBJS += src/dconv.o
+OBJS += src/scene.o
+OBJS += src/title.o
+OBJS += src/init.o
+OBJS += src/act.o
+OBJS += src/option.o
+OBJS += src/ending.o
+OBJS += src/logo.o
+OBJS += src/audio/headless/audio_headless.o
 OBJS += src/renderer/sdl12generic/renderer_sdl12.o
 OBJS += src/input/generic/input_generic.o
 OBJS += src/filesystem/tinspire/filesystem_tinspire.o
+OBJS += src/platform/generic/platform_generic.o
 SOURCES = $(patsubst %.o, %.c, $(OBJS))
 
 all: gnp
