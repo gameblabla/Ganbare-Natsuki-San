@@ -5,7 +5,8 @@
 #include "function.h"
 #include "audio/audio.h"
 #include "extern.h"
-#include "act.h" 
+#include "act.h"
+#include "wasm/achievements.h" 
 #include "dconv.h" 
 #include "general.h" 
 #include "renderer/renderer.h"
@@ -99,6 +100,120 @@ void debugdisp( void );
 
 /* Size was 1024, reduce it to 30 as that's the minimum required here. - Gameblabla */
 static char string[30];
+
+#ifdef GNS_WASM_RAW
+extern int gns_wasm_debug_cheat_is_active(void);
+
+/* Runtime-only Newgrounds score validation state.  These gameflag slots are
+   otherwise unused by the original game.  They are deliberately not part of the
+   portable score-save format; they exist only to prevent the browser build from
+   posting leaderboard scores after level-select or other non-full-run starts. */
+#define WASM_SCORE_TA_STATE         gameflag[139]
+#define WASM_SCORE_TA_EXPECT_STAGE  gameflag[140]
+#define WASM_SCORE_TA_INVALID       2
+#define WASM_SCORE_TA_VALID         1
+
+static Sint32 wasm_score_encoded_time_ms( Sint32 encoded_time )
+{
+	Sint32 frames;
+	Sint32 seconds;
+	Sint32 minutes;
+	Sint32 body;
+
+	if ( encoded_time <= 1000000 )
+	{
+		return -1;
+	}
+
+	body = encoded_time - 1000000;
+	frames = body % 100;
+	seconds = ( body / 100 ) % 100;
+	minutes = body / 10000;
+
+	if ( frames < 0 || frames >= 60 || seconds < 0 || seconds >= 60 || minutes < 0 )
+	{
+		return -1;
+	}
+
+	return ( minutes * 60 * 1000 ) + ( seconds * 1000 ) + ( frames * 1000 / 60 );
+}
+
+static void wasm_score_validate_time_attack_stage_start( Sint32 current_stage )
+{
+	if ( gameflag[127] != 1 )
+	{
+		return;
+	}
+
+	/* Replays/demo playback are never eligible for online score submission. */
+	if ( gameflag[132] != 0 )
+	{
+		WASM_SCORE_TA_STATE = WASM_SCORE_TA_INVALID;
+		return;
+	}
+
+	/* If the run did not pass through the WASM title-menu marker, fall back to a
+	   conservative check: only a fresh total-attack timer at stage 1 is eligible. */
+	if ( WASM_SCORE_TA_STATE == 0 )
+	{
+		if ( current_stage == 1 && gameflag[135] == 1000000 && gameflag[136] == 0 )
+		{
+			WASM_SCORE_TA_STATE = WASM_SCORE_TA_VALID;
+			WASM_SCORE_TA_EXPECT_STAGE = 1;
+		}
+		else
+		{
+			WASM_SCORE_TA_STATE = WASM_SCORE_TA_INVALID;
+			return;
+		}
+	}
+
+	if ( WASM_SCORE_TA_STATE == WASM_SCORE_TA_VALID && current_stage != WASM_SCORE_TA_EXPECT_STAGE )
+	{
+		WASM_SCORE_TA_STATE = WASM_SCORE_TA_INVALID;
+	}
+}
+
+static void wasm_score_note_time_attack_stage_clear( Sint32 completed_stage )
+{
+	if ( gameflag[127] != 1 )
+	{
+		return;
+	}
+
+	if ( WASM_SCORE_TA_STATE != WASM_SCORE_TA_VALID || completed_stage != WASM_SCORE_TA_EXPECT_STAGE )
+	{
+		WASM_SCORE_TA_STATE = WASM_SCORE_TA_INVALID;
+		return;
+	}
+
+	WASM_SCORE_TA_EXPECT_STAGE = completed_stage + 1;
+}
+
+static void wasm_score_post_total_time( Sint32 completed_stage )
+{
+	Sint32 total_ms;
+
+	/* The Newgrounds board is for full Time Attack only.  Do not post aggregate
+	   normal-mode records, replay clears, or Time Attack runs entered through
+	   level select. */
+	if ( completed_stage < 50 || gameflag[127] != 1 || gameflag[132] != 0 )
+	{
+		return;
+	}
+
+	if ( WASM_SCORE_TA_STATE != WASM_SCORE_TA_VALID || WASM_SCORE_TA_EXPECT_STAGE != completed_stage )
+	{
+		return;
+	}
+
+	total_ms = wasm_score_encoded_time_ms( gameflag[135] );
+	if ( total_ms > 0 )
+	{
+		GNS_Score( GNS_SCORE_TOTAL_TIME, total_ms );
+	}
+}
+#endif
 
 static Sint32 scene_exit;
 static Sint32 sn = 0;									/* ��ʗp�ϐ������ς��邱�Ƃɂ���ĕ`��֐����̏�����ς���		*/
@@ -238,6 +353,49 @@ static Sint32 atk_rr1 =22;						/* �r�̉�]���x */
 static Sint32 atk_rr2 = 1;						/* �r�̉�]���x */
 //Sint32 atk_rr = 360 / 32;						/* �r�̉�]���x */
 
+
+static Sint32 clamp_sint32( Sint32 value, Sint32 low, Sint32 high )
+{
+	if ( value < low )
+	{
+		return low;
+	}
+	if ( value > high )
+	{
+		return high;
+	}
+	return value;
+}
+
+static Sint32 camera_max_x( void )
+{
+	Sint32 max_x;
+
+	max_x = MapInfo[2] - DISPLY_WIDTH;
+	if ( max_x < 0 )
+	{
+		max_x = 0;
+	}
+	return max_x;
+}
+
+static Sint32 camera_x_for_player( void )
+{
+	return clamp_sint32( player[0] - DISPLY_WIDTH_HALF, 0, camera_max_x( ) );
+}
+
+static Sint32 widescreen_center_320_x( void )
+{
+	Sint32 x;
+
+	x = ( DISPLY_WIDTH - 320 ) / 2;
+	if ( x < 0 )
+	{
+		x = 0;
+	}
+	return x;
+}
+
 static Sint32 stage = 0;								/* �X�e�[�W�ԍ� */
 
 static Sint32 pshot[10 * 10];							/* �v���C���[�U���p��� */
@@ -322,15 +480,26 @@ void act_main( void )
 }
 
 #else
+static int act_step_active = 0;
+
+void act_step_force_inactive( void )
+{
+	if ( act_step_active )
+	{
+		act_relese( );
+		act_step_active = 0;
+	}
+	scene_exit = 0;
+}
+
 int act_step( void )
 {
-	static int active = 0;
 	Sint32 exit_code;
 
-	if ( ! active )
+	if ( ! act_step_active )
 	{
 		act_init( );
-		active = 1;
+		act_step_active = 1;
 	}
 
 	if ( scene_exit )
@@ -348,7 +517,7 @@ int act_step( void )
 	if ( ! scene_exit )
 	{
 		act_relese( );
-		active = 0;
+		act_step_active = 0;
 		return 0;
 	}
 
@@ -439,6 +608,9 @@ void act_init( void )
 	stage = save_data[2];
 	d_num = save_data[3]; 	/* ��� */
 	gameflag[120] = d_num;
+#ifdef GNS_WASM_RAW
+	wasm_score_validate_time_attack_stage_start( d_num );
+#endif
 
 
 	player[20] = 0;
@@ -2300,6 +2472,27 @@ void save_file_w( )
 	ResetGameFlag2();
 	save_data[5] = player[8];
 	save_data[2] = stage;
+
+	/* Browser and native continue should restart the current selected stage after
+	   a death in normal stage mode.  Do not persist a dead HP value, because the
+	   browser work-save validator uses this file as the authoritative continue
+	   state.  Time Attack deliberately resets to stage 1 after death. */
+	if ( player[8] <= 0 )
+	{
+		if ( gameflag[127] == 1 )
+		{
+			save_data[2] = 1;
+			save_data[3] = 1;
+		}
+		if ( save_data[6] > 0 )
+		{
+			save_data[5] = save_data[6];
+		}
+		else
+		{
+			save_data[5] = 3;
+		}
+	}
 	
 	save_data[0] = player[0];	
 	save_data[1] = player[1];
@@ -2371,18 +2564,8 @@ void playerdisp( )
 	}
 	fram_set( );
 	
-	if ( player[0] < DISPLY_WIDTH_HALF )
-	{
-		dp_x = player[0];
-	}
-	else if ( player[0] >= DISPLY_WIDTH_PLUS_HALF )
-	{
-		dp_x = player[0] - DISPLY_WIDTH;
-	}
-	else 
-	{
-		dp_x = DISPLY_WIDTH_HALF;
-	}
+	d_x = camera_x_for_player( );
+	dp_x = player[0] - d_x;
 	
 	if ( player[1] < DISPLY_HEIGHT_HALF )
 	{
@@ -2663,18 +2846,7 @@ void bakdisp1()
 		bak_cnt = 0;
 	}
 
-	if ( player[0] < DISPLY_WIDTH_HALF )
-	{
-		d_x = 0;
-	}
-	else if ( player[0] >= DISPLY_WIDTH_PLUS_HALF )
-	{
-		d_x = DISPLY_WIDTH;
-	}
-	else 
-	{
-		d_x = player[0] - DISPLY_WIDTH_HALF;
-	}
+	d_x = camera_x_for_player( );
 
 	if ( player[1] < ( DISPLY_HEIGHT_HALF ) )
 	{
@@ -3458,14 +3630,14 @@ void stage_claer( )
 		{
 			if ( gameflag[132] == 0 )
 			{
-				Blt( 69, 0, 0 );
+				Blt( 69, widescreen_center_320_x( ), 0 );
 			}
 		}
 		if ( ( gameflag[200 + save_data[3] + stage_hosei] > play_time[4] ) )
 		{
 			if ( gameflag[132] == 0 )
 			{
-				Blt( 68, 0, 0 );
+				Blt( 68, widescreen_center_320_x( ), 0 );
 			}
 		}
 	}
@@ -3520,10 +3692,46 @@ void stage_claer( )
 				}
 			}
 				
-				save_data[3]++;
-				if ( gameflag[121] < save_data[3] )
 				{
-					gameflag[121] = save_data[3];
+					int completed_stage = save_data[3];
+
+					if ( stage == 0 )
+					{
+						/* Tutorial is not part of normal progression.  Return to title
+						   without incrementing unlocked stages, medals, scores, or the
+						   persistent browser continue slot. */
+						gameflag[40] = 1;
+						g_scene = EN_SN_TITLE;
+					}
+					else
+					{
+						save_data[3]++;
+#ifdef GNS_WASM_RAW
+						if ( !gns_wasm_debug_cheat_is_active() )
+						{
+#endif
+						if ( completed_stage == 1 )
+						{
+							GNS_Achievement(GNS_ACH_FIRST_LEVEL, completed_stage);
+						}
+						if ( completed_stage >= 50 )
+						{
+							GNS_Achievement(GNS_ACH_GAME_COMPLETE, completed_stage);
+#ifdef GNS_WASM_RAW
+							wasm_score_post_total_time( completed_stage );
+#endif
+						}
+#ifdef GNS_WASM_RAW
+						}
+#endif
+#ifdef GNS_WASM_RAW
+						wasm_score_note_time_attack_stage_clear( completed_stage );
+#endif
+						if ( gameflag[121] < save_data[3] )
+						{
+							gameflag[121] = save_data[3];
+						}
+					}
 				}
 		}
 		else 
@@ -5083,6 +5291,11 @@ Sint32 map1_item_j( Sint32 x, Sint32 y )
 	}
 	
 	rc = map1[ px + ( ( py ) * 20 ) ];
+
+	/* Do not normalize the 300/400 tile families here.  Stage 11 uses many
+	   300/400-series tiles as visual/background blocks: the player can pass
+	   through them, so the anchor must not attach to them.  Only the original
+	   100/200-series map tiles are treated as solid/grabbable by callers. */
 	
 	/* �A�C�e���Ƃ̂����蔻�� */
 	for ( i = 0; i < 50; i++ )
@@ -5323,6 +5536,15 @@ void window_disp( )
 /* ���j���[�ł̃L�[���� */
 void window_keys( )
 {
+	/* In browser/controller builds players expect the same Pause/Start
+	   control to unpause.  The original menu only accepted OK/Cancel,
+	   which looked like a lock-up when Start/Escape/P had opened it. */
+	if ( IsPushKey( gameflag[6] ) )
+	{
+		sn = 1;
+		return;
+	}
+
 	if ( IsPushKey( gameflag[0] ) )
 	{
 		soundPlaySe( EN_SE_SELECT );

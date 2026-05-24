@@ -11,6 +11,7 @@
 #include "platform.h"
 #include "renderer/renderer.h"
 #include "filesystem/filesystem.h"
+#include "wasm/achievements.h"
 
 #include "scene.h"
 
@@ -93,6 +94,7 @@ int gns_start(void)
 
 	FunctionInit( );
 	main_init( );
+	GNS_Achievement(GNS_ACH_STARTUP, 0);
 	return 0;
 }
 
@@ -116,6 +118,69 @@ int gns_frame(void)
 	}
 	return 1;
 }
+
+
+#ifdef GNS_WASM_RAW
+extern void gns_wasm_debug_start_level(int level);
+extern void title_step_force_inactive( void );
+extern void act_step_force_inactive( void );
+extern void gns_input_clear(void);
+
+
+__attribute__((export_name("gns_debug_unlock_levels")))
+void gns_debug_unlock_levels(void)
+{
+	/* Browser-only debug helper.  This is intentionally separate from normal
+	   save/config loading so ?debug=1 can test any level without requiring an
+	   already-completed save file. */
+	gameflag[100] = 1;
+	gameflag[121] = 50;
+	if (gameflag[120] < 1) gameflag[120] = 1;
+	if (gameflag[120] > 50) gameflag[120] = 50;
+	/* Debug access must never make the Newgrounds Time Attack board eligible. */
+	gameflag[139] = 2;
+}
+
+__attribute__((export_name("gns_debug_start_level")))
+int gns_debug_start_level(int level)
+{
+	if (level < 1) level = 1;
+	if (level > 50) level = 50;
+
+	if (!gns_started)
+	{
+		if (gns_start() != 0) return 0;
+	}
+
+	if (g_scene == EN_SN_TITLE)
+	{
+		title_step_force_inactive();
+	}
+	else if (g_scene == EN_SN_ACT)
+	{
+		act_step_force_inactive();
+	}
+
+	gns_input_clear();
+	gns_wasm_debug_start_level(level);
+
+	gameflag[120] = level;
+	gameflag[121] = 50;
+	gameflag[123] = -1;
+	gameflag[124] = 0;
+	gameflag[125] = 0;
+	gameflag[127] = 0;
+	gameflag[132] = 0;
+	gameflag[139] = 2;
+	gameflag[140] = 0;
+	gameflag[70] = 1;
+	gameflag[71] = 1;
+	gameflag[40] = 4;
+
+	g_scene = EN_SN_ACT;
+	return level;
+}
+#endif
 
 __attribute__((export_name("gns_shutdown")))
 void gns_shutdown(void)

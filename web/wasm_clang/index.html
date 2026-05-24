@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ganbare Natsuki-san</title>
+  <link rel="icon" href="data:,">
   <style>
     :root {
       color-scheme: dark;
@@ -52,12 +53,111 @@
       pointer-events: none;
     }
 
-    #controls {
+
+    #audio-prompt {
+      position: fixed;
+      left: 0.75rem;
+      top: 0.75rem;
+      z-index: 4;
+      max-width: min(23rem, calc(100vw - 1.5rem));
+      border-radius: 0.45rem;
+      background: rgb(0 0 0 / 62%);
+      color: #eee;
+      padding: 0.35rem 0.55rem;
+      font: 12px/1.35 system-ui, sans-serif;
+      user-select: none;
+      pointer-events: none;
+      text-shadow: 0 1px 2px #000;
+    }
+
+    #audio-prompt[hidden] {
+      display: none;
+    }
+
+    #achievement-toast {
+      position: fixed;
+      left: 50%;
+      top: 1rem;
+      z-index: 5;
+      transform: translate(-50%, -150%);
+      display: grid;
+      grid-template-columns: 3rem auto;
+      gap: 0.55rem;
+      align-items: center;
+      min-width: min(22rem, calc(100vw - 1.5rem));
+      max-width: min(28rem, calc(100vw - 1.5rem));
+      border: 1px solid rgb(255 255 255 / 22%);
+      border-radius: 0.55rem;
+      background: rgb(0 0 0 / 82%);
+      color: #eee;
+      padding: 0.55rem 0.7rem;
+      box-shadow: 0 0.35rem 1.2rem rgb(0 0 0 / 55%);
+      font: 12px/1.35 system-ui, sans-serif;
+      transition: transform 180ms ease;
+      pointer-events: none;
+    }
+
+    #achievement-toast.visible {
+      transform: translate(-50%, 0);
+    }
+
+    #achievement-toast[hidden] {
+      display: none;
+    }
+
+    #achievement-toast img {
+      width: 3rem;
+      height: 3rem;
+      object-fit: cover;
+      image-rendering: pixelated;
+      border-radius: 0.35rem;
+      background: #111;
+    }
+
+    #achievement-toast-title {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    #achievement-toast-text {
+      margin-top: 0.1rem;
+      color: #ccc;
+    }
+
+    #newgrounds-panel {
+      margin: 0.45rem 0 0.65rem;
+      padding: 0.45rem 0.55rem;
+      border: 1px solid rgb(255 255 255 / 15%);
+      border-radius: 0.35rem;
+      background: rgb(255 255 255 / 7%);
+    }
+
+    #newgrounds-panel[hidden] {
+      display: none;
+    }
+
+    #top-ui {
       position: fixed;
       right: 0.75rem;
       top: 0.75rem;
+      z-index: 6;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.35rem;
       max-width: min(35rem, calc(100vw - 1.5rem));
       max-height: calc(100vh - 1.5rem);
+      pointer-events: none;
+    }
+
+    #top-ui > * {
+      pointer-events: auto;
+    }
+
+    #controls {
+      width: 9rem;
+      max-width: 100%;
+      max-height: calc(100vh - 4.1rem);
       overflow: auto;
       border-radius: 0.45rem;
       background: rgb(0 0 0 / 72%);
@@ -65,6 +165,10 @@
       font: 12px/1.35 system-ui, sans-serif;
       box-shadow: 0 0.35rem 1.2rem rgb(0 0 0 / 55%);
       user-select: none;
+    }
+
+    #controls[open] {
+      width: min(35rem, calc(100vw - 1.5rem));
     }
 
     #controls:not([open]) {
@@ -78,6 +182,7 @@
       list-style: none;
       color: #eee;
       font-weight: 700;
+      text-align: center;
     }
 
     #controls > summary::-webkit-details-marker {
@@ -152,73 +257,282 @@
       background: rgb(255 255 255 / 22%);
     }
 
+    .top-button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem;
+      width: 9rem;
+      max-width: 100%;
+      align-self: flex-end;
+    }
+
+    .top-icon-button {
+      display: grid;
+      place-items: center;
+      min-height: 2rem;
+      border: 1px solid rgb(255 255 255 / 30%);
+      border-radius: 0.45rem;
+      background: rgb(0 0 0 / 42%);
+      color: #eee;
+      padding: 0.28rem 0.35rem;
+      font: 800 17px/1 system-ui, sans-serif;
+      cursor: pointer;
+      box-shadow: none;
+      user-select: none;
+    }
+
+    .top-icon-button:hover,
+    .top-icon-button:focus-visible {
+      background: rgb(255 255 255 / 18%);
+    }
+
+    .top-icon-button[hidden] {
+      display: none;
+    }
+
+    #debug-cheat-panel {
+      width: 9rem;
+      max-width: 100%;
+      border: 1px solid rgb(255 190 70 / 38%);
+      border-radius: 0.45rem;
+      background: rgb(0 0 0 / 58%);
+      color: #ffe8b5;
+      padding: 0.45rem;
+      font: 12px/1.35 system-ui, sans-serif;
+      box-shadow: 0 0.35rem 1.2rem rgb(0 0 0 / 45%);
+      user-select: none;
+    }
+
+    #debug-cheat-panel[hidden] {
+      display: none;
+    }
+
+    #debug-cheat-panel strong {
+      display: block;
+      margin-bottom: 0.35rem;
+      color: #fff2ce;
+    }
+
+    #debug-cheat-panel label {
+      display: grid;
+      gap: 0.2rem;
+      margin-bottom: 0.4rem;
+    }
+
+    #debug-level-select {
+      width: 100%;
+      border: 1px solid rgb(255 255 255 / 28%);
+      border-radius: 0.3rem;
+      background: rgb(0 0 0 / 45%);
+      color: #fff;
+      padding: 0.18rem 0.25rem;
+      font: inherit;
+    }
+
+    #debug-start-level {
+      width: 100%;
+    }
+
+    #debug-cheat-status {
+      min-height: 1.3em;
+      margin-top: 0.25rem;
+      color: #ffd98a;
+      font-size: 11px;
+    }
+
     #touch-controls {
       position: fixed;
-      left: 50%;
-      bottom: 1.25rem;
-      transform: translateX(-50%);
-      display: flex;
-      gap: min(8vw, 3rem);
-      align-items: end;
-      opacity: 0.42;
+      inset: 0;
+      z-index: 3;
+      display: none;
+      pointer-events: none;
       user-select: none;
+      -webkit-user-select: none;
       touch-action: none;
     }
 
-    #touch-controls:focus-within,
-    #touch-controls:hover {
-      opacity: 0.75;
+    @media (pointer: coarse), (hover: none) {
+      #touch-controls {
+        display: block;
+      }
     }
 
-    .dpad {
+    body.gns-force-touch #touch-controls {
+      display: block;
+    }
+
+    .touch-stick-wrap {
+      position: fixed;
+      left: max(1rem, env(safe-area-inset-left));
+      bottom: max(1rem, env(safe-area-inset-bottom));
       display: grid;
-      grid-template-columns: repeat(3, 2.5rem);
-      grid-template-rows: repeat(3, 2.5rem);
-      gap: 0.18rem;
+      gap: 0.45rem;
+      justify-items: center;
+      pointer-events: none;
     }
 
-    .action-pad {
+    .touch-stick {
+      position: relative;
+      width: clamp(6.1rem, 23vw, 9.2rem);
+      height: clamp(6.1rem, 23vw, 9.2rem);
+      border: 1px solid rgb(255 255 255 / 30%);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, rgb(255 255 255 / 14%) 0 22%, transparent 23%),
+        radial-gradient(circle at 50% 50%, transparent 0 57%, rgb(255 255 255 / 12%) 58% 61%, transparent 62%),
+        rgb(0 0 0 / 42%);
+      box-shadow: 0 0.45rem 1.35rem rgb(0 0 0 / 45%);
+      backdrop-filter: blur(2px);
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    .touch-stick::before,
+    .touch-stick::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: rgb(255 255 255 / 16%);
+      pointer-events: none;
+    }
+
+    .touch-stick::before {
+      width: 68%;
+      height: 1px;
+    }
+
+    .touch-stick::after {
+      width: 1px;
+      height: 68%;
+    }
+
+    .touch-stick-knob {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 40%;
+      height: 40%;
+      border: 1px solid rgb(255 255 255 / 35%);
+      border-radius: 50%;
+      background: rgb(255 255 255 / 22%);
+      box-shadow: inset 0 0.1rem 0.35rem rgb(255 255 255 / 18%), 0 0.25rem 0.8rem rgb(0 0 0 / 45%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .touch-stick-label,
+    .touch-system-label {
+      color: rgb(255 255 255 / 70%);
+      font: 700 10px/1 system-ui, sans-serif;
+      letter-spacing: 0.08em;
+      text-shadow: 0 1px 2px #000;
+      pointer-events: none;
+    }
+
+    .touch-action-wrap {
+      position: fixed;
+      right: max(1rem, env(safe-area-inset-right));
+      bottom: max(1rem, env(safe-area-inset-bottom));
       display: grid;
-      grid-template-columns: repeat(2, 2.7rem);
-      grid-template-rows: repeat(2, 2.7rem);
-      gap: 0.35rem;
+      grid-template-columns: repeat(2, clamp(3.3rem, 12vw, 4.9rem));
+      grid-template-rows: repeat(2, clamp(3.3rem, 12vw, 4.9rem));
+      gap: clamp(0.45rem, 2.2vw, 0.85rem);
+      pointer-events: none;
     }
 
-    .sys-pad {
+    .touch-system-wrap {
+      position: fixed;
+      left: 50%;
+      bottom: max(0.85rem, env(safe-area-inset-bottom));
+      transform: translateX(-50%);
       display: flex;
-      gap: 0.35rem;
-      align-self: center;
+      align-items: center;
+      gap: 0.45rem;
+      pointer-events: none;
     }
 
     [data-gns-button] {
       border: 1px solid rgb(255 255 255 / 35%);
-      border-radius: 0.45rem;
-      background: rgb(0 0 0 / 55%);
+      border-radius: 999px;
+      background: rgb(0 0 0 / 48%);
       color: #eee;
-      min-width: 2.5rem;
-      min-height: 2.5rem;
-      padding: 0 0.45rem;
-      font: 600 12px/1 system-ui, sans-serif;
+      min-width: 2.8rem;
+      min-height: 2.8rem;
+      padding: 0 0.55rem;
+      font: 800 13px/1 system-ui, sans-serif;
+      box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 45%);
+      backdrop-filter: blur(2px);
+      pointer-events: auto;
       touch-action: none;
       -webkit-user-select: none;
       user-select: none;
     }
 
-    [data-gns-button]:active {
+    .touch-action-wrap [data-gns-button] {
+      width: 100%;
+      height: 100%;
+      font-size: clamp(15px, 4vw, 20px);
+    }
+
+    .touch-system-wrap [data-gns-button] {
+      min-width: 3.7rem;
+      min-height: 2rem;
+      font-size: 10px;
+      border-radius: 0.75rem;
+      background: rgb(0 0 0 / 42%);
+    }
+
+    [data-gns-button].touch-active,
+    [data-gns-button]:active,
+    .touch-stick.touch-active {
       background: rgb(255 255 255 / 25%);
     }
 
-    @media (pointer: fine) {
-      #touch-controls {
-        display: none;
+    @media (orientation: portrait) {
+      #gns-canvas {
+        width: min(100vw, calc(78vh * var(--gns-aspect)));
+      }
+
+      .touch-stick-wrap {
+        bottom: max(1.3rem, env(safe-area-inset-bottom));
+      }
+
+      .touch-action-wrap {
+        bottom: max(1.3rem, env(safe-area-inset-bottom));
+      }
+    }
+
+    @media (max-height: 430px) and (orientation: landscape) {
+      .touch-stick-wrap {
+        left: max(0.55rem, env(safe-area-inset-left));
+        bottom: max(0.55rem, env(safe-area-inset-bottom));
+      }
+
+      .touch-action-wrap {
+        right: max(0.55rem, env(safe-area-inset-right));
+        bottom: max(0.55rem, env(safe-area-inset-bottom));
+      }
+
+      .touch-system-wrap {
+        bottom: max(0.45rem, env(safe-area-inset-bottom));
       }
     }
 
     @media (max-width: 720px) {
-      #controls[open] {
+      #top-ui {
         left: 0.75rem;
         right: 0.75rem;
         max-width: none;
+      }
+
+      #controls[open] {
+        width: 100%;
+      }
+
+      .top-button-row {
+        width: 9rem;
       }
 
       #bindings-table th,
@@ -231,51 +545,87 @@
 <body>
   <canvas id="gns-canvas" width="400" height="240" tabindex="0" aria-label="Ganbare Natsuki-san game canvas"></canvas>
 
-  <details id="controls">
-    <summary>Controls</summary>
-    <div class="controls-body">
-      <p>The panel is collapsed by default so it does not cover the game. Keyboard, Gamepad API controllers, and touch buttons are remappable here.</p>
-      <div class="controls-actions">
-        <button id="reset-bindings" class="small-button" type="button">Reset defaults</button>
-        <button id="close-controls" class="small-button" type="button">Close</button>
+  <div id="top-ui">
+    <details id="controls">
+      <summary>Controls</summary>
+      <div class="controls-body">
+        <p>The panel is collapsed by default so it does not cover the game. Keyboard, Gamepad API controllers, and touch buttons are remappable here. Default keyboard controls: Arrow keys or WASD to move, Z or Enter to confirm, X or Space to cancel/jump, P or Escape to pause, C/V for B, Q/E for L/R, Tab for Select.</p>
+        <div class="controls-actions">
+          <button id="reset-bindings" class="small-button" type="button">Reset defaults</button>
+          <button id="close-controls" class="small-button" type="button">Close</button>
+        </div>
+        <div id="newgrounds-panel" hidden>
+          <strong>Newgrounds</strong>
+          <p id="newgrounds-user">Not signed in</p>
+          <button id="newgrounds-login" class="small-button" type="button">Sign in</button>
+          <button id="newgrounds-logout" class="small-button" type="button">Sign out</button>
+        </div>
+        <div id="capture-box" hidden>
+          <div id="capture-status"></div>
+          <button id="cancel-capture" class="small-button" type="button">Cancel remap</button>
+        </div>
+        <table id="bindings-table">
+          <thead>
+            <tr>
+              <th>Game control</th>
+              <th>Keyboard</th>
+              <th></th>
+              <th>Gamepad</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="binding-rows"></tbody>
+        </table>
       </div>
-      <div id="capture-box" hidden>
-        <div id="capture-status"></div>
-        <button id="cancel-capture" class="small-button" type="button">Cancel remap</button>
-      </div>
-      <table id="bindings-table">
-        <thead>
-          <tr>
-            <th>Game control</th>
-            <th>Keyboard</th>
-            <th></th>
-            <th>Gamepad</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="binding-rows"></tbody>
-      </table>
+    </details>
+    <div class="top-button-row" aria-label="Game page actions">
+      <button id="fullscreen-button" class="top-icon-button" type="button" title="Fullscreen" aria-label="Fullscreen">⛶</button>
+      <button id="pause-button" class="top-icon-button" type="button" title="Pause / menu" aria-label="Pause / menu">⏸</button>
     </div>
-  </details>
+    <div id="debug-cheat-panel" hidden>
+      <strong>Debug cheats</strong>
+      <label>Level
+        <select id="debug-level-select" aria-label="Debug level select"></select>
+      </label>
+      <button id="debug-start-level" class="small-button" type="button">Start level</button>
+      <div id="debug-cheat-status" aria-live="polite"></div>
+    </div>
+  </div>
 
   <div id="touch-controls" aria-label="On-screen controls">
-    <div class="dpad">
-      <span></span><button type="button" data-gns-button="UP">↑</button><span></span>
-      <button type="button" data-gns-button="LEFT">←</button><span></span><button type="button" data-gns-button="RIGHT">→</button>
-      <span></span><button type="button" data-gns-button="DOWN">↓</button><span></span>
+    <div class="touch-stick-wrap">
+      <div id="touch-stick" class="touch-stick" role="application" aria-label="Virtual analog joystick">
+        <div id="touch-stick-knob" class="touch-stick-knob"></div>
+      </div>
+      <div class="touch-stick-label">MOVE</div>
     </div>
-    <div class="sys-pad">
-      <button type="button" data-gns-button="SELECT">SEL</button>
-      <button type="button" data-gns-button="START">STA</button>
+    <div class="touch-system-wrap">
+      <button type="button" data-gns-button="SELECT" aria-label="Select">SEL</button>
+      <span class="touch-system-label">MENU</span>
+      <button type="button" data-gns-button="Y" aria-label="Pause / menu">PAU</button>
     </div>
-    <div class="action-pad">
-      <button type="button" data-gns-button="Y">C</button>
-      <button type="button" data-gns-button="B">V</button>
-      <button type="button" data-gns-button="A">Z</button>
-      <button type="button" data-gns-button="X">X</button>
+    <div class="touch-action-wrap" aria-label="Action buttons">
+      <button type="button" data-gns-button="Y" aria-label="Y / pause menu">Y</button>
+      <button type="button" data-gns-button="B" aria-label="B">B</button>
+      <button type="button" data-gns-button="A" aria-label="A / confirm">A</button>
+      <button type="button" data-gns-button="X" aria-label="X / cancel or jump">X</button>
+    </div>
+  </div>
+  <div id="audio-prompt">Click or press a key to enable audio.</div>
+  <div id="achievement-toast" hidden aria-live="polite">
+    <img id="achievement-toast-image" alt="">
+    <div>
+      <div id="achievement-toast-title"></div>
+      <div id="achievement-toast-text"></div>
     </div>
   </div>
   <div id="status">Loading…</div>
+  <!-- Optional Newgrounds.io medal support. The config is included in the WASM
+       build; place the official Newgrounds.io library next to this page as
+       newgroundsio.min.js to enable online medal unlocks. If that library is
+       absent, the game still runs and local achievement toasts still work. -->
+  <script src="newgroundsio.min.js"></script>
+  <script src="newgrounds_config.js"></script>
   <script src="gns_wasm.js"></script>
 </body>
 </html>

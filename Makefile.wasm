@@ -1,0 +1,9 @@
+# Default WebAssembly target: upstream clang/LLD + raw Canvas host.
+#
+# This wrapper exists so the expected command remains:
+#   make -f Makefile.wasm
+#
+# The older Emscripten/Asyncify canvas experiment is retained as:
+#   make -f Makefile.wasm-emcc
+
+include Makefile.wasm-clang

@@ -3,7 +3,18 @@
 
   const canvas = document.getElementById('gns-canvas');
   const status = document.getElementById('status');
+  const audioPrompt = document.getElementById('audio-prompt');
+  const achievementToast = document.getElementById('achievement-toast');
+  const achievementToastImage = document.getElementById('achievement-toast-image');
+  const achievementToastTitle = document.getElementById('achievement-toast-title');
+  const achievementToastText = document.getElementById('achievement-toast-text');
   const controls = document.getElementById('controls');
+  const fullscreenButton = document.getElementById('fullscreen-button');
+  const pauseButton = document.getElementById('pause-button');
+  const debugCheatPanel = document.getElementById('debug-cheat-panel');
+  const debugLevelSelect = document.getElementById('debug-level-select');
+  const debugStartLevelButton = document.getElementById('debug-start-level');
+  const debugCheatStatus = document.getElementById('debug-cheat-status');
   let instance = null;
   let memory = null;
   let imageData = null;
@@ -12,7 +23,11 @@
   let assetManifest = null;
   let running = false;
 
-  const DEBUG_INPUT = new URLSearchParams(window.location.search).has('debugInput');
+  const urlParams = new URLSearchParams(window.location.search);
+  const DEBUG_MODE = urlParams.get('debug') === '1' || urlParams.has('debug');
+  const DEBUG_INPUT = urlParams.has('debugInput');
+  const FORCE_TOUCH_CONTROLS = urlParams.has('touch');
+  if (FORCE_TOUCH_CONTROLS && document.body) document.body.classList.add('gns-force-touch');
 
   const GP2X_BUTTON = Object.freeze({
     UP: 0,
@@ -58,37 +73,35 @@
     { id: 'RIGHT', label: 'Right', button: GP2X_BUTTON.RIGHT },
     { id: 'A', label: 'Confirm / A', button: GP2X_BUTTON.A },
     { id: 'X', label: 'Cancel / Jump / X', button: GP2X_BUTTON.X },
-    { id: 'Y', label: 'Third action / Y', button: GP2X_BUTTON.Y },
+    { id: 'Y', label: 'Pause / menu / Y', button: GP2X_BUTTON.Y },
     { id: 'B', label: 'B', button: GP2X_BUTTON.B },
     { id: 'L', label: 'L', button: GP2X_BUTTON.L },
     { id: 'R', label: 'R', button: GP2X_BUTTON.R },
-    { id: 'START', label: 'Start', button: GP2X_BUTTON.START },
+    { id: 'START', label: 'Start (legacy)', button: GP2X_BUTTON.START },
     { id: 'SELECT', label: 'Select', button: GP2X_BUTTON.SELECT },
     { id: 'VOLDOWN', label: 'Volume down', button: GP2X_BUTTON.VOLDOWN },
-    { id: 'VOLUP', label: 'Volume up', button: GP2X_BUTTON.VOLUP },
-    { id: 'EXIT', label: 'Exit', button: GP2X_BUTTON.EXIT }
+    { id: 'VOLUP', label: 'Volume up', button: GP2X_BUTTON.VOLUP }
   ]);
 
   const ACTION_BY_ID = Object.freeze(Object.fromEntries(GAME_ACTIONS.map((action) => [action.id, action])));
-  const REMAP_STORAGE_KEY = 'ganbare-natsuki-san:wasm-input-map-v3';
+  const REMAP_STORAGE_KEY = 'ganbare-natsuki-san:wasm-input-map-v7';
 
   const DEFAULT_BINDINGS = Object.freeze({
     keyboard: Object.freeze({
-      UP: Object.freeze(['keyboard:key:ArrowUp', 'keyboard:key:w', 'keyboard:key:8']),
-      DOWN: Object.freeze(['keyboard:key:ArrowDown', 'keyboard:key:s', 'keyboard:key:2']),
-      LEFT: Object.freeze(['keyboard:key:ArrowLeft', 'keyboard:key:a', 'keyboard:key:4']),
-      RIGHT: Object.freeze(['keyboard:key:ArrowRight', 'keyboard:key:d', 'keyboard:key:6']),
-      A: Object.freeze(['keyboard:key:z', 'keyboard:key:Enter', 'keyboard:key:Control']),
-      X: Object.freeze(['keyboard:key:x', 'keyboard:key: ', 'keyboard:key:Alt', 'keyboard:key:Backspace']),
-      Y: Object.freeze(['keyboard:key:c']),
-      B: Object.freeze(['keyboard:key:v', 'keyboard:key:Shift']),
-      L: Object.freeze([]),
-      R: Object.freeze([]),
+      UP: Object.freeze(['keyboard:key:ArrowUp', 'keyboard:key:w']),
+      DOWN: Object.freeze(['keyboard:key:ArrowDown', 'keyboard:key:s']),
+      LEFT: Object.freeze(['keyboard:key:ArrowLeft', 'keyboard:key:a']),
+      RIGHT: Object.freeze(['keyboard:key:ArrowRight', 'keyboard:key:d']),
+      A: Object.freeze(['keyboard:key:z', 'keyboard:key:Enter']),
+      X: Object.freeze(['keyboard:key:x', 'keyboard:key: ']),
+      Y: Object.freeze(['keyboard:key:p', 'keyboard:key:Escape', 'keyboard:key:Esc']),
+      B: Object.freeze(['keyboard:key:c', 'keyboard:key:v']),
+      L: Object.freeze(['keyboard:key:q']),
+      R: Object.freeze(['keyboard:key:e']),
       START: Object.freeze([]),
       SELECT: Object.freeze(['keyboard:key:Tab']),
       VOLDOWN: Object.freeze(['keyboard:key:F1', 'keyboard:key:-']),
-      VOLUP: Object.freeze(['keyboard:key:F2', 'keyboard:key:=']),
-      EXIT: Object.freeze(['keyboard:key:Escape', 'keyboard:key:Esc'])
+      VOLUP: Object.freeze(['keyboard:key:F2', 'keyboard:key:='])
     }),
     gamepad: Object.freeze({
       UP: Object.freeze(['gamepad:button:12', 'gamepad:axis:1:-']),
@@ -97,15 +110,14 @@
       RIGHT: Object.freeze(['gamepad:button:15', 'gamepad:axis:0:+']),
       A: Object.freeze(['gamepad:button:0']),
       X: Object.freeze(['gamepad:button:1']),
-      Y: Object.freeze(['gamepad:button:2']),
+      Y: Object.freeze(['gamepad:button:2', 'gamepad:button:9']),
       B: Object.freeze(['gamepad:button:3']),
       L: Object.freeze(['gamepad:button:4', 'gamepad:button:6']),
       R: Object.freeze(['gamepad:button:5', 'gamepad:button:7']),
-      START: Object.freeze(['gamepad:button:9']),
+      START: Object.freeze([]),
       SELECT: Object.freeze(['gamepad:button:8']),
       VOLDOWN: Object.freeze([]),
-      VOLUP: Object.freeze([]),
-      EXIT: Object.freeze([])
+      VOLUP: Object.freeze([])
     })
   });
 
@@ -123,8 +135,7 @@
     ['START', GP2X_BUTTON.START],
     ['SELECT', GP2X_BUTTON.SELECT],
     ['VOL-', GP2X_BUTTON.VOLDOWN],
-    ['VOL+', GP2X_BUTTON.VOLUP],
-    ['EXIT', GP2X_BUTTON.EXIT]
+    ['VOL+', GP2X_BUTTON.VOLUP]
   ]);
 
   const sourceButtons = new Map();
@@ -132,6 +143,12 @@
 
   function setStatus(text) {
     if (status) status.textContent = text || '';
+  }
+
+  function setAudioPrompt(text, visible) {
+    if (!audioPrompt) return;
+    audioPrompt.textContent = text || '';
+    audioPrompt.hidden = !visible;
   }
 
   function u8() {
@@ -210,6 +227,26 @@
       return v * m;
     }
 
+    function isMuted() {
+      return host.masterVol <= 0 || (host.bgmVol <= 0 && host.seVol <= 0);
+    }
+
+    function refreshPrompt() {
+      if (isMuted()) {
+        setAudioPrompt('Audio is muted in the game options.', true);
+        return;
+      }
+      if (!host.ctx) {
+        setAudioPrompt('Click or press a key to enable audio.', true);
+        return;
+      }
+      if (host.ctx.state === 'running') {
+        setAudioPrompt('', false);
+      } else {
+        setAudioPrompt('Click or press a key to enable audio.', true);
+      }
+    }
+
     function ensure() {
       if (host.ctx) return true;
       const Ctor = AudioContextCtor();
@@ -227,13 +264,24 @@
       host.bgmGain.connect(host.masterGain);
       host.seGain.connect(host.masterGain);
       host.masterGain.connect(host.ctx.destination);
+      host.ctx.onstatechange = refreshPrompt;
+      refreshPrompt();
       return true;
+    }
+
+    function maybeStartWantedBgm() {
+      if (!host.ctx || host.wantedBgm < 0 || host.currentBgm) return;
+      const wanted = host.wantedBgm;
+      startBgm(wanted);
     }
 
     function resume() {
       if (!ensure()) return;
       if (host.ctx.state === 'suspended') {
-        host.ctx.resume().catch(() => {});
+        host.ctx.resume().then(() => { maybeStartWantedBgm(); refreshPrompt(); }).catch(() => { refreshPrompt(); });
+      } else {
+        maybeStartWantedBgm();
+        refreshPrompt();
       }
     }
 
@@ -271,10 +319,13 @@
     }
 
     function startBgm(index) {
-      if (!ensure()) return -1;
       const slot = host.bgm[index];
       if (!slot) return -1;
       host.wantedBgm = index;
+      if (!host.ctx) {
+        refreshPrompt();
+        return 0;
+      }
       if (!slot.buffer) {
         slot.pendingBgm = true;
         decodeSlot(slot);
@@ -301,9 +352,12 @@
     }
 
     function playSe(index) {
-      if (!ensure()) return -1;
       const slot = host.se[index];
       if (!slot) return -1;
+      if (!host.ctx) {
+        refreshPrompt();
+        return 0;
+      }
       if (!slot.buffer) {
         decodeSlot(slot);
         return 0;
@@ -339,10 +393,13 @@
 
     return {
       unlock: resume,
+      updatePrompt: refreshPrompt,
       init() {
-        /* Do not require a gesture here; browsers usually create a suspended
-           context and allow resume from the first key/pointer event. */
-        ensure();
+        /* Do not create AudioContext during gns_start().  Some browsers warn
+           when a context is constructed before a user gesture.  The first
+           pointer/key event calls unlock(), constructs the context, resumes it,
+           and starts the pending BGM. */
+        refreshPrompt();
         return 0;
       },
       shutdown() {
@@ -352,6 +409,7 @@
           host.ctx.close().catch(() => {});
         }
         host.ctx = null;
+        refreshPrompt();
       },
       loadBgm(num, pathPtr, loop) {
         const path = cstr(pathPtr);
@@ -361,7 +419,7 @@
           return -1;
         }
         host.bgm[num] = { index: num, path, loop, buffer: null, promise: null, pendingBgm: false };
-        decodeSlot(host.bgm[num]);
+        if (host.ctx) decodeSlot(host.bgm[num]);
         return 0;
       },
       loadSe(num, pathPtr) {
@@ -372,7 +430,7 @@
           return -1;
         }
         host.se[num] = { index: num, path, loop: 0, buffer: null, promise: null, pendingBgm: false };
-        decodeSlot(host.se[num]);
+        if (host.ctx) decodeSlot(host.se[num]);
         return 0;
       },
       playBgm: startBgm,
@@ -383,10 +441,12 @@
       setBgmGain(vol, master) {
         host.bgmVol = volGain(vol, master);
         if (host.bgmGain) host.bgmGain.gain.value = host.bgmVol;
+        refreshPrompt();
       },
       setSeGain(vol, master) {
         host.seVol = volGain(vol, master);
         if (host.seGain) host.seGain.gain.value = host.seVol;
+        refreshPrompt();
       },
       playSe,
       stopSe,
@@ -397,10 +457,429 @@
         return host.activeSe.some((active) => active.index === num) ? 1 : 0;
       },
       pause() {
-        if (host.ctx && host.ctx.state === 'running') host.ctx.suspend().catch(() => {});
+        if (host.ctx && host.ctx.state === 'running') host.ctx.suspend().then(refreshPrompt).catch(() => { refreshPrompt(); });
       },
       resume
     };
+  }
+
+
+  const ACHIEVEMENT_STORAGE_KEY = 'ganbare-natsuki-san:wasm-achievements-v1';
+  const ACHIEVEMENT_PENDING_STORAGE_KEY = 'ganbare-natsuki-san:wasm-ng-pending-v1';
+  const SCORE_PENDING_STORAGE_KEY = 'ganbare-natsuki-san:wasm-ng-score-pending-v1';
+
+
+  const ACHIEVEMENT_EVENTS = Object.freeze({
+    STARTUP: 1,
+    FIRST_LEVEL: 2,
+    GAME_COMPLETE: 3
+  });
+
+  const SCORE_EVENTS = Object.freeze({
+    TOTAL_TIME: 1
+  });
+
+  const SCOREBOARDS = Object.freeze({
+    total_time: Object.freeze({
+      id: 'total_time',
+      event: SCORE_EVENTS.TOTAL_TIME,
+      title: 'Total time',
+      boardKey: 'total_time'
+    })
+  });
+
+  const ACHIEVEMENTS = Object.freeze({
+    startup: Object.freeze({
+      id: 'startup',
+      event: ACHIEVEMENT_EVENTS.STARTUP,
+      title: 'Booted up !',
+      text: 'Playing the game for first time',
+      icon: 'achievements/startup.png',
+      medalKey: 'startup'
+    }),
+    first_level: Object.freeze({
+      id: 'first_level',
+      event: ACHIEVEMENT_EVENTS.FIRST_LEVEL,
+      title: 'First level',
+      text: 'Completed the first level',
+      icon: 'achievements/first_level.png',
+      medalKey: 'first_level'
+    }),
+    game_complete: Object.freeze({
+      id: 'game_complete',
+      event: ACHIEVEMENT_EVENTS.GAME_COMPLETE,
+      title: 'Game complete',
+      text: 'Completed all levels',
+      icon: 'achievements/game_complete.png',
+      medalKey: 'game_complete'
+    })
+  });
+
+  function safeLoadJsonSet(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      const arr = raw ? JSON.parse(raw) : [];
+      return new Set(Array.isArray(arr) ? arr.filter((v) => typeof v === 'string') : []);
+    } catch (_) {
+      return new Set();
+    }
+  }
+
+  function safeSaveJsonSet(key, set) {
+    try {
+      localStorage.setItem(key, JSON.stringify(Array.from(set)));
+    } catch (_) {}
+  }
+
+  function safeLoadJsonArray(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function safeSaveJsonArray(key, arr) {
+    try {
+      localStorage.setItem(key, JSON.stringify(Array.isArray(arr) ? arr : []));
+    } catch (_) {}
+  }
+
+  function makeAchievementHost() {
+    const unlocked = safeLoadJsonSet(ACHIEVEMENT_STORAGE_KEY);
+    const pendingNg = safeLoadJsonSet(ACHIEVEMENT_PENDING_STORAGE_KEY);
+    let pendingScores = safeLoadJsonArray(SCORE_PENDING_STORAGE_KEY);
+    const byEvent = new Map(Object.values(ACHIEVEMENTS).map((a) => [a.event, a]));
+    const scoreByEvent = new Map(Object.values(SCOREBOARDS).map((s) => [s.event, s]));
+    let toastTimer = 0;
+    let ngio = null;
+    let ngStatic = null;
+    let ngReady = false;
+    let ngStatusTimer = 0;
+    const config = window.GNS_NEWGROUNDS_CONFIG || {};
+
+    function showToast(achievement) {
+      if (!achievementToast) return;
+      if (achievementToastImage) {
+        achievementToastImage.src = achievement.icon;
+        achievementToastImage.alt = '';
+      }
+      if (achievementToastTitle) achievementToastTitle.textContent = achievement.title;
+      if (achievementToastText) achievementToastText.textContent = achievement.text;
+      achievementToast.hidden = false;
+      achievementToast.classList.add('visible');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        achievementToast.classList.remove('visible');
+        achievementToast.hidden = true;
+      }, 4200);
+    }
+
+    function ngMedalIdFor(achievement) {
+      const medals = config.medals || {};
+      const id = medals[achievement.medalKey] || medals[achievement.id] || 0;
+      return Number(id) || 0;
+    }
+
+    function markPendingNg(achievement) {
+      if (!ngMedalIdFor(achievement)) return;
+      pendingNg.add(achievement.id);
+      safeSaveJsonSet(ACHIEVEMENT_PENDING_STORAGE_KEY, pendingNg);
+    }
+
+    function clearPendingNg(achievement) {
+      pendingNg.delete(achievement.id);
+      safeSaveJsonSet(ACHIEVEMENT_PENDING_STORAGE_KEY, pendingNg);
+    }
+
+    function getStaticNGIO() {
+      try {
+        if (typeof NGIO !== 'undefined' && NGIO && typeof NGIO.init === 'function') return NGIO;
+      } catch (_) {}
+      return (window.NGIO && typeof window.NGIO.init === 'function') ? window.NGIO : null;
+    }
+
+    function staticNgioUserText() {
+      if (!ngStatic) return 'Not signed in';
+      const user = ngStatic.user || null;
+      if (user && user.name) return `Signed in as ${user.name}`;
+      if (ngStatic.hasUser) return 'Signed in to Newgrounds';
+      if (ngReady) return 'Newgrounds ready; not signed in';
+      return 'Newgrounds connecting…';
+    }
+
+    function callMedalUnlock(achievement) {
+      const medalId = ngMedalIdFor(achievement);
+      if (!medalId) return;
+
+      if (ngStatic) {
+        if (!ngReady || typeof ngStatic.unlockMedal !== 'function') {
+          markPendingNg(achievement);
+          return;
+        }
+        try {
+          ngStatic.unlockMedal(medalId, (medal) => {
+            if (medal) {
+              clearPendingNg(achievement);
+              console.info(`Newgrounds medal unlocked: ${achievement.title} (#${medalId})`);
+            } else {
+              markPendingNg(achievement);
+              console.warn(`Newgrounds medal unlock did not complete: ${achievement.title} (#${medalId})`);
+            }
+          });
+        } catch (err) {
+          markPendingNg(achievement);
+          console.warn('Newgrounds NGIO.unlockMedal failed:', err);
+        }
+        return;
+      }
+
+      if (!ngio || !ngReady || !ngio.user || typeof ngio.callComponent !== 'function') {
+        markPendingNg(achievement);
+        return;
+      }
+      ngio.callComponent('Medal.unlock', { id: medalId }, (result) => {
+        if (result && result.success) {
+          clearPendingNg(achievement);
+          console.info(`Newgrounds medal unlocked: ${achievement.title} (#${medalId})`);
+        } else {
+          markPendingNg(achievement);
+          if (result && result.error) console.warn('Newgrounds Medal.unlock failed:', result.error.message || result.error);
+        }
+      });
+    }
+
+    function ngScoreboardIdFor(score) {
+      const scoreboards = config.scoreboards || {};
+      const id = scoreboards[score.boardKey] || scoreboards[score.id] || 0;
+      return Number(id) || 0;
+    }
+
+    function pendingScoreKey(score, value, tag) {
+      return `${score.id}:${value | 0}:${tag || ''}`;
+    }
+
+    function markPendingScore(score, value, tag) {
+      if (!ngScoreboardIdFor(score)) return;
+      const entry = { id: score.id, value: value | 0, tag: tag || '' };
+      const key = pendingScoreKey(score, entry.value, entry.tag);
+      if (!pendingScores.some((p) => p && pendingScoreKey(SCOREBOARDS[p.id] || score, p.value | 0, p.tag || '') === key)) {
+        pendingScores.push(entry);
+        safeSaveJsonArray(SCORE_PENDING_STORAGE_KEY, pendingScores);
+      }
+    }
+
+    function clearPendingScore(score, value, tag) {
+      const key = pendingScoreKey(score, value | 0, tag || '');
+      pendingScores = pendingScores.filter((p) => {
+        const def = SCOREBOARDS[p.id] || score;
+        return pendingScoreKey(def, p.value | 0, p.tag || '') !== key;
+      });
+      safeSaveJsonArray(SCORE_PENDING_STORAGE_KEY, pendingScores);
+    }
+
+    function callScorePost(score, value, tag) {
+      const boardId = ngScoreboardIdFor(score);
+      const scoreValue = value | 0;
+      const scoreTag = tag || '';
+      if (scoreValue <= 0) return;
+      if (!boardId) return;
+
+      if (ngStatic) {
+        if (!ngReady || typeof ngStatic.postScore !== 'function') {
+          markPendingScore(score, scoreValue, scoreTag);
+          return;
+        }
+        try {
+          ngStatic.postScore(boardId, scoreValue, scoreTag, (board, postedScore) => {
+            if (board || postedScore) {
+              clearPendingScore(score, scoreValue, scoreTag);
+              console.info(`Newgrounds score posted: ${score.title}=${scoreValue} (#${boardId})`);
+            } else {
+              markPendingScore(score, scoreValue, scoreTag);
+              console.warn(`Newgrounds score post did not complete: ${score.title}=${scoreValue} (#${boardId})`);
+            }
+          });
+        } catch (err) {
+          markPendingScore(score, scoreValue, scoreTag);
+          console.warn('Newgrounds NGIO.postScore failed:', err);
+        }
+        return;
+      }
+
+      if (!ngio || !ngReady || !ngio.user || typeof ngio.callComponent !== 'function') {
+        markPendingScore(score, scoreValue, scoreTag);
+        return;
+      }
+      const params = { id: boardId, value: scoreValue };
+      if (scoreTag) params.tag = scoreTag;
+      ngio.callComponent('ScoreBoard.postScore', params, (result) => {
+        if (result && result.success) {
+          clearPendingScore(score, scoreValue, scoreTag);
+          console.info(`Newgrounds score posted: ${score.title}=${scoreValue} (#${boardId})`);
+        } else {
+          markPendingScore(score, scoreValue, scoreTag);
+          if (result && result.error) console.warn('Newgrounds ScoreBoard.postScore failed:', result.error.message || result.error);
+        }
+      });
+    }
+
+    function flushPendingNg() {
+      for (const id of Array.from(pendingNg)) {
+        const achievement = ACHIEVEMENTS[id];
+        if (achievement) callMedalUnlock(achievement);
+      }
+      for (const pending of pendingScores.slice()) {
+        const score = pending && SCOREBOARDS[pending.id];
+        if (score) callScorePost(score, pending.value | 0, pending.tag || '');
+      }
+    }
+
+    function initNewgrounds() {
+      if (!config.enabled) return;
+      const appId = String(config.appId || '');
+      const aesKey = String(config.aesKey || '');
+      if (!appId || !aesKey) {
+        console.warn('Newgrounds achievements enabled but appId/aesKey are missing. See newgrounds_config.example.js.');
+        return;
+      }
+
+      const panel = document.getElementById('newgrounds-panel');
+      const login = document.getElementById('newgrounds-login');
+      const logout = document.getElementById('newgrounds-logout');
+      const name = document.getElementById('newgrounds-user');
+      if (panel) panel.hidden = false;
+
+      const updateCorePanel = () => {
+        if (!name) return;
+        if (ngStatic) {
+          name.textContent = staticNgioUserText();
+        } else {
+          name.textContent = ngio && ngio.user ? `Signed in as ${ngio.user.name}` : 'Not signed in';
+        }
+      };
+
+      ngStatic = getStaticNGIO();
+      if (ngStatic) {
+        try {
+          ngStatic.init(appId, aesKey, {
+            version: String(config.version || '1.0.0'),
+            checkHostLicense: false,
+            autoLogNewView: true,
+            preloadMedals: true,
+            preloadScoreBoards: true,
+            preloadSaveSlots: false,
+            debugMode: !!config.debug
+          });
+        } catch (err) {
+          console.warn('Newgrounds NGIO.init failed:', err);
+          ngStatic = null;
+          updateCorePanel();
+          return;
+        }
+
+        const pumpStaticStatus = () => {
+          if (!ngStatic || typeof ngStatic.getConnectionStatus !== 'function') return;
+          try {
+            ngStatic.getConnectionStatus((status) => {
+              const ready = !!(ngStatic.isReady || status === ngStatic.STATUS_READY ||
+                status === ngStatic.STATUS_ITEMS_PRELOADED ||
+                (ngStatic.medals && ngStatic.medals.length > 0));
+              ngReady = ready;
+              updateCorePanel();
+              if (ready) flushPendingNg();
+            });
+          } catch (err) {
+            console.warn('Newgrounds NGIO.getConnectionStatus failed:', err);
+          }
+        };
+
+        if (login && typeof ngStatic.openLoginPage === 'function') {
+          login.addEventListener('click', () => {
+            try { ngStatic.openLoginPage(); } catch (err) { console.warn('Newgrounds login failed:', err); }
+            setTimeout(pumpStaticStatus, 500);
+          });
+        }
+        if (logout && typeof ngStatic.logOut === 'function') {
+          logout.addEventListener('click', () => {
+            try { ngStatic.logOut(); } catch (err) { console.warn('Newgrounds logout failed:', err); }
+            ngReady = false;
+            updateCorePanel();
+          });
+        }
+
+        pumpStaticStatus();
+        ngStatusTimer = setInterval(pumpStaticStatus, 1000);
+        return;
+      }
+
+      const Core = window.Newgrounds && window.Newgrounds.io && window.Newgrounds.io.core;
+      if (!Core) {
+        console.warn('Newgrounds.io JS library not found. Include newgroundsio.min.js before gns_wasm.js. Local achievement toasts will still work, but online medals will not unlock.');
+        return;
+      }
+      ngio = new Core(appId, aesKey);
+      if (config.debug) ngio.debug = true;
+      const onLoggedIn = () => { ngReady = true; updateCorePanel(); flushPendingNg(); };
+      const onLoggedOut = () => { ngReady = false; updateCorePanel(); };
+      if (login && typeof ngio.requestLogin === 'function') login.addEventListener('click', () => ngio.requestLogin(onLoggedIn, onLoggedOut, onLoggedOut));
+      if (logout && typeof ngio.logOut === 'function') logout.addEventListener('click', () => ngio.logOut(onLoggedOut));
+      if (typeof ngio.getValidSession === 'function') {
+        ngio.getValidSession(() => {
+          ngReady = true;
+          updateCorePanel();
+          flushPendingNg();
+        });
+      } else {
+        ngReady = true;
+        updateCorePanel();
+        flushPendingNg();
+      }
+    }
+
+    function unlock(achievement, value) {
+      if (!achievement) return;
+      if (!unlocked.has(achievement.id)) {
+        unlocked.add(achievement.id);
+        safeSaveJsonSet(ACHIEVEMENT_STORAGE_KEY, unlocked);
+        showToast(achievement);
+      }
+      callMedalUnlock(achievement, value);
+    }
+
+    function postScore(score, value) {
+      if (!score) return;
+      callScorePost(score, value | 0, '');
+    }
+
+    return {
+      init: initNewgrounds,
+      unlockByEvent(eventId, value) {
+        unlock(byEvent.get(eventId | 0), value | 0);
+      },
+      postScoreByEvent(eventId, value) {
+        postScore(scoreByEvent.get(eventId | 0), value | 0);
+      }
+    };
+  }
+
+  const achievementHost = makeAchievementHost();
+
+  function maybeUnlockAchievementsFromWorkSave(storageKey, bytes) {
+    if (storageKey !== 'work.sav' || !bytes || bytes.length < 16) return;
+    try {
+      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      const stageSet = view.getInt32(8, true);
+      const nextStage = view.getInt32(12, true);
+      if (stageSet >= 1 && stageSet <= 2) {
+        if (nextStage >= 2) achievementHost.unlockByEvent(ACHIEVEMENT_EVENTS.FIRST_LEVEL, nextStage - 1);
+        if (nextStage >= 51) achievementHost.unlockByEvent(ACHIEVEMENT_EVENTS.GAME_COMPLETE, nextStage - 1);
+      }
+    } catch (err) {
+      console.warn('could not inspect work save for achievements', err);
+    }
   }
 
   const audioHost = makeAudioHost();
@@ -729,6 +1208,133 @@
     setStatus(message);
   }
 
+  function fullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement || null;
+  }
+
+  function fullscreenAvailable() {
+    return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled || document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen || document.documentElement.mozRequestFullScreen || document.documentElement.msRequestFullscreen);
+  }
+
+  function updateFullscreenButton() {
+    if (!fullscreenButton) return;
+    if (!fullscreenAvailable()) {
+      fullscreenButton.hidden = true;
+      return;
+    }
+    const active = !!fullscreenElement();
+    fullscreenButton.hidden = false;
+    fullscreenButton.textContent = active ? '↙' : '⛶';
+    fullscreenButton.title = active ? 'Exit fullscreen' : 'Fullscreen';
+    fullscreenButton.setAttribute('aria-label', active ? 'Exit fullscreen' : 'Fullscreen');
+    fullscreenButton.setAttribute('aria-pressed', active ? 'true' : 'false');
+  }
+
+  async function enterFullscreen() {
+    const target = document.documentElement;
+    const request = target.requestFullscreen || target.webkitRequestFullscreen || target.mozRequestFullScreen || target.msRequestFullscreen;
+    if (!request) return false;
+    try {
+      await request.call(target);
+      return true;
+    } catch (err) {
+      console.warn('Fullscreen request failed:', err);
+      setStatus('Fullscreen was blocked by the browser. Try clicking the button again.');
+      return false;
+    }
+  }
+
+  async function exitFullscreen() {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+    if (!exit) return false;
+    try {
+      await exit.call(document);
+      return true;
+    } catch (err) {
+      console.warn('Exit fullscreen failed:', err);
+      return false;
+    }
+  }
+
+  async function toggleFullscreen() {
+    if (fullscreenElement()) await exitFullscreen();
+    else await enterFullscreen();
+    updateFullscreenButton();
+    if (canvas) canvas.focus({ preventScroll: true });
+  }
+
+  function installFullscreenButton() {
+    if (!fullscreenButton) return;
+    updateFullscreenButton();
+    fullscreenButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleFullscreen();
+    });
+    for (const eventName of ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange']) {
+      document.addEventListener(eventName, updateFullscreenButton);
+    }
+  }
+
+  function tapGameButton(button, source) {
+    const src = source || `ui:button:${button | 0}`;
+    setSourceButtons(src, null, false);
+    const changed = setSourceButtons(src, [button | 0], true);
+    if (changed) updateDebugInputStatus();
+    window.setTimeout(() => {
+      if (setSourceButtons(src, null, false)) updateDebugInputStatus();
+    }, 90);
+  }
+
+  function installPauseButton() {
+    if (!pauseButton) return;
+    pauseButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      audioHost.unlock();
+      tapGameButton(GP2X_BUTTON.Y, 'ui:pause-button');
+      if (canvas) canvas.focus({ preventScroll: true });
+    });
+  }
+
+  function installDebugCheatPanel() {
+    if (!debugCheatPanel) return;
+
+    if (!DEBUG_MODE) {
+      debugCheatPanel.hidden = true;
+      return;
+    }
+
+    debugCheatPanel.hidden = false;
+
+    if (debugLevelSelect && !debugLevelSelect.options.length) {
+      for (let level = 1; level <= 50; level += 1) {
+        const option = document.createElement('option');
+        option.value = String(level);
+        option.textContent = `Level ${String(level).padStart(2, '0')}`;
+        debugLevelSelect.appendChild(option);
+      }
+    }
+
+    if (debugStartLevelButton) {
+      debugStartLevelButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const level = Math.max(1, Math.min(50, parseInt(debugLevelSelect && debugLevelSelect.value ? debugLevelSelect.value : '1', 10) || 1));
+        if (!instance || !instance.exports || typeof instance.exports.gns_debug_start_level !== 'function') {
+          if (debugCheatStatus) debugCheatStatus.textContent = 'WASM debug export is not available.';
+          return;
+        }
+        cancelBindingCapture('Control remap cancelled.');
+        clearInputSources();
+        audioHost.unlock();
+        const started = instance.exports.gns_debug_start_level(level | 0);
+        if (debugCheatStatus) debugCheatStatus.textContent = started ? `Started level ${String(started).padStart(2, '0')}.` : 'Could not start level.';
+        if (canvas) canvas.focus({ preventScroll: true });
+      });
+    }
+  }
+
   function installControlPanel() {
     renderBindingUI();
     const reset = document.getElementById('reset-bindings');
@@ -820,6 +1426,7 @@
 
   function installPointerControls() {
     const nodes = document.querySelectorAll('[data-gns-button]');
+
     for (const node of nodes) {
       const name = String(node.getAttribute('data-gns-button') || '').toUpperCase();
       const button = GP2X_BUTTON_NAME[name];
@@ -828,15 +1435,18 @@
       const sourceFor = (event) => `pointer:${event.pointerId}:${name}`;
       const press = (event) => {
         event.preventDefault();
+        if (controls && controls.open) return;
         audioHost.unlock();
         if (node.setPointerCapture) {
           try { node.setPointerCapture(event.pointerId); } catch (_) {}
         }
+        node.classList.add('touch-active');
         setSourceButtons(sourceFor(event), [button], true);
         updateDebugInputStatus();
       };
       const release = (event) => {
         event.preventDefault();
+        node.classList.remove('touch-active');
         setSourceButtons(sourceFor(event), [button], false);
         updateDebugInputStatus();
       };
@@ -846,6 +1456,88 @@
       node.addEventListener('pointercancel', release, { passive: false });
       node.addEventListener('lostpointercapture', release, { passive: false });
     }
+
+    const stick = document.getElementById('touch-stick');
+    const knob = document.getElementById('touch-stick-knob');
+    if (!stick) return;
+
+    let activeStickPointer = null;
+    const stickSource = 'pointer:touch-stick';
+    const stickDeadzone = 0.23;
+
+    function setKnob(x, y) {
+      if (!knob) return;
+      knob.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+    }
+
+    function resetStick() {
+      activeStickPointer = null;
+      stick.classList.remove('touch-active');
+      setKnob(0, 0);
+      setSourceButtons(stickSource, null, false);
+      updateDebugInputStatus();
+    }
+
+    function updateStick(event) {
+      const rect = stick.getBoundingClientRect();
+      const cx = rect.left + rect.width * 0.5;
+      const cy = rect.top + rect.height * 0.5;
+      const maxRadius = Math.max(1, Math.min(rect.width, rect.height) * 0.38);
+      let dx = event.clientX - cx;
+      let dy = event.clientY - cy;
+      const distance = Math.hypot(dx, dy);
+      if (distance > maxRadius) {
+        const scale = maxRadius / distance;
+        dx *= scale;
+        dy *= scale;
+      }
+
+      setKnob(dx, dy);
+
+      const nx = dx / maxRadius;
+      const ny = dy / maxRadius;
+      const buttons = [];
+      if (ny <= -stickDeadzone) buttons.push(GP2X_BUTTON.UP);
+      if (ny >= stickDeadzone) buttons.push(GP2X_BUTTON.DOWN);
+      if (nx <= -stickDeadzone) buttons.push(GP2X_BUTTON.LEFT);
+      if (nx >= stickDeadzone) buttons.push(GP2X_BUTTON.RIGHT);
+
+      if (buttons.length) setSourceButtons(stickSource, buttons, true);
+      else setSourceButtons(stickSource, null, false);
+      updateDebugInputStatus();
+    }
+
+    stick.addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+      if (controls && controls.open) return;
+      audioHost.unlock();
+      activeStickPointer = event.pointerId;
+      stick.classList.add('touch-active');
+      if (stick.setPointerCapture) {
+        try { stick.setPointerCapture(event.pointerId); } catch (_) {}
+      }
+      updateStick(event);
+    }, { passive: false });
+
+    stick.addEventListener('pointermove', (event) => {
+      if (activeStickPointer !== event.pointerId) return;
+      event.preventDefault();
+      updateStick(event);
+    }, { passive: false });
+
+    stick.addEventListener('pointerup', (event) => {
+      if (activeStickPointer !== event.pointerId) return;
+      event.preventDefault();
+      resetStick();
+    }, { passive: false });
+
+    stick.addEventListener('pointercancel', (event) => {
+      if (activeStickPointer !== event.pointerId) return;
+      event.preventDefault();
+      resetStick();
+    }, { passive: false });
+
+    stick.addEventListener('lostpointercapture', resetStick, { passive: true });
   }
 
   function gamepadTokensForPad(gp, threshold) {
@@ -972,12 +1664,17 @@
         }
       },
       gns_local_storage_save(keyPtr, src, size) {
+        const key = cstr(keyPtr);
         try {
           const bytes = u8().slice(src, src + size);
-          localStorage.setItem(localStorageKey(keyPtr), b64FromBytes(bytes));
+          localStorage.setItem('ganbare-natsuki-san:' + key, b64FromBytes(bytes));
+          maybeUnlockAchievementsFromWorkSave(key, bytes);
           return 0;
         } catch (err) {
           console.warn('could not persist save data', err);
+          try {
+            maybeUnlockAchievementsFromWorkSave(key, u8().slice(src, src + size));
+          } catch (_) {}
           return -1;
         }
       },
@@ -999,6 +1696,12 @@
       gns_host_log(textPtr) {
         console.log(cstr(textPtr));
       },
+      gns_host_achievement(eventId, value) {
+        achievementHost.unlockByEvent(eventId, value);
+      },
+      gns_host_score(scoreId, value) {
+        achievementHost.postScoreByEvent(scoreId, value);
+      },
       gns_host_exit(code) {
         running = false;
         setStatus(code ? `Exited with code ${code}` : '');
@@ -1014,8 +1717,11 @@
 
   async function main() {
     installControlPanel();
+    installFullscreenButton();
+    installPauseButton();
     installKeyboard();
     installPointerControls();
+    achievementHost.init();
     setStatus('Loading assets…');
 
     const [manifest, packedAssets, wasmBytes] = await Promise.all([
@@ -1037,9 +1743,13 @@
 
     const rc = instance.exports.gns_start();
     if (rc !== 0) throw new Error(`gns_start failed: ${rc}`);
+    if (DEBUG_MODE && instance.exports.gns_debug_unlock_levels) {
+      instance.exports.gns_debug_unlock_levels();
+    }
     syncInputToWasm();
     canvas.focus();
-    setStatus('Click or press a key to enable audio.');
+    setStatus('');
+    audioHost.updatePrompt();
 
     running = true;
     function frame() {

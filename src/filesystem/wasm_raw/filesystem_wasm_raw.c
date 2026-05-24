@@ -1,6 +1,7 @@
 #include "../../define.h"
 #include "../../extern.h"
 #include "../../filesystem/filesystem.h"
+#include "../../wasm/achievements.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,6 +17,94 @@ int gns_asset_size(const char *path);
 
 __attribute__((import_module("env"), import_name("gns_asset_read")))
 int gns_asset_read(const char *path, unsigned char *dst, int capacity);
+
+
+static int gns_debug_cheat_active = 0;
+static int gns_debug_work_valid = 0;
+static int gns_debug_item_valid = 0;
+static unsigned char gns_debug_work_save[GAMEFLAG_SIZE * sizeof(Sint32)];
+static unsigned char gns_debug_item_save[GAMEFLAG_SIZE * sizeof(Sint32)];
+
+/* The title-screen Tutorial entry uses the stage-0 data set.  Keep that
+   work save transient in WASM so it cannot overwrite the browser's normal
+   continue slot or make the Tutorial behave like a page reload/reset. */
+static int gns_tutorial_active = 0;
+static int gns_tutorial_work_valid = 0;
+static int gns_tutorial_item_valid = 0;
+static unsigned char gns_tutorial_work_save[GAMEFLAG_SIZE * sizeof(Sint32)];
+static unsigned char gns_tutorial_item_save[GAMEFLAG_SIZE * sizeof(Sint32)];
+
+static void make_work_save_for_stage(void *buff, int size, int stage_set, int level)
+{
+    Sint32 *save = (Sint32*)buff;
+    int count = size / (int)sizeof(Sint32);
+
+    if (stage_set < 0) stage_set = 0;
+    if (stage_set > 2) stage_set = 2;
+    if (level < 1) level = 1;
+    if (level > 50) level = 50;
+
+    memset(buff, 0, size);
+    if (count <= 6) {
+        return;
+    }
+
+    save[0] = 8 * 32;
+    save[1] = (2 * 32) - 16;
+    save[2] = stage_set;
+    save[3] = level;
+    save[4] = 0;
+    save[5] = 3;
+    save[6] = 3;
+}
+
+static void make_work_save_for_level(void *buff, int size, int level)
+{
+    make_work_save_for_stage(buff, size, 1, level);
+}
+
+void gns_wasm_debug_start_level(int level)
+{
+    gns_tutorial_active = 0;
+    gns_tutorial_work_valid = 0;
+    gns_tutorial_item_valid = 0;
+
+    gns_debug_cheat_active = 1;
+    gns_debug_work_valid = 1;
+    gns_debug_item_valid = 1;
+    make_work_save_for_level(gns_debug_work_save, (int)sizeof(gns_debug_work_save), level);
+    memset(gns_debug_item_save, 0, sizeof(gns_debug_item_save));
+}
+
+void gns_wasm_tutorial_start(void)
+{
+    gns_debug_cheat_active = 0;
+    gns_debug_work_valid = 0;
+    gns_debug_item_valid = 0;
+
+    gns_tutorial_active = 1;
+    gns_tutorial_work_valid = 1;
+    gns_tutorial_item_valid = 1;
+    make_work_save_for_stage(gns_tutorial_work_save, (int)sizeof(gns_tutorial_work_save), 0, 1);
+    memset(gns_tutorial_item_save, 0, sizeof(gns_tutorial_item_save));
+}
+
+void gns_wasm_tutorial_clear(void)
+{
+    gns_tutorial_active = 0;
+    gns_tutorial_work_valid = 0;
+    gns_tutorial_item_valid = 0;
+}
+
+int gns_wasm_tutorial_is_active(void)
+{
+    return gns_tutorial_active;
+}
+
+int gns_wasm_debug_cheat_is_active(void)
+{
+    return gns_debug_cheat_active;
+}
 
 static const char *storage_key_for_path(const char *fn)
 {
@@ -76,13 +165,58 @@ static int valid_work_save(const void *buff, int size)
     if (save[3] < 1 || save[3] > 50) {
         return 0;
     }
-    if (save[5] <= 0 || save[5] > 99) {
+
+    /* A legitimate work save can contain zero HP after a death.  Older
+       browser builds treated that as corruption and silently replaced the
+       save with a fresh stage-1 file, which broke normal continue and stage
+       selection after dying.  Validate structure here; normalize dead HP
+       separately after loading. */
+    if (save[5] < -99 || save[5] > 99) {
         return 0;
     }
     if (save[6] <= 0 || save[6] > 99) {
         return 0;
     }
     return 1;
+}
+
+static void normalize_work_save_after_load(void *buff, int size)
+{
+    Sint32 *save = (Sint32*)buff;
+    int count = size / (int)sizeof(Sint32);
+
+    if (count <= 6) {
+        return;
+    }
+
+    /* The ACT loader does not need to inherit a dead HP value.  Keep the
+       selected/current stage, but restart with usable health. */
+    if (save[5] <= 0) {
+        save[5] = save[6] > 0 ? save[6] : 3;
+    }
+}
+
+static void emit_progress_achievements_from_work_save(const void *buff, int size)
+{
+    const Sint32 *save = (const Sint32*)buff;
+    int count = size / (int)sizeof(Sint32);
+
+    if (count <= 6) {
+        return;
+    }
+
+    /* save[2] is the stage set, save[3] is the next normal stage number.
+       The direct ACT-stage hook remains the primary source, but this save-file
+       fallback catches the browser path after scene transitions and avoids
+       missing medals if the clear hook is bypassed by the original flow. */
+    if (save[2] >= 1 && save[2] <= 2) {
+        if (save[3] >= 2) {
+            GNS_Achievement(GNS_ACH_FIRST_LEVEL, save[3] - 1);
+        }
+        if (save[3] >= 51) {
+            GNS_Achievement(GNS_ACH_GAME_COMPLETE, save[3] - 1);
+        }
+    }
 }
 
 int Filesystem_Init(void)
@@ -100,12 +234,42 @@ int Filesystem_LoadFile(const char *fn, void *buff, int size)
     int asset_size;
 
     if (storage_key) {
-        int rc = gns_local_storage_load(storage_key, (unsigned char*)buff, size);
+        int rc;
+
+        if (gns_tutorial_active && is_work_save_key(storage_key) && gns_tutorial_work_valid) {
+            int copy = size < (int)sizeof(gns_tutorial_work_save) ? size : (int)sizeof(gns_tutorial_work_save);
+            memcpy(buff, gns_tutorial_work_save, copy);
+            if (copy < size) memset((unsigned char*)buff + copy, 0, size - copy);
+            return 0;
+        }
+        if (gns_tutorial_active && is_item_save_key(storage_key) && gns_tutorial_item_valid) {
+            int copy = size < (int)sizeof(gns_tutorial_item_save) ? size : (int)sizeof(gns_tutorial_item_save);
+            memcpy(buff, gns_tutorial_item_save, copy);
+            if (copy < size) memset((unsigned char*)buff + copy, 0, size - copy);
+            return 0;
+        }
+        if (gns_debug_cheat_active && is_work_save_key(storage_key) && gns_debug_work_valid) {
+            int copy = size < (int)sizeof(gns_debug_work_save) ? size : (int)sizeof(gns_debug_work_save);
+            memcpy(buff, gns_debug_work_save, copy);
+            if (copy < size) memset((unsigned char*)buff + copy, 0, size - copy);
+            return 0;
+        }
+        if (gns_debug_cheat_active && is_item_save_key(storage_key) && gns_debug_item_valid) {
+            int copy = size < (int)sizeof(gns_debug_item_save) ? size : (int)sizeof(gns_debug_item_save);
+            memcpy(buff, gns_debug_item_save, copy);
+            if (copy < size) memset((unsigned char*)buff + copy, 0, size - copy);
+            return 0;
+        }
+
+        rc = gns_local_storage_load(storage_key, (unsigned char*)buff, size);
 
         if (rc == 0) {
-            if (is_work_save_key(storage_key) && !valid_work_save(buff, size)) {
-                make_default_work_save(buff, size);
-                return -1;
+            if (is_work_save_key(storage_key)) {
+                if (!valid_work_save(buff, size)) {
+                    make_default_work_save(buff, size);
+                    return -1;
+                }
+                normalize_work_save_after_load(buff, size);
             }
             return 0;
         }
@@ -133,7 +297,40 @@ int Filesystem_SaveFile(const char *fn, const void *buff, int size)
     const char *storage_key = storage_key_for_path(fn);
 
     if (storage_key) {
-        return gns_local_storage_save(storage_key, (const unsigned char*)buff, size);
+        if (gns_tutorial_active && is_work_save_key(storage_key)) {
+            int copy = size < (int)sizeof(gns_tutorial_work_save) ? size : (int)sizeof(gns_tutorial_work_save);
+            memcpy(gns_tutorial_work_save, buff, copy);
+            if (copy < (int)sizeof(gns_tutorial_work_save)) memset(gns_tutorial_work_save + copy, 0, sizeof(gns_tutorial_work_save) - copy);
+            gns_tutorial_work_valid = 1;
+            return 0;
+        }
+        if (gns_tutorial_active && is_item_save_key(storage_key)) {
+            int copy = size < (int)sizeof(gns_tutorial_item_save) ? size : (int)sizeof(gns_tutorial_item_save);
+            memcpy(gns_tutorial_item_save, buff, copy);
+            if (copy < (int)sizeof(gns_tutorial_item_save)) memset(gns_tutorial_item_save + copy, 0, sizeof(gns_tutorial_item_save) - copy);
+            gns_tutorial_item_valid = 1;
+            return 0;
+        }
+        if (gns_debug_cheat_active && is_work_save_key(storage_key)) {
+            int copy = size < (int)sizeof(gns_debug_work_save) ? size : (int)sizeof(gns_debug_work_save);
+            memcpy(gns_debug_work_save, buff, copy);
+            if (copy < (int)sizeof(gns_debug_work_save)) memset(gns_debug_work_save + copy, 0, sizeof(gns_debug_work_save) - copy);
+            gns_debug_work_valid = 1;
+            return 0;
+        }
+        if (gns_debug_cheat_active && is_item_save_key(storage_key)) {
+            int copy = size < (int)sizeof(gns_debug_item_save) ? size : (int)sizeof(gns_debug_item_save);
+            memcpy(gns_debug_item_save, buff, copy);
+            if (copy < (int)sizeof(gns_debug_item_save)) memset(gns_debug_item_save + copy, 0, sizeof(gns_debug_item_save) - copy);
+            gns_debug_item_valid = 1;
+            return 0;
+        }
+
+        int rc = gns_local_storage_save(storage_key, (const unsigned char*)buff, size);
+        if (is_work_save_key(storage_key)) {
+            emit_progress_achievements_from_work_save(buff, size);
+        }
+        return rc;
     }
 
     /* Browser save writes are intentionally restricted to persistent game state. */

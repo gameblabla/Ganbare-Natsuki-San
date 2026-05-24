@@ -48,6 +48,16 @@ static int title_no = 0;
 /* Size was 1024, reduce it to 29 as that's the minimum here. - Gameblabla */
 static char string[29];
 
+#ifdef GNS_WASM_RAW
+#define TITLE_HAS_EXIT 0
+#define TITLE_MAX_MODE 3
+extern void gns_wasm_tutorial_start(void);
+extern void gns_wasm_tutorial_clear(void);
+#else
+#define TITLE_HAS_EXIT 1
+#define TITLE_MAX_MODE 4
+#endif
+
 #ifndef GNS_FRAME_STEPPED
 void title_main( void )
 {
@@ -75,15 +85,26 @@ void title_main( void )
 }
 
 #else
+static int title_step_active = 0;
+
+void title_step_force_inactive( void )
+{
+	if ( title_step_active )
+	{
+		title_relese( );
+		title_step_active = 0;
+	}
+	scene_exit = 0;
+}
+
 int title_step( void )
 {
-	static int active = 0;
 	int exit_code;
 
-	if ( ! active )
+	if ( ! title_step_active )
 	{
 		title_init( );
-		active = 1;
+		title_step_active = 1;
 	}
 
 	if ( scene_exit )
@@ -103,7 +124,7 @@ int title_step( void )
 	if ( ! scene_exit )
 	{
 		title_relese( );
-		active = 0;
+		title_step_active = 0;
 		return 0;
 	}
 
@@ -113,6 +134,11 @@ int title_step( void )
 
 void title_init( void )
 {
+#ifdef GNS_WASM_RAW
+	/* Returning to the title exits the transient browser Tutorial save slot.
+	   Normal continue/stage-select data remains untouched in localStorage. */
+	gns_wasm_tutorial_clear();
+#endif
 	Stop_Music();
 	scene_exit = 1;
 
@@ -144,7 +170,9 @@ void title_init( void )
 		LoadBitmap(TITLE_IMAGE_PATH "title5_ura.bmp",7,true);
 	}
 
+	#ifndef GNS_WASM_RAW
 	LoadBitmap(TITLE_IMAGE_PATH "title3.bmp",10,true);
+#endif
 	LoadBitmap(SYS_IMAGE_PATH "fonts2.bmp",18,true);
 	/*LoadBitmap(SYS_IMAGE_PATH "waku.bmp",109,true);*/
 
@@ -196,14 +224,14 @@ void title_keys( void )
 		{
 			if ( mode == -2 )
 			{
-				mode = 4;
+				mode = TITLE_MAX_MODE;
 			}
 		}
 		else 
 		{
 			if ( mode == -1 )
 			{
-				mode = 4;
+				mode = TITLE_MAX_MODE;
 			}
 		}
 	}
@@ -211,22 +239,15 @@ void title_keys( void )
 	{
 		soundPlaySe( EN_SE_SELECT );
 		mode++;
-		if ( gameflag[100] == 1 )
+		if ( mode > TITLE_MAX_MODE )
 		{
-			if ( mode == 5 )
+			if ( gameflag[100] == 1 )
 			{
-				{
-					mode = -1;
-				}
+				mode = -1;
 			}
-		}
-		else 
-		{
-			if ( mode == 5 )
+			else
 			{
-				{
-					mode = 0;
-				}
+				mode = 0;
 			}
 		}
 	}
@@ -324,7 +345,7 @@ void title_keys( void )
 
 	if ( IsPushOKKey( ) )
 	{
-		if ( mode == 4 )	/* Exit */
+		if ( TITLE_HAS_EXIT && mode == 4 )	/* Exit */
 		{
 			gameflag[123] = -1;
 			gameflag[40] = 10;
@@ -340,8 +361,30 @@ void title_keys( void )
 			g_scene = EN_SN_OPTION;
 			scene_exit=0;
 		}
-		else if ( mode == 2 )	/* demo */
+		else if ( mode == 2 )	/* tutorial */
 		{
+#ifdef GNS_WASM_RAW
+			/* Browser Tutorial is playable stage-0 data, but uses a transient
+			   in-memory work save so it cannot overwrite normal Continue or the
+			   user's stage-selection progress.  Do not enable replay mode here;
+			   the packaged browser build does not include replay input data. */
+			ResetGameFlag2( );
+			gns_wasm_tutorial_start();
+			gameflag[123] = -1;
+			gameflag[124] = 0;
+			gameflag[125] = 0;
+			gameflag[127] = 0;
+			gameflag[132] = 0;
+			gameflag[139] = 2;
+			gameflag[140] = 0;
+			gameflag[70] = 1;
+			gameflag[71] = 1;
+
+			gameflag[40] = 4;
+			g_scene = EN_SN_ACT;
+			scene_exit=0;
+			return;
+#else
 			ResetGameFlag2( );
 			
 			title_init_save_data( );
@@ -359,6 +402,7 @@ void title_keys( void )
 			gameflag[40] = 4;
 			g_scene = EN_SN_ACT;
 			scene_exit=0;
+#endif
 		}
 		else if ( mode == 1 )	/* replay */
 		{
@@ -408,6 +452,8 @@ void title_keys( void )
 		}
 		else if ( mode == -1 )
 		{
+			Sint32 time_attack_selected_stage = gameflag[120];
+
 			ResetGameFlag2( );
 			
 			title_init_save_data( );
@@ -418,6 +464,14 @@ void title_keys( void )
 			gameflag2[3] = 1;	
 			gameflag[123] = gameflag[120];	
 			gameflag[127] = 1;	
+#ifdef GNS_WASM_RAW
+			/* Newgrounds score submission is valid only for a full Time Attack run
+			   started from stage 1.  Starting Time Attack after changing the title
+			   stage selector still plays locally, but the online score is marked
+			   ineligible. */
+			gameflag[139] = ( time_attack_selected_stage == 1 ) ? 1 : 2;
+			gameflag[140] = 1;
+#endif
 			gameflag[123] = -1;	
 			gameflag[132] =  0;
 			gameflag[70] = 1;

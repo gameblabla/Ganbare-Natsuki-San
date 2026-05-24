@@ -123,10 +123,8 @@ int Input_IsPushCancel(void)
 
 int Input_SystemKeys(void)
 {
-    if (Input_IsPress(GP2X_BUTTON_EXIT)) {
-        g_scene = EN_SN_EXIT;
-        return 0;
-    }
+    /* Browser builds cannot sensibly quit the host page.  Keep the legacy
+       EXIT button inert here; native/Dreamcast/SDL backends retain exit. */
 
     if (Input_IsPush(GP2X_BUTTON_VOLUP)) {
         gameflag[60] += 10;

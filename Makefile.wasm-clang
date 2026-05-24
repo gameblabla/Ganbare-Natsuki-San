@@ -26,8 +26,9 @@ COMMON_CFLAGS += -DWIDESCREEN -DRELATIVE_PATH -DGNS_WASM_RAW -DGNS_FRAME_STEPPED
 
 WASM_LDFLAGS += --target=wasm32-unknown-unknown -nostdlib
 WASM_LDFLAGS += -Wl,--no-entry -Wl,--allow-undefined -Wl,--export-memory
-WASM_LDFLAGS += -Wl,--export=gns_start -Wl,--export=gns_frame -Wl,--export=gns_shutdown
+WASM_LDFLAGS += -Wl,--export=gns_start -Wl,--export=gns_frame -Wl,--export=gns_shutdown -Wl,--export=gns_debug_start_level -Wl,--export=gns_debug_unlock_levels
 WASM_LDFLAGS += -Wl,--export=gns_input_button_event -Wl,--export=gns_input_clear -Wl,--export=gns_input_debug_press -Wl,--export=gns_input_debug_push
+WASM_LDFLAGS += -Wl,--strip-debug
 WASM_LDFLAGS += -Wl,--initial-memory=67108864 -Wl,--max-memory=268435456 -Wl,-z,stack-size=1048576
 
 SRCS  = src/ram.c src/refresh.c src/function.c src/dconv.c src/scene.c src/title.c src/init.c src/act.c src/option.c src/ending.c src/logo.c
@@ -42,7 +43,7 @@ OBJS = $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRCS))
 
 ASSETS_STAMP = $(BUILD_DIR)/.assets-stamp
 
-all: $(BUILD_DIR)/index.html $(BUILD_DIR)/gns_wasm.js $(WASM) $(ASSETS_STAMP)
+all: $(BUILD_DIR)/index.html $(BUILD_DIR)/gns_wasm.js $(BUILD_DIR)/newgrounds_config.js $(BUILD_DIR)/newgrounds_config.example.js $(BUILD_DIR)/NEWGROUNDS.md $(BUILD_DIR)/newgroundsio.min.js $(BUILD_DIR)/achievements/.stamp $(WASM) $(ASSETS_STAMP)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -64,10 +65,29 @@ $(BUILD_DIR)/index.html: web/wasm_clang/index.html | $(BUILD_DIR)
 $(BUILD_DIR)/gns_wasm.js: web/wasm_clang/gns_wasm.js | $(BUILD_DIR)
 	cp $< $@
 
+$(BUILD_DIR)/newgrounds_config.js: web/wasm_clang/newgrounds_config.js | $(BUILD_DIR)
+	cp $< $@
+
+$(BUILD_DIR)/newgrounds_config.example.js: web/wasm_clang/newgrounds_config.example.js | $(BUILD_DIR)
+	cp $< $@
+
+$(BUILD_DIR)/newgroundsio.min.js: FORCE | $(BUILD_DIR)
+	@if [ -f web/wasm_clang/newgroundsio.min.js ]; then cp web/wasm_clang/newgroundsio.min.js $@; elif [ -f web/wasm_clang/newgrounds.js ]; then cp web/wasm_clang/newgrounds.js $@; else : > $@; fi
+
+$(BUILD_DIR)/NEWGROUNDS.md: web/wasm_clang/NEWGROUNDS.md | $(BUILD_DIR)
+	cp $< $@
+
+$(BUILD_DIR)/achievements/.stamp: web/wasm_clang/achievements/startup.png web/wasm_clang/achievements/first_level.png web/wasm_clang/achievements/game_complete.png | $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/achievements
+	cp web/wasm_clang/achievements/*.png $(BUILD_DIR)/achievements/
+	touch $@
+
 serve: all
 	$(PYTHON) -m http.server 8000 -d $(BUILD_DIR)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: all serve clean
+FORCE:
+
+.PHONY: all serve clean FORCE
